@@ -1,14 +1,14 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import { registerLicense } from "@syncfusion/ej2-base";
-import Layout from "../components/Layout";
+import AdminLayout from "../components/AdminLayout";
+import AllUsers from "../pages/AllUsers";
 
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
 const RegisterPage = lazy(() => import("../pages/RegisterPage"));
-const HomePage = lazy(() => import("../pages/HomePage"));
+const Dashboard = lazy(() => import("../pages/Dashboard"));
+const Trips = lazy(() => import("../pages/TripsPage"));
 
-registerLicense(import.meta.env.VITE_SYNCFUSION_KEY as string);
 
 const Router = () => {
   return (
@@ -22,13 +22,17 @@ const Router = () => {
       >
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Index />} />
+          {/* <Route path="/" element={<Index />} /> */}
+          <Route path="/" element={<AdminLayout />}/>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected Routes */}
-          <Route path="/" element={<Layout />}>
-            <Route path="/home" element={<HomePage />} />
+          <Route path="/" element={<AdminLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/all-users" element={<AllUsers />} />
+            <Route path="/trips" element={<Trips />} />
+
           </Route>
 
         </Routes>

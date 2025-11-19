@@ -13,7 +13,7 @@ const LoginPage = () => {
                 <label className='text-gray-700' htmlFor="password">Password:</label>
                 <input className='p-2 border rounded w-full mb-4' type="password" id="password" name="password" />
             </div>
-            <button className='bg-green-500 text-white px-4 py-2 rounded mb-4' type="submit">Login</button>
+            <button className='bg-green-500 text-white px-4 py-2 rounded mb-4' type="button">Login</button>
             <p className='text-gray-700'>Don't have an account? <Link to="/register" className='text-blue-500'>Register here</Link></p>
         </form>
     </div>

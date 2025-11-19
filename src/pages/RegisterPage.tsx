@@ -17,7 +17,7 @@ const RegisterPage = () => {
                 <label className='text-gray-700' htmlFor="password">Password:</label>
                 <input className='p-2 border rounded w-full mb-4' type="password" id="password" name="password" />
             </div>
-            <button className='bg-blue-500 text-white px-4 py-2 rounded mb-4' type="submit">Register</button>
+            <button className='bg-blue-500 text-white px-4 py-2 rounded mb-4' type="button">Register</button>
             <p className='text-gray-700'>Already have an account? <Link to="/login" className='text-blue-500'>Login here</Link></p>
 
         </form>
