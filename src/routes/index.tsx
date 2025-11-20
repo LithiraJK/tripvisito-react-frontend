@@ -1,13 +1,13 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import AdminLayout from "../components/AdminLayout";
-import AllUsers from "../pages/AllUsers";
+import AllUsers from "../pages/admin/AllUsers";
 
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
 const RegisterPage = lazy(() => import("../pages/RegisterPage"));
-const Dashboard = lazy(() => import("../pages/Dashboard"));
-const Trips = lazy(() => import("../pages/TripsPage"));
+const Dashboard = lazy(() => import("../pages/admin/Dashboard"));
+const Trips = lazy(() => import("../pages/admin/TripsPage"));
 
 
 const Router = () => {
