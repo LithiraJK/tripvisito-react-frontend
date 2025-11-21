@@ -21,7 +21,7 @@ const NavItems = () => {
         <h1 className='text-2xl font-bold'>Tripvisito</h1>
         </Link>
 
-        <div className="container flex flex-col flex-1">
+        <div className="flex flex-col gap-9 mt-2.5 flex-1">
             <nav>
                 {sidebarItems.map(({id, href , icon , label}) => (
                     <NavLink to={href} key={id} className={({isActive}) => `flex items-center gap-2 p-4 font-medium border-0 rounded-lg mb-2 transition-colors ${isActive ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-100'}`}>
@@ -30,7 +30,7 @@ const NavItems = () => {
                     </NavLink>
                 ))}
             </nav>
-            <footer className='nav-footer flex items-center gap-4 mt-auto p-4'>
+            <footer className='flex items-center gap-2.5 pb-8 mt-auto p-4'>
                 <img src={user?.imageURL} alt={user?.name} className='size-10 rounded-full shrink-0' />
                 <article className='flex-1 min-w-0'>
                   <h2 className='font-medium truncate'>{user?.name}</h2>
