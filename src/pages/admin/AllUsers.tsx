@@ -1,7 +1,11 @@
+import Header from "../../components/Header"
 
 const AllUsers = () => {
   return (
-    <div>AllUsers Table Page</div>
+    <main>
+      <Header title="All Users" description="Manage all users here" />
+      AllUsers Table Page Content
+    </main>
   )
 }
 

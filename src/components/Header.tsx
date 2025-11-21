@@ -1,31 +1,22 @@
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { cn } from "../lib/utils";
 
-const Header = () => {
+interface Props {
+  title: string;
+  description: string;
+}
+const Header = ({ title, description }: Props) => {
+
+  {/* Track location for dynamic styling Header using useLocation hook */}
+  const location = useLocation()
+
   return (
-    <header className="p-4 flex justify-around items-center">
-      <div>Tripvisito</div>
-      <ul className="flex space-x-4">
-        <li>
-          <Link to="/home" className=" text-black hover:underline">
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link to="/login" className="text-black hover:underline">
-            Login
-          </Link>
-        </li>
-        <li>
-          <Link to="/register" className="text-black hover:underline">
-            Register
-          </Link>
-        </li>
-      </ul>
-      <div>
-        <button className="bg-red-500 text-white px-4 py-2 rounded">
-          Logout
-        </button>
-      </div>
+    <header>
+      <article>
+        <h1 className={ cn("text-gray-900 text-2xl font-bold mb-2", location.pathname === '/' ? 'text-2xl md:text-4xl font-bold' : 'text-xl md:text-2xl font-semibold' )}>{title}</h1>
+        <p className={ cn("text-gray-600 mb-4" , location.pathname === '/' ? 'text-lg md:text-xl' : 'text-sm md:text-base' ) }>{description}</p>
+      </article> 
+
     </header>
   );
 };
