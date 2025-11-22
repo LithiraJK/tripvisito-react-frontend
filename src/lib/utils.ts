@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import dayjs from "dayjs"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -30,4 +31,8 @@ export const calculateTrendPercentage = (
   } else {
     return { trend: "no change", percentage: 0 };
   }
+};
+
+export const formatDate = (dateString: string): string => {
+  return dayjs(dateString).format("MMMM DD, YYYY");
 };
