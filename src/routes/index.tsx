@@ -22,8 +22,8 @@ const Router = () => {
       >
         <Routes>
           {/* Public Routes */}
-          {/* <Route path="/" element={<Index />} /> */}
-          <Route path="/" element={<AdminLayout />}/>
+          <Route path="/" element={<Index />} />
+          {/* <Route path="/" element={<AdminLayout />}/> */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
