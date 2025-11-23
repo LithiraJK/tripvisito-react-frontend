@@ -1,7 +1,11 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { sidebarItems } from '../constants/index.ts'
 
 const NavItems = () => {
+
+  const navigate = useNavigate()
+
+
   const user = {
     name: "John Doe",
     role: "Admin",
@@ -10,6 +14,7 @@ const NavItems = () => {
   }
 
   const handleLogout = () => {
+    navigate('/login')
 
   }
 
