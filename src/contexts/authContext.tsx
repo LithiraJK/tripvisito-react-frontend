@@ -1,44 +1,46 @@
-import { createContext, useContext, useEffect, useState } from "react"
-import { getMyDetails } from "../services/auth"
+import { createContext, useContext, useEffect, useState } from "react";
+import { getMyDetails } from "../services/auth";
 
-const AuthContext = createContext<any>(null)
+const AuthContext = createContext<any>(null);
 
 export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken")
+    const token = localStorage.getItem("accessToken");
     if (token) {
       getMyDetails()
         .then((res) => {
-          if (res.data) setUser(res.data)
-          else setUser(null)
+          if (res.data) setUser(res.data);
+          else setUser(null);
         })
         .catch((err) => {
-          console.error(err)
-          setUser(null)
+          console.error(err);
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          setUser(null);
         })
         .finally(() => {
-          setLoading(false)
-        })
+          setLoading(false);
+        });
     } else {
-      setUser(null)
-      setLoading(false)
+      setUser(null);
+      setLoading(false);
     }
-  }, []) // Run only once on mount
+  }, []); // Run only once on mount
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
 export const useAuth = () => {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
-}
+  return context;
+};

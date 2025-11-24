@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
 import { register } from "../services/auth";
-import { toast } from "react-hot-toast/headless";
+import { toast } from "react-hot-toast";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -14,7 +14,6 @@ const RegisterPage = () => {
   const handleRegister = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    // Validate input fields
     if (!name.trim()) {
       toast.error("Please enter your name");
       return;
@@ -57,7 +56,7 @@ const RegisterPage = () => {
       // Handle specific error messages from the API
       const errorMessage = error?.response?.data?.message || 
                           error?.response?.message || 
-                          error?.message || 
+                          error?.message ||
                           "Registration failed. Please try again.";
       
       toast.error(errorMessage);
