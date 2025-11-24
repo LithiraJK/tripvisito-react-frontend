@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: any) => {
       setUser(null)
       setLoading(false)
     }
-  }, [])
+  }, []) // Run only once on mount
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading }}>

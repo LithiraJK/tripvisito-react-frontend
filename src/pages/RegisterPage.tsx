@@ -1,7 +1,35 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { useState } from "react";
+import { register } from "../services/auth";
 
 const RegisterPage = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleRegister = async (e: React.FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      alert("Please fill all the fields !");
+      return;
+    }
+
+    try {
+      const response: any = await register(name, email, password);
+
+      alert("Registration successful!");
+      navigate("/login");
+      
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("Registration failed, please try again.");
+    }
+  };
+
   return (
     <main className='w-full h-screen flex justify-center items-center min-h-screen  bg-[url("src/assets/images/auth-img.webp")] bg-cover bg-no-repeat'>
       <section className="size-full bg-[rgba(255,255,255,0.3)] glassmorphism flex justify-center items-center px-2 sm:px-4 overflow-y-auto">
@@ -25,17 +53,32 @@ const RegisterPage = () => {
                 Join Our Travel Community
               </h2>
               <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-md">
-                Create your account to unlock exclusive features, plan amazing trips, and connect with travelers worldwide.
+                Create your account to unlock exclusive features, plan amazing
+                trips, and connect with travelers worldwide.
               </p>
               <div className="hidden md:flex items-start space-x-3 pt-4">
                 <div className="shrink-0 w-10 h-10 rounded-full bg-linear-to-r from-cyan-400 to-sky-500 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-800">Quick & Easy Setup</h3>
-                  <p className="text-sm text-gray-600">Get started in seconds with our simple registration</p>
+                  <h3 className="font-semibold text-gray-800">
+                    Quick & Easy Setup
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Get started in seconds with our simple registration
+                  </p>
                 </div>
               </div>
             </article>
@@ -69,6 +112,7 @@ const RegisterPage = () => {
                             type="text"
                             className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
                             placeholder="Name"
+                            onChange={(e) => setName(e.target.value)}
                           />
                         </div>
                         <div className="relative">
@@ -84,6 +128,7 @@ const RegisterPage = () => {
                             type="text"
                             className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
                             placeholder="Email address"
+                            onChange={(e) => setEmail(e.target.value)}
                           />
                         </div>
                         <div className="relative">
@@ -98,18 +143,27 @@ const RegisterPage = () => {
                             type="password"
                             className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
                             placeholder="Password"
+                            onChange={(e) => setPassword(e.target.value)}
                           />
                         </div>
                         <div className="relative pt-1 sm:pt-2">
-                          <button className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:bg-linear-to-r hover:from-sky-500 hover:to-cyan-400 transition-all hover:cursor-pointer">
+                          <button
+                            onClick={handleRegister}
+                            className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:bg-linear-to-r hover:from-sky-500 hover:to-cyan-400 transition-all hover:cursor-pointer"
+                          >
                             Create An Account
                           </button>
                         </div>
-                        <p className="text-center text-xs sm:text-sm text-gray-500 py-1 sm:py-2"> or </p>
+                        <p className="text-center text-xs sm:text-sm text-gray-500 py-1 sm:py-2">
+                          {" "}
+                          or{" "}
+                        </p>
                         <div className="relative">
                           <button className="w-full border border-gray-300 rounded-xl py-2 flex items-center justify-center hover:bg-gray-50 transition-all hover:cursor-pointer">
                             <FcGoogle className="mr-2 text-lg sm:text-xl" />
-                            <span className="text-xs xs:text-sm sm:text-base">Continue with Google</span>
+                            <span className="text-xs xs:text-sm sm:text-base">
+                              Continue with Google
+                            </span>
                           </button>
                         </div>
                       </div>
