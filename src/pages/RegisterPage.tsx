@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
 import { register } from "../services/auth";
+import { toast } from "react-hot-toast/headless";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -13,20 +14,53 @@ const RegisterPage = () => {
   const handleRegister = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    if (!name.trim() || !email.trim() || !password.trim()) {
-      alert("Please fill all the fields !");
+    // Validate input fields
+    if (!name.trim()) {
+      toast.error("Please enter your name");
       return;
     }
 
-    try {
-      const response: any = await register(name, email, password);
+    if (!email.trim()) {
+      toast.error("Please enter your email address");
+      return;
+    }
 
-      alert("Registration successful!");
-      navigate("/login");
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (!password.trim()) {
+      toast.error("Please enter a password");
+      return;
+    }
+
+
+    try {
+      await register(name.trim(), email.trim(), password);
       
-    } catch (error) {
+      toast.success("Registration successful! Redirecting to login...");
+      
+      setName("");
+      setEmail("");
+      setPassword("");
+      
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+
+    } catch (error: any) {
       console.error("Registration error:", error);
-      alert("Registration failed, please try again.");
+      
+      // Handle specific error messages from the API
+      const errorMessage = error?.response?.data?.message || 
+                          error?.response?.message || 
+                          error?.message || 
+                          "Registration failed. Please try again.";
+      
+      toast.error(errorMessage);
     }
   };
 

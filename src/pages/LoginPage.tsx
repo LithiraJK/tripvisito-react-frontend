@@ -3,6 +3,7 @@ import { FcGoogle } from "react-icons/fc";
 import React, { useState } from "react";
 import { login } from "../services/auth";
 import { useAuth } from "../contexts/authContext";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const LoginPage = () => {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
-      alert("Please Enter both email and password !");
+      toast.error("Please Enter both email and password !");
       return;
     }
 
@@ -30,14 +31,12 @@ const LoginPage = () => {
         setUser(userDetails);
 
         navigate("/dashboard");
-      }else{
-        alert("Login failed, please check your credentials");
       }
 
 
     } catch (error) {
       console.error("Login error:", error);
-      alert("Login failed, please check your credentials");
+      toast.error("Login failed, please check your credentials");
     }
   };
 

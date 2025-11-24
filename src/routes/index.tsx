@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import AdminLayout from "../components/AdminLayout";
 import AllUsers from "../pages/admin/AllUsers";
 import { useAuth } from "../contexts/authContext";
+import { Toaster } from "react-hot-toast";
 
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
@@ -51,6 +52,7 @@ const Router = () => {
           </div>
         }
       >
+         <Toaster position="top-center" />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Index />} />
