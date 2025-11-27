@@ -8,7 +8,7 @@ const { totalUsers, usersJoined, totalTrips, tripsCreated, userGrowth } =
 
 const Dashboard = () => {
   return (
-    <main className="dashboard wrapper">
+    <main className="flex flex-col gap-10 w-full pb-20 max-w-7xl mx-auto px-4 lg:px-8">
       <Header
         title={`Welcome, ${user?.name ?? "Guest"} 👋`}
         description="Track activity, trends and popular destinations"

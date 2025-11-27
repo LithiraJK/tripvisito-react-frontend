@@ -55,23 +55,17 @@ const Router = () => {
          <Toaster position="top-center" />
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Index />} />
-          {/* <Route path="/" element={<AdminLayout />}/> */}
+          {/* <Route path="/" element={<Index />} /> */}
+          <Route path="/" element={<AdminLayout />}/>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected Routes */}
-          <Route
-            element={
-              <RequireAuth>
-                <AdminLayout />
-              </RequireAuth>
-            }
-          >
+          {/* <Route element={<RequireAuth><AdminLayout /></RequireAuth> }> */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/all-users" element={<AllUsers />} />
             <Route path="/trips" element={<Trips />} />
-          </Route>
+          {/* </Route> */}
         </Routes>
       </Suspense>
     </BrowserRouter>
