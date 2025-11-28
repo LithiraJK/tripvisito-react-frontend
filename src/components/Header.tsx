@@ -4,8 +4,10 @@ import { cn } from "../lib/utils";
 interface Props {
   title: string;
   description: string;
+  ctaText?: string;
+  ctaURL?: string;
 }
-const Header = ({ title, description }: Props) => {
+const Header = ({ title, description, ctaText , ctaURL }: Props) => {
 
   {/* Track location for dynamic styling Header using useLocation hook */}
   const location = useLocation()

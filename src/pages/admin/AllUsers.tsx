@@ -1,6 +1,7 @@
 import Header from "../../components/Header"
 import { FiTrash2, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { users } from "../../constants";
+import Chip from "../../components/Chip";
 
     // id: 1,
     // name: "John Doe",
@@ -15,7 +16,6 @@ const AllUsers = () => {
     <main className="w-full min-h-screen  flex flex-col gap-10 max-w-7xl mx-auto px-4 lg:px-8">
       <Header title="All Users" description="Manage all users here" />
       <section className="">
-        {/* --- Table Section --- */}
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -30,7 +30,7 @@ const AllUsers = () => {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50 transition-colors group">
+              <tr key={user.id} className="hover:bg-blue-50 transition-colors group">
                 <td className="py-4 px-4 flex items-center gap-3">
                   <img src={user.imageUrl} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
                   <span className="text-sm font-medium text-gray-900">{user.name}</span>
@@ -39,16 +39,10 @@ const AllUsers = () => {
                 <td className="py-4 px-4 text-sm text-gray-600">{user.dateJoined}</td>
                 <td className="py-4 px-4 text-sm text-gray-600">{user.itineraryCreated}</td>
                 <td className="py-4 px-4">
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      user.status === "Admin" ? "bg-gray-100 text-gray-600" : "bg-green-50 text-green-600"
-                    }`}
-                  >
-                    {user.status}
-                  </span>
+                <Chip className="py-0.5" label={user.status} variant={user.status === "User" ? "default" : "success"} />
                 </td>
                 <td className="py-4 px-4 text-right">
                   <button className="text-gray-400 hover:text-red-500 transition-colors">
-                    {/* CHANGE 3: Trash Icon */}
                     <FiTrash2 size={18} />
                   </button>
                 </td>
@@ -60,8 +54,7 @@ const AllUsers = () => {
 
       {/* --- Pagination Section --- */}
       <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
-        <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded border border-gray-200">
-          {/* CHANGE 4: Chevron Left */}
+        <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 hover:scale-105 px-4 py-2 rounded-lg bg-white border-0 drop-shadow-xl">
           <FiChevronLeft size={16} />
           Previous
         </button>
@@ -74,9 +67,8 @@ const AllUsers = () => {
           <button className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-50 text-sm rounded">6</button>
         </div>
 
-        <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded border border-gray-200">
+        <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 hover:scale-105 px-4 py-2 rounded-lg bg-white border-0 drop-shadow-xl">
           Next
-          {/* CHANGE 5: Chevron Right */}
           <FiChevronRight size={16} />
         </button>
       </div>

@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios"
 import { refreshTokens } from "./auth";
+import toast from "react-hot-toast";
 
 
 const api = axios.create({
@@ -8,19 +9,24 @@ const api = axios.create({
 
 const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register"];
 
-api.interceptors.request.use((config) => {
+// Request interceptor
+api.interceptors.request.use(
+  (config) => {
   const token = localStorage.getItem("accessToken")
 
-  const isPUblic = PUBLIC_ENDPOINTS.some((url) => config.url?.includes(url))
+  const isPublic = PUBLIC_ENDPOINTS.some((url) => config.url?.includes(url))
 
-  if (!isPUblic && token) {
+  if (!isPublic && token) {
     config.headers.Authorization = `Bearer ${token}`
   }
 
   return config
-})
+},
+(error) => Promise.reject(error)
+)
 
 
+// Response interceptor 
 api.interceptors.response.use(
   (response) => {
     return response
@@ -33,25 +39,33 @@ api.interceptors.response.use(
       !PUBLIC_ENDPOINTS.some((url) => originalRequest.url?.includes(url)) &&
       !originalRequest._retry
     ) {
+      console.log("🔄 401 Error detected - Attempting token refresh...")
       originalRequest._retry = true
 
       try {
         const refreshToken = localStorage.getItem("refreshToken")
         if (!refreshToken) {
+          window.location.href = "/login"
           throw new Error("No refresh token available")
         }
 
+        console.log("🔑 Refreshing tokens...")
+        toast.loading("Refreshing session...")
         const data = await refreshTokens(refreshToken)
+        console.log("✅ Token refresh successful")
+        
         localStorage.setItem("accessToken", data.accessToken)
+        if (data.refreshToken) {
+          localStorage.setItem("refreshToken", data.refreshToken)
+        }
 
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`
-
-        return axios(originalRequest)
+        console.log("🔄 Retrying original request...")
+        return api(originalRequest)
       } catch (refreshErr) {
         localStorage.removeItem("refreshToken")
         localStorage.removeItem("accessToken")
         window.location.href = "/login"
-        console.error(refreshErr)
         return Promise.reject(refreshErr)
       }
     }
