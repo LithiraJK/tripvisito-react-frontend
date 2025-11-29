@@ -4,6 +4,7 @@ import AdminLayout from "../components/AdminLayout";
 import AllUsers from "../pages/admin/AllUsers";
 import { useAuth } from "../contexts/authContext";
 import { Toaster } from "react-hot-toast";
+import {CreateTrip} from "../pages/trip/CreateTrip";
 
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
@@ -66,6 +67,11 @@ const Router = () => {
             <Route path="/all-users" element={<AllUsers />} />
             <Route path="/trips" element={<Trips />} />
           </Route>
+          <Route element={<RequireAuth roles={['ADMIN']}><AdminLayout /></RequireAuth> }>
+            <Route path="/trips/create" element={<CreateTrip />} />
+          </Route>
+          
+
         </Routes>
       </Suspense>
     </BrowserRouter>
