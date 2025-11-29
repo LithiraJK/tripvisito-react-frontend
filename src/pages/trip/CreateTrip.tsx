@@ -13,6 +13,15 @@ export interface Country {
   };
 }
 
+export interface TripFormData {
+  country: string;
+  travelStyle: string;
+  interest: string;
+  budget: string;
+  duration: number;
+  groupType: string;
+}
+
 export const getCountries = async (): Promise<Country[]> => {
   try {
     const response = await fetch("https://restcountries.com/v3.1/all?fields=name,cca2,flags");
@@ -45,6 +54,7 @@ export const CreateTrip = () => {
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountry, setSelectedCountry] = useState("");
 
+
   useEffect(() => {
     const fetchCountries = async () => {
       const data = await getCountries();
@@ -54,18 +64,23 @@ export const CreateTrip = () => {
     fetchCountries();
   }, []);
 
-  // Map countries to ComboBox options format: "🇱🇰 Sri Lanka"
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Selected country:", selectedCountry);
+  };
+
+  const handleChange = (key: keyof TripFormData, value: string) => {
+    setSelectedCountry(value);
+
+  }
+
   const countryOptions = countries.map((country) => ({
     value: country.cca2,
     label: country.name.common,
     icon: country.flags?.png || country.flags?.svg
   }));
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Selected country:", selectedCountry);
-  };
-
+  
   return (
     <main className="flex flex-col gap-10 pb-20 w-full max-w-7xl mx-auto px-4 lg:px-8">
       <Header
@@ -87,9 +102,29 @@ export const CreateTrip = () => {
             <ComboBox
               options={countryOptions}
               value={selectedCountry}
-              onChange={setSelectedCountry}
+              onChange={(value) => handleChange("country", value)}
               placeholder="Select a country..."
             />
+          </div>
+          <div className="w-full flex flex-col gap-2.5 px-6 relative">
+            <label className="text-sm font-normal text-gray-400" htmlFor="duration">Duration</label>
+            <input type="number" id="duration" name="duration"  placeholder="Enter a number of days" className="p-3.5 rounded-xl font-normal border border-gray-300" onChange={(e) => handleChange('duration' , Number(e.target.value))}/>
+          </div>
+          <div className="w-full flex flex-col gap-2.5 px-6 relative">
+            <label className="text-sm font-normal text-gray-400" htmlFor="tripStyle">Trip Style</label>
+            <ComboBox
+              options={[
+                { value: 'adventure', label: 'Adventure' },
+                { value: 'relaxation', label: 'Relaxation' },
+                { value: 'cultural', label: 'Cultural' },
+                { value: 'romantic', label: 'Romantic' },
+              ]}
+              value={selectedCountry}
+              onChange={(value) => handleChange("travelStyle", value)}
+              placeholder="Select a trip style..."
+            />
+
+
           </div>
         </form>
       </section>
