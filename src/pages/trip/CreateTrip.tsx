@@ -106,12 +106,20 @@ export const CreateTrip = () => {
               placeholder="Select a country..."
             />
           </div>
+        
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
-            <label className="text-sm font-normal text-gray-400" htmlFor="duration">Duration</label>
-            <input type="number" id="duration" name="duration"  placeholder="Enter a number of days" className="p-3.5 rounded-xl font-normal border border-gray-300" onChange={(e) => handleChange('duration' , Number(e.target.value))}/>
+            <label className="text-sm font-normal text-gray-400 " htmlFor="duration">Duration</label>
+           <input
+                type="number"
+                id="budget"
+                name="budget"
+                placeholder="Enter a number of days..."
+                className="w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
+                onChange={(e) => handleChange('budget', e.target.value)}
+            />
           </div>
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
-            <label className="text-sm font-normal text-gray-400" htmlFor="tripStyle">Trip Style</label>
+            <label className="text-sm font-normal text-gray-400" htmlFor="travelStyle">Travel Style</label>
             <ComboBox
               options={[
                 { value: 'adventure', label: 'Adventure' },
@@ -121,10 +129,36 @@ export const CreateTrip = () => {
               ]}
               value={selectedCountry}
               onChange={(value) => handleChange("travelStyle", value)}
-              placeholder="Select a trip style..."
+              placeholder="Select a travel style..."
             />
-
-
+          </div>
+          <div className="w-full flex flex-col gap-2.5 px-6 relative">
+            <label className="text-sm font-normal text-gray-400" htmlFor="interest">Interests</label>
+            <ComboBox
+              options={[
+                { value: 'adventure', label: 'Adventure' },
+                { value: 'relaxation', label: 'Relaxation' },
+                { value: 'cultural', label: 'Cultural' },
+                { value: 'romantic', label: 'Romantic' },
+              ]}
+              value={selectedCountry}
+              onChange={(value) => handleChange("travelStyle", value)}
+              placeholder="Select a travel style..."
+            />
+          </div>
+          <div className="w-full flex flex-col gap-2.5 px-6 relative">
+            <label className="text-sm font-normal text-gray-400" htmlFor="travelStyle">Budget Estimate</label>
+            <ComboBox
+              options={[
+                { value: 'adventure', label: 'Adventure' },
+                { value: 'relaxation', label: 'Relaxation' },
+                { value: 'cultural', label: 'Cultural' },
+                { value: 'romantic', label: 'Romantic' },
+              ]}
+              value={selectedCountry}
+              onChange={(value) => handleChange("travelStyle", value)}
+              placeholder="Select your budget preference"
+            />
           </div>
         </form>
       </section>
