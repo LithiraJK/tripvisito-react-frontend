@@ -119,6 +119,20 @@ export const CreateTrip = () => {
             />
           </div>
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
+            <label className="text-sm font-normal text-gray-400" htmlFor="groupType">Group Type</label>
+            <ComboBox
+              options={[
+                { value: 'family', label: 'Family' },
+                { value: 'friends', label: 'Friends' },
+                { value: 'solo', label: 'Solo' },
+                { value: 'couple', label: 'Couple' },
+              ]}
+              value={selectedCountry}
+              onChange={(value) => handleChange("travelStyle", value)}
+              placeholder="Select your budget preference"
+            />
+          </div>
+          <div className="w-full flex flex-col gap-2.5 px-6 relative">
             <label className="text-sm font-normal text-gray-400" htmlFor="travelStyle">Travel Style</label>
             <ComboBox
               options={[
@@ -136,10 +150,10 @@ export const CreateTrip = () => {
             <label className="text-sm font-normal text-gray-400" htmlFor="interest">Interests</label>
             <ComboBox
               options={[
-                { value: 'adventure', label: 'Adventure' },
-                { value: 'relaxation', label: 'Relaxation' },
-                { value: 'cultural', label: 'Cultural' },
-                { value: 'romantic', label: 'Romantic' },
+                { value: 'nature', label: 'Nature' },
+                { value: 'history', label: 'History' },
+                { value: 'food', label: 'Food' },
+                { value: 'art', label: 'Art' },
               ]}
               value={selectedCountry}
               onChange={(value) => handleChange("travelStyle", value)}
@@ -150,10 +164,9 @@ export const CreateTrip = () => {
             <label className="text-sm font-normal text-gray-400" htmlFor="travelStyle">Budget Estimate</label>
             <ComboBox
               options={[
-                { value: 'adventure', label: 'Adventure' },
-                { value: 'relaxation', label: 'Relaxation' },
-                { value: 'cultural', label: 'Cultural' },
-                { value: 'romantic', label: 'Romantic' },
+                { value: 'budget', label: 'Budget' },
+                { value: 'midrange', label: 'Mid-range' },
+                { value: 'luxury', label: 'Luxury' },
               ]}
               value={selectedCountry}
               onChange={(value) => handleChange("travelStyle", value)}
