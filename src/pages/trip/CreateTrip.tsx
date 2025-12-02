@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import ComboBox from "../../components/ComboBox";
 import Header from "../../components/Header";
+import { BsStars } from "react-icons/bs";
+
 
 export interface Country {
   cca2: string;
@@ -24,12 +26,14 @@ export interface TripFormData {
 
 export const getCountries = async (): Promise<Country[]> => {
   try {
-    const response = await fetch("https://restcountries.com/v3.1/all?fields=name,cca2,flags");
-    
+    const response = await fetch(
+      "https://restcountries.com/v3.1/all?fields=name,cca2,flags"
+    );
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
 
     // Check if data is an array
@@ -54,6 +58,8 @@ export const CreateTrip = () => {
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountry, setSelectedCountry] = useState("");
 
+  const[error, setError] = useState<string | null>(null);
+  const[loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -71,16 +77,14 @@ export const CreateTrip = () => {
 
   const handleChange = (key: keyof TripFormData, value: string) => {
     setSelectedCountry(value);
-
-  }
+  };
 
   const countryOptions = countries.map((country) => ({
     value: country.cca2,
     label: country.name.common,
-    icon: country.flags?.png || country.flags?.svg
+    icon: country.flags?.png || country.flags?.svg,
   }));
 
-  
   return (
     <main className="flex flex-col gap-10 pb-20 w-full max-w-7xl mx-auto px-4 lg:px-8">
       <Header
@@ -106,26 +110,36 @@ export const CreateTrip = () => {
               placeholder="Select a country..."
             />
           </div>
-        
+
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
-            <label className="text-sm font-normal text-gray-400 " htmlFor="duration">Duration</label>
-           <input
-                type="number"
-                id="budget"
-                name="budget"
-                placeholder="Enter a number of days..."
-                className="w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
-                onChange={(e) => handleChange('budget', e.target.value)}
+            <label
+              className="text-sm font-normal text-gray-400 "
+              htmlFor="duration"
+            >
+              Duration
+            </label>
+            <input
+              type="number"
+              id="budget"
+              name="budget"
+              placeholder="Enter a number of days..."
+              className="w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
+              onChange={(e) => handleChange("budget", e.target.value)}
             />
           </div>
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
-            <label className="text-sm font-normal text-gray-400" htmlFor="groupType">Group Type</label>
+            <label
+              className="text-sm font-normal text-gray-400"
+              htmlFor="groupType"
+            >
+              Group Type
+            </label>
             <ComboBox
               options={[
-                { value: 'family', label: 'Family' },
-                { value: 'friends', label: 'Friends' },
-                { value: 'solo', label: 'Solo' },
-                { value: 'couple', label: 'Couple' },
+                { value: "family", label: "Family" },
+                { value: "friends", label: "Friends" },
+                { value: "solo", label: "Solo" },
+                { value: "couple", label: "Couple" },
               ]}
               value={selectedCountry}
               onChange={(value) => handleChange("travelStyle", value)}
@@ -133,13 +147,18 @@ export const CreateTrip = () => {
             />
           </div>
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
-            <label className="text-sm font-normal text-gray-400" htmlFor="travelStyle">Travel Style</label>
+            <label
+              className="text-sm font-normal text-gray-400"
+              htmlFor="travelStyle"
+            >
+              Travel Style
+            </label>
             <ComboBox
               options={[
-                { value: 'adventure', label: 'Adventure' },
-                { value: 'relaxation', label: 'Relaxation' },
-                { value: 'cultural', label: 'Cultural' },
-                { value: 'romantic', label: 'Romantic' },
+                { value: "adventure", label: "Adventure" },
+                { value: "relaxation", label: "Relaxation" },
+                { value: "cultural", label: "Cultural" },
+                { value: "romantic", label: "Romantic" },
               ]}
               value={selectedCountry}
               onChange={(value) => handleChange("travelStyle", value)}
@@ -147,13 +166,18 @@ export const CreateTrip = () => {
             />
           </div>
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
-            <label className="text-sm font-normal text-gray-400" htmlFor="interest">Interests</label>
+            <label
+              className="text-sm font-normal text-gray-400"
+              htmlFor="interest"
+            >
+              Interests
+            </label>
             <ComboBox
               options={[
-                { value: 'nature', label: 'Nature' },
-                { value: 'history', label: 'History' },
-                { value: 'food', label: 'Food' },
-                { value: 'art', label: 'Art' },
+                { value: "nature", label: "Nature" },
+                { value: "history", label: "History" },
+                { value: "food", label: "Food" },
+                { value: "art", label: "Art" },
               ]}
               value={selectedCountry}
               onChange={(value) => handleChange("travelStyle", value)}
@@ -161,18 +185,51 @@ export const CreateTrip = () => {
             />
           </div>
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
-            <label className="text-sm font-normal text-gray-400" htmlFor="travelStyle">Budget Estimate</label>
+            <label
+              className="text-sm font-normal text-gray-400"
+              htmlFor="travelStyle"
+            >
+              Budget Estimate
+            </label>
             <ComboBox
               options={[
-                { value: 'budget', label: 'Budget' },
-                { value: 'midrange', label: 'Mid-range' },
-                { value: 'luxury', label: 'Luxury' },
+                { value: "budget", label: "Budget" },
+                { value: "midrange", label: "Mid-range" },
+                { value: "luxury", label: "Luxury" },
               ]}
               value={selectedCountry}
               onChange={(value) => handleChange("travelStyle", value)}
               placeholder="Select your budget preference"
             />
           </div>
+          <div className="w-full flex flex-col gap-2.5 px-6 relative">
+            <label
+              className="text-sm font-normal text-gray-400"
+              htmlFor="travelStyle"
+            >
+              Location on the world map
+            </label>
+            <div className="w-full h-[200px] pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200">
+              World map is here
+            </div>
+          </div>
+
+          <div className="bg-gray-200 h-px w-full" />
+          {
+            error && (
+              <div className="px-6">
+                <p className="text-red-500 text-base font-medium text-center">{error}</p>
+              </div>
+            )
+          }
+
+          <footer className="w-full px-6">
+            <button type="submit" className="bg-blue-500 w-full text-white p-2 font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-none">
+                <BsStars />{loading ? "Generating Trip..." : "Generate Trip"}
+            </button>
+          </footer>
+
+
         </form>
       </section>
     </main>
