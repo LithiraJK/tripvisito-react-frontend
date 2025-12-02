@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import ComboBox from "../../components/ComboBox";
 import Header from "../../components/Header";
+import WorldMap from "../../components/WorldMap";
 import { BsStars } from "react-icons/bs";
-
+import { TbLoader3 } from "react-icons/tb";
 
 export interface Country {
   cca2: string;
@@ -56,10 +57,17 @@ export const getCountries = async (): Promise<Country[]> => {
 
 export const CreateTrip = () => {
   const [countries, setCountries] = useState<Country[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState("");
+  const [formData, setFormData] = useState<TripFormData>({
+    country: "",
+    travelStyle: "",
+    interest: "",
+    budget: "",
+    duration: 0,
+    groupType: "",
+  });
 
-  const[error, setError] = useState<string | null>(null);
-  const[loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -72,15 +80,33 @@ export const CreateTrip = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Selected country:", selectedCountry);
+    setLoading(true);
+    setError(null);
+    
+    if(!formData.country || !formData.duration || !formData.groupType || !formData.travelStyle || !formData.interest || !formData.budget){
+        setError("Please fill all required fields.");
+        setLoading(false);
+        return;
+    }
+
+    if(formData.duration < 1 || formData.duration > 10 ){
+        setError("Duration must be between 1 and 10 days");
+    } 
+    
+    // TODO: Submit form data
+    console.log("Form submitted:", formData);
+    setLoading(false);
   };
 
-  const handleChange = (key: keyof TripFormData, value: string) => {
-    setSelectedCountry(value);
+  const handleChange = (key: keyof TripFormData, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      [key]: value
+    }));
   };
 
   const countryOptions = countries.map((country) => ({
-    value: country.cca2,
+    value: country.name.common,
     label: country.name.common,
     icon: country.flags?.png || country.flags?.svg,
   }));
@@ -105,7 +131,7 @@ export const CreateTrip = () => {
             </label>
             <ComboBox
               options={countryOptions}
-              value={selectedCountry}
+              value={formData.country}
               onChange={(value) => handleChange("country", value)}
               placeholder="Select a country..."
             />
@@ -120,13 +146,15 @@ export const CreateTrip = () => {
             </label>
             <input
               type="number"
-              id="budget"
-              name="budget"
+              id="duration"
+              name="duration"
               placeholder="Enter a number of days..."
+              value={formData.duration || ""}
               className="w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
-              onChange={(e) => handleChange("budget", e.target.value)}
+              onChange={(e) => handleChange("duration", Number(e.target.value))}
             />
           </div>
+
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
             <label
               className="text-sm font-normal text-gray-400"
@@ -141,11 +169,12 @@ export const CreateTrip = () => {
                 { value: "solo", label: "Solo" },
                 { value: "couple", label: "Couple" },
               ]}
-              value={selectedCountry}
-              onChange={(value) => handleChange("travelStyle", value)}
-              placeholder="Select your budget preference"
+              value={formData.groupType}
+              onChange={(value) => handleChange("groupType", value)}
+              placeholder="Select group type..."
             />
           </div>
+
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
             <label
               className="text-sm font-normal text-gray-400"
@@ -160,11 +189,12 @@ export const CreateTrip = () => {
                 { value: "cultural", label: "Cultural" },
                 { value: "romantic", label: "Romantic" },
               ]}
-              value={selectedCountry}
+              value={formData.travelStyle}
               onChange={(value) => handleChange("travelStyle", value)}
               placeholder="Select a travel style..."
             />
           </div>
+
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
             <label
               className="text-sm font-normal text-gray-400"
@@ -179,11 +209,12 @@ export const CreateTrip = () => {
                 { value: "food", label: "Food" },
                 { value: "art", label: "Art" },
               ]}
-              value={selectedCountry}
-              onChange={(value) => handleChange("travelStyle", value)}
-              placeholder="Select a travel style..."
+              value={formData.interest}
+              onChange={(value) => handleChange("interest", value)}
+              placeholder="Select your interests..."
             />
           </div>
+
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
             <label
               className="text-sm font-normal text-gray-400"
@@ -197,39 +228,55 @@ export const CreateTrip = () => {
                 { value: "midrange", label: "Mid-range" },
                 { value: "luxury", label: "Luxury" },
               ]}
-              value={selectedCountry}
-              onChange={(value) => handleChange("travelStyle", value)}
+              value={formData.budget}
+              onChange={(value) => handleChange("budget", value)}
               placeholder="Select your budget preference"
             />
           </div>
+
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
             <label
               className="text-sm font-normal text-gray-400"
-              htmlFor="travelStyle"
+              htmlFor="worldMap"
             >
               Location on the world map
             </label>
-            <div className="w-full h-[200px] pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200">
-              World map is here
+            <div className="w-full h-[300px] md:h-[400px] border-2 rounded-lg duration-200 bg-white hover:border-blue-400 border-gray-200 overflow-hidden">
+              <WorldMap
+                selectedCountry={formData.country}
+                onCountryClick={(countryName) => handleChange("country", countryName)}
+              />
             </div>
           </div>
 
           <div className="bg-gray-200 h-px w-full" />
-          {
-            error && (
-              <div className="px-6">
-                <p className="text-red-500 text-base font-medium text-center">{error}</p>
-              </div>
-            )
-          }
+
+          {error && (
+            <div className="px-6">
+              <p className="text-red-500 text-base font-medium text-center">
+                {error}
+              </p>
+            </div>
+          )}
 
           <footer className="w-full px-6">
-            <button type="submit" className="bg-blue-500 w-full text-white p-2 font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-none">
-                <BsStars />{loading ? "Generating Trip..." : "Generate Trip"}
+            <button
+              type="submit"
+              className="bg-blue-500 w-full text-white p-2 font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-none"
+            >
+              {loading ? (
+                <>
+                  <TbLoader3 className="animate-spin" />
+                  Generating Trip...
+                </>
+              ) : (
+                <>
+                  <BsStars />
+                  Generate Trip
+                </>
+              )}
             </button>
           </footer>
-
-
         </form>
       </section>
     </main>

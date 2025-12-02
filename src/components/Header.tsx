@@ -22,7 +22,7 @@ const Header = ({ title, description, ctaText , ctaURL }: Props) => {
 
       {ctaText && ctaURL && (
         <Link to={ctaURL}>
-          <button className="bg-blue-500 w-full md:w-60 text-white p-2 font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-none "><FaPlus />{ctaText}</button>
+          <button className="bg-blue-500 w-full md:w-60 text-white p-2 font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-none"><FaPlus />{ctaText}</button>
         </Link>
       )}
 
