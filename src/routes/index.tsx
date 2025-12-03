@@ -53,7 +53,7 @@ const Router = () => {
           </div>
         }
       >
-         <Toaster position="top-center" />
+         <Toaster position="top-right" />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Index />} />

@@ -2,8 +2,12 @@ import { useState, useEffect } from "react";
 import ComboBox from "../../components/ComboBox";
 import Header from "../../components/Header";
 import WorldMap from "../../components/WorldMap";
+import Button from "../../components/Button";
 import { BsStars } from "react-icons/bs";
 import { TbLoader3 } from "react-icons/tb";
+import Chip from "../../components/Chip";
+import { toast } from "react-hot-toast";
+
 
 export interface Country {
   cca2: string;
@@ -19,6 +23,7 @@ export interface Country {
 export interface TripFormData {
   country: string;
   travelStyle: string;
+  
   interest: string;
   budget: string;
   duration: number;
@@ -86,16 +91,20 @@ export const CreateTrip = () => {
     if(!formData.country || !formData.duration || !formData.groupType || !formData.travelStyle || !formData.interest || !formData.budget){
         setError("Please fill all required fields.");
         setLoading(false);
+        toast.error("Please fill all required fields.");
         return;
     }
 
     if(formData.duration < 1 || formData.duration > 10 ){
         setError("Duration must be between 1 and 10 days");
+        setLoading(false);
+        toast.error("Duration must be between 1 and 10 days");
+        return;
     } 
     
     // TODO: Submit form data
     console.log("Form submitted:", formData);
-    setLoading(false);
+    setLoading(true);
   };
 
   const handleChange = (key: keyof TripFormData, value: string | number) => {
@@ -119,7 +128,7 @@ export const CreateTrip = () => {
       />
       <section className="mt-2.5 w-full max-w-3xl px-4 lg:px-8 mx-auto">
         <form
-          className="flex flex-col gap-6 py-6 bg-white border border-light-200 rounded-xl shadow-100"
+          className="flex flex-col gap-6 py-6 bg-white rounded-xl shadow-xl"
           onSubmit={handleSubmit}
         >
           <div className="w-full flex flex-col gap-2.5 px-6 relative">
@@ -241,7 +250,7 @@ export const CreateTrip = () => {
             >
               Location on the world map
             </label>
-            <div className="w-full h-[300px] md:h-[400px] border-2 rounded-lg duration-200 bg-white hover:border-blue-400 border-gray-200 overflow-hidden">
+            <div className="w-full h-[300px] md:h-[400px] border-2 rounded-lg duration-200 bg-white border-gray-200 overflow-hidden">
               <WorldMap
                 selectedCountry={formData.country}
                 onCountryClick={(countryName) => handleChange("country", countryName)}
@@ -253,29 +262,19 @@ export const CreateTrip = () => {
 
           {error && (
             <div className="px-6">
-              <p className="text-red-500 text-base font-medium text-center">
-                {error}
-              </p>
+              <Chip variant="danger" label={error} className="rounded-md w-full justify-center py-2" />
             </div>
           )}
 
           <footer className="w-full px-6">
-            <button
+            <Button
               type="submit"
-              className="bg-blue-500 w-full text-white p-2 font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-none"
-            >
-              {loading ? (
-                <>
-                  <TbLoader3 className="animate-spin" />
-                  Generating Trip...
-                </>
-              ) : (
-                <>
-                  <BsStars />
-                  Generate Trip
-                </>
-              )}
-            </button>
+              ctaText={loading ? "Generating Trip..." : "Generate Trip"}
+              icon={loading ? <TbLoader3 className="animate-spin" /> : <BsStars />}
+              variant="primary"
+              fullWidth={true}
+              disabled={loading}
+            />
           </footer>
         </form>
       </section>

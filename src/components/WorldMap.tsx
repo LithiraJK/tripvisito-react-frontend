@@ -36,7 +36,7 @@ const WorldMap = ({ selectedCountry, onCountryClick, className = '' }: WorldMapP
         const { width } = svgRef.current.parentElement.getBoundingClientRect();
         setDimensions({
           width: width || 800,
-          height: (width || 800) * 0.5 // Maintain aspect ratio
+          height: (width || 800) * 0.5 
         });
       }
     };
