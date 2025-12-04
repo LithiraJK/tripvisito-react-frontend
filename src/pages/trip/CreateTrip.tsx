@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import ComboBox from "../../components/ComboBox";
 import Header from "../../components/Header";
 import WorldMap from "../../components/WorldMap";
@@ -7,7 +7,8 @@ import { BsStars } from "react-icons/bs";
 import { TbLoader3 } from "react-icons/tb";
 import Chip from "../../components/Chip";
 import { toast } from "react-hot-toast";
-
+import { generateTrip } from "../../services/trip";
+import { useNavigate } from "react-router-dom";
 
 export interface Country {
   cca2: string;
@@ -23,8 +24,7 @@ export interface Country {
 export interface TripFormData {
   country: string;
   travelStyle: string;
-  
-  interest: string;
+  interests: string;
   budget: string;
   duration: number;
   groupType: string;
@@ -65,7 +65,7 @@ export const CreateTrip = () => {
   const [formData, setFormData] = useState<TripFormData>({
     country: "",
     travelStyle: "",
-    interest: "",
+    interests: "",
     budget: "",
     duration: 0,
     groupType: "",
@@ -73,6 +73,7 @@ export const CreateTrip = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -83,34 +84,68 @@ export const CreateTrip = () => {
     fetchCountries();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
-    if(!formData.country || !formData.duration || !formData.groupType || !formData.travelStyle || !formData.interest || !formData.budget){
-        setError("Please fill all required fields.");
-        setLoading(false);
-        toast.error("Please fill all required fields.");
-        return;
+
+    if (
+      !formData.country ||
+      !formData.duration ||
+      !formData.groupType ||
+      !formData.travelStyle ||
+      !formData.interests ||
+      !formData.budget
+    ) {
+      setError("Please fill all required fields.");
+      setLoading(false);
+      toast.error("Please fill all required fields.");
+      return;
     }
 
-    if(formData.duration < 1 || formData.duration > 10 ){
-        setError("Duration must be between 1 and 10 days");
-        setLoading(false);
-        toast.error("Duration must be between 1 and 10 days");
-        return;
-    } 
-    
-    // TODO: Submit form data
-    console.log("Form submitted:", formData);
-    setLoading(true);
+    if (formData.duration < 1 || formData.duration > 10) {
+      setError("Duration must be between 1 and 10 days");
+      setLoading(false);
+      toast.error("Duration must be between 1 and 10 days");
+      return;
+    }
+
+    try {
+      console.log("Form submitted:", formData);
+      setLoading(true);
+      const tripData = await generateTrip(
+        formData.country,
+        formData.travelStyle,
+        formData.interests,
+        formData.budget,
+        formData.duration,
+        formData.groupType
+      );
+
+      if(!tripData){
+        setError("No trip data received from server");
+      }
+
+      console.log("Generated Trip Data:", tripData);
+      setLoading(false);
+
+      //navigate to edit page with tripData
+      if(tripData.data && tripData.data.tripId){
+        navigate(`/trips/${tripData.data.tripId}`);
+      }else{
+        setError("Invalid trip data received from server");
+      }
+
+    } catch (error) {
+      console.error("Error generating trip:", error);
+      setLoading(false);
+    }
   };
 
   const handleChange = (key: keyof TripFormData, value: string | number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -218,8 +253,8 @@ export const CreateTrip = () => {
                 { value: "food", label: "Food" },
                 { value: "art", label: "Art" },
               ]}
-              value={formData.interest}
-              onChange={(value) => handleChange("interest", value)}
+              value={formData.interests}
+              onChange={(value) => handleChange("interests", value)}
               placeholder="Select your interests..."
             />
           </div>
@@ -253,7 +288,9 @@ export const CreateTrip = () => {
             <div className="w-full h-[300px] md:h-[400px] border-2 rounded-lg duration-200 bg-white border-gray-200 overflow-hidden">
               <WorldMap
                 selectedCountry={formData.country}
-                onCountryClick={(countryName) => handleChange("country", countryName)}
+                onCountryClick={(countryName) =>
+                  handleChange("country", countryName)
+                }
               />
             </div>
           </div>
@@ -262,7 +299,11 @@ export const CreateTrip = () => {
 
           {error && (
             <div className="px-6">
-              <Chip variant="danger" label={error} className="rounded-md w-full justify-center py-2" />
+              <Chip
+                variant="danger"
+                label={error}
+                className="rounded-md w-full justify-center py-2"
+              />
             </div>
           )}
 
@@ -270,7 +311,9 @@ export const CreateTrip = () => {
             <Button
               type="submit"
               ctaText={loading ? "Generating Trip..." : "Generate Trip"}
-              icon={loading ? <TbLoader3 className="animate-spin" /> : <BsStars />}
+              icon={
+                loading ? <TbLoader3 className="animate-spin" /> : <BsStars />
+              }
               variant="primary"
               fullWidth={true}
               disabled={loading}
