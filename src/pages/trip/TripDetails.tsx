@@ -6,16 +6,29 @@ import InfoPill from "../../components/InfoPill";
 import { MdOutlineDateRange } from "react-icons/md";
 import { IoLocationOutline } from "react-icons/io5";
 import { cn } from "../../lib/utils";
+import Chip from "../../components/Chip";
+import { FaStar } from "react-icons/fa";
+import TripCard from "../../components/TripCard";
+import { allTrips } from "../../constants";
+
+export interface DayPlan {
+  day: number;
+  location: string;
+  activities: Activity[];
+}
+
+export interface Activity {
+  time: string;
+  description: string;
+}
 
 const TripDetails = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const [tripDetails, setTripDetails] = useState<any>(null);
-  const [imageUrls , setImageUrls] = useState<string[]>([]);
-
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
 
   const {
     name,
@@ -33,8 +46,13 @@ const TripDetails = () => {
     itinerary,
   } = tripDetails || {};
 
-  useEffect(() => {
+  const chipsData = [budget, travelStyle, interests, groupType];
+  const visitTimeAndWeather = [
+    { title: "Best Time to Visit : ", item: bestTimeToVisit },
+    { title: "Weather : ", item: weatherInfo },
+  ];
 
+  useEffect(() => {
     const getTripData = async () => {
       if (!tripId) {
         setError("Trip ID is missing");
@@ -51,6 +69,21 @@ const TripDetails = () => {
       } catch (error) {
         console.error(error);
         setError("Failed to load trip Data");
+      } finally {
+        setLoading(false);
+      }
+    };
+ //to do:  pagination for all trips
+    const getAllTrips = async () => {
+      try {
+        setLoading(true);
+        const response = await getAllTrips();
+        // setAllTrips(response.data.trips);
+        const allTrips = []; // Placeholder for fetched trips
+        console.log("All Trips Data:", response);
+      } catch (error) {
+        console.error(error);
+        setError("Failed to load AllTrips Data");
       } finally {
         setLoading(false);
       }
@@ -100,27 +133,144 @@ const TripDetails = () => {
           </h1>
           <InfoPill text={`${duration} days`} icon={<MdOutlineDateRange />} />
           <InfoPill
-            text={itinerary
-              ?.slice(0, 2)
-              .map((item : any) => item.location)
-              .join(", ") || ""}
+            text={
+              itinerary
+                ?.slice(0, 2)
+                .map((item: any) => item.location)
+                .join(", ") || ""
+            }
             icon={<IoLocationOutline />}
           />
         </header>
         <section className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-7 mt-1">
-            {imageUrls.map((url: string, index: number) => (
-              <img
-                key={index}
-                src={url}
-                alt={`Trip Image ${index + 1}`}
-                className={cn("w-full rounded-xl object-cover" , index === 0 ? 'md:col-span-2 md:row-span-2 h-[330px]' : 'md:row-span-1 h-[150px]')}
-              />
-            ))}
-
+          {imageUrls.map((url: string, index: number) => (
+            <img
+              key={index}
+              src={url}
+              alt={`Trip Image ${index + 1}`}
+              className={cn(
+                "w-full rounded-xl object-cover",
+                index === 0
+                  ? "md:col-span-2 md:row-span-2 h-[330px]"
+                  : "md:row-span-1 h-[150px]"
+              )}
+            />
+          ))}
         </section>
 
         <section className="flex gap-3 md:gap-5 items-center flex-wrap">
+          {chipsData.map((data, index) => (
+            <Chip
+              key={index}
+              label={data}
+              variant={
+                budget === data
+                  ? "primary"
+                  : travelStyle === data
+                  ? "pink"
+                  : interests === data
+                  ? "success"
+                  : groupType === data
+                  ? "purple"
+                  : "default"
+              }
+              className="mr-3"
+            />
+          ))}
 
+          <ul className="flex gap-1 items-center">
+            {Array(5)
+              .fill(null)
+              .map((_, index) => (
+                <li key={index} className="text-yellow-400">
+                  <FaStar />
+                </li>
+              ))}
+
+            <li className="ml-1">
+              <Chip label="4.9/5" variant="warning" />
+            </li>
+
+            <section className="flex justify-between gap-5">
+              <article className="flex flex-col gap-4">
+                <h3 className=" text-xl md:text-3xl text-dark-100 font-semibold">
+                  {duration}-Day {country} {travelStyle}
+                </h3>
+                <p className="text-base md:text-2xl text-gray-100 font-normal">
+                  {budget}, {groupType} and {interests}{" "}
+                </p>
+              </article>
+
+              <h2>{estimatedPrice}</h2>
+            </section>
+          </ul>
+        </section>
+        <p className="text-sm md:text-lg font-normal text-gray-600">
+          {description}
+        </p>
+
+        <ul className="flex flex-col gap-9">
+          {itinerary?.map((dayPlan: DayPlan, index: number) => (
+            <li
+              key={index}
+              className="flex max-sm:flex-col flex-row justify-between sm:gap-7 gap-3 text-sm md:text-lg font-normal text-dark-400 !list-disc"
+            >
+              <h3 className="text-base md:text-xl font-semibold text-dark-400">
+                Day {dayPlan.day}: {dayPlan.location}
+              </h3>
+              <ul className="flex flex-col sm:gap-3 gap-7">
+                {dayPlan.activities.map((activity, number) => (
+                  <li
+                    key={number}
+                    className="flex max-sm:flex-col flex-row justify-between sm:gap-7 gap-3 text-sm md:text-lg font-normal text-dark-400 !list-disc"
+                  >
+                    <span className="w-[90px] font-medium">
+                      {activity.time}
+                    </span>
+                    <span>{activity.description}</span>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+
+        {visitTimeAndWeather.map((section) => (
+          <section key={section.title} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4">
+              <h3 className="text-base md:text-xl text-dark-400 font-semibold">
+                {section.title}
+              </h3>
+              <ul className="flex flex-col gap-3">
+                {section.item?.map((item: any) => (
+                  <li
+                    key={item}
+                    className="flex justify-between gap-7 text-sm md:text-lg font-normal text-dark-400 list-disc"
+                  >
+                    <p className="flex-grow">{item}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        ))}
+
+        <section className="flex flex-col gap-6">
+          <h2 className="p-24 font-semibold">Popular Trips</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7">
+            
+            {allTrips.map((trip) => (
+              <TripCard
+                key=""
+                id=""
+                name={trip.name}
+                location=""
+                imageUrl={trip.imageUrls[0]}
+                tags={trip.tags}
+                price={trip.estimatedPrice}
+              />
+            ))}
+          </div>
         </section>
       </section>
     </main>

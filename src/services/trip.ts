@@ -9,3 +9,8 @@ export const getTripDetails = async (tripId: string) => {
   const res = await api.get(`/trip/${tripId}`);
   return res.data;
 };
+
+export const getAllTrips = async () => {
+  const res = await api.get("/trip/all");
+  return res.data;
+}
