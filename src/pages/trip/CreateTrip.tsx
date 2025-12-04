@@ -131,7 +131,7 @@ export const CreateTrip = () => {
 
       //navigate to edit page with tripData
       if(tripData.data && tripData.data.tripId){
-        navigate(`/trips/${tripData.data.tripId}`);
+        navigate(`/trip/${tripData.data.tripId}`);
       }else{
         setError("Invalid trip data received from server");
       }
