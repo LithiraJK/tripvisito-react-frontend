@@ -1,5 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import Chip from "./Chip";
+import { IoLocationOutline } from "react-icons/io5";
+
 
 export interface TripCardProps {
   id: string;
@@ -23,11 +25,11 @@ const TripCard = ({
   return (
     <Link
       to={
-        path.pathname === "/" || path.pathname.startsWith("/travel")
-          ? `/travel/${id}`
-          : `/trips/${id}`
+        path.pathname === "/" || path.pathname.startsWith("/trip")
+          ? `/trip/${id}`
+          : `/trip/${id}`
       }
-      className="shadow-300 bg-white rounded-20 flex-col w-full relative"
+      className="shadow-300 bg-white rounded-[16px] flex-col w-full relative shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out"
     >
       <img
         src={imageUrl}
@@ -39,11 +41,7 @@ const TripCard = ({
           {name}
         </h2>
         <figure className="flex items-center gap-2">
-          <img
-            src="src/assets/icons/location-mark.svg"
-            alt="location"
-            className="size-4"
-          />
+          <IoLocationOutline />
           <figcaption className="text-xs md:text-sm font-normal text-gray-600">
             {location}
           </figcaption>

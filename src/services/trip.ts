@@ -10,7 +10,7 @@ export const getTripDetails = async (tripId: string) => {
   return res.data;
 };
 
-export const getAllTrips = async () => {
-  const res = await api.get("/trip/all");
+export const getAllTrips = async (page: number , limit:number) => {
+  const res = await api.get(`/trip/all?page=${page}&limit=${limit}`);
   return res.data;
 }

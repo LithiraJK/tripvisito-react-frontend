@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../../components/Header";
-import { getTripDetails } from "../../services/trip";
+import { getTripDetails, getAllTrips } from "../../services/trip";
 import InfoPill from "../../components/InfoPill";
 import { MdOutlineDateRange } from "react-icons/md";
 import { IoLocationOutline } from "react-icons/io5";
@@ -9,7 +9,6 @@ import { cn } from "../../lib/utils";
 import Chip from "../../components/Chip";
 import { FaStar } from "react-icons/fa";
 import TripCard from "../../components/TripCard";
-import { allTrips } from "../../constants";
 
 export interface DayPlan {
   day: number;
@@ -26,6 +25,8 @@ const TripDetails = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const [tripDetails, setTripDetails] = useState<any>(null);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+  const [popularTrips, setPopularTrips] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,24 +74,21 @@ const TripDetails = () => {
         setLoading(false);
       }
     };
- //to do:  pagination for all trips
-    const getAllTrips = async () => {
+
+    const fetchAllTrips = async () => {
       try {
-        setLoading(true);
-        const response = await getAllTrips();
-        // setAllTrips(response.data.trips);
-        const allTrips = []; // Placeholder for fetched trips
+        const response = await getAllTrips(1, 2); 
         console.log("All Trips Data:", response);
+        setPopularTrips(response.data.trips || []);
       } catch (error) {
-        console.error(error);
-        setError("Failed to load AllTrips Data");
-      } finally {
-        setLoading(false);
+        console.error("Error loading popular trips:", error);
+        // Don't set error state here, as it's not critical if popular trips fail
       }
     };
 
-    getTripData(); // runs AFTER the component mounts and renders
-  }, [tripId]); // Re-runs when tripId changes
+    getTripData();
+    fetchAllTrips();
+  }, [tripId]);
 
   if (loading) {
     return (
@@ -256,18 +254,21 @@ const TripDetails = () => {
         ))}
 
         <section className="flex flex-col gap-6">
-          <h2 className="p-24 font-semibold">Popular Trips</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7">
-            
-            {allTrips.map((trip) => (
+          <h2 className="text-2xl font-semibold">Popular Trips</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-7">
+            {popularTrips.map((trip) => (
               <TripCard
-                key=""
-                id=""
-                name={trip.name}
-                location=""
-                imageUrl={trip.imageUrls[0]}
-                tags={trip.tags}
-                price={trip.estimatedPrice}
+                key={trip.id}
+                id={trip.id}
+                name={trip.tripDetails?.name || ""}
+                location={trip.tripDetails?.location?.city || ""}
+                imageUrl={trip.imageUrls?.[0] || ""}
+                tags={[
+                  trip.tripDetails?.budget,
+                  trip.tripDetails?.travelStyle,
+                  trip.tripDetails?.interests,
+                ].filter(Boolean)}
+                price={trip.tripDetails?.estimatedPrice || ""}
               />
             ))}
           </div>
