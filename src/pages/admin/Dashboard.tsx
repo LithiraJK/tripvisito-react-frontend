@@ -1,12 +1,41 @@
+import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import StatsCard from "../../components/StatsCard";
 import TripCard from "../../components/TripCard";
-import { user, dashboardStats, allTrips } from "../../constants";
+import {dashboardStats, allTrips } from "../../constants";
+import { getMyDetails } from "../../services/auth";
 
 const { totalUsers, usersJoined, totalTrips, tripsCreated, userGrowth } =
   dashboardStats;
 
 const Dashboard = () => {
+
+   const [user, setUser] = useState<any>(null);
+
+
+   useEffect(() => {
+    let isMounted = true;
+    
+    const getUserDetails = async () => {
+      try {
+        const response = await getMyDetails();
+        console.log(response)
+        if (isMounted) {
+          setUser(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    }
+
+    getUserDetails();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+
   return (
     <main className="flex flex-col gap-10 w-full pb-20 max-w-7xl mx-auto px-4 lg:px-8">
       <Header
