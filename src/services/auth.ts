@@ -17,6 +17,11 @@ export const getMyDetails = async () => {
   return res.data
 }
 
+export const getAllUsers = async (page:number , limit:number) => {
+  const res = await api.get(`/auth/users?page=${page}&limit=${limit}`)
+  return res.data;
+}
+
 export const refreshTokens = async (refreshToken: string) => {
   const res = await api.post("/auth/refresh", {
     refreshToken: refreshToken
