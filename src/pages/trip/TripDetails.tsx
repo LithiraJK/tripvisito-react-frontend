@@ -9,6 +9,8 @@ import { cn } from "../../lib/utils";
 import Chip from "../../components/Chip";
 import { FaStar } from "react-icons/fa";
 import TripCard from "../../components/TripCard";
+import Button from "../../components/Button";
+import WorldMap from "../../components/WorldMap";
 
 export interface DayPlan {
   day: number;
@@ -77,12 +79,11 @@ const TripDetails = () => {
 
     const fetchAllTrips = async () => {
       try {
-        const response = await getAllTrips(1, 2); 
+        const response = await getAllTrips(1, 2);
         console.log("All Trips Data:", response);
         setPopularTrips(response.data.trips || []);
       } catch (error) {
         console.error("Error loading popular trips:", error);
-        // Don't set error state here, as it's not critical if popular trips fail
       }
     };
 
@@ -126,7 +127,7 @@ const TripDetails = () => {
       />
       <section className="flex flex-col gap-9 mt-2.5  w-full max-w-3xl px-4 lg:px-8 mx-auto">
         <header>
-          <h1 className="font-semibold text-black text-2xl">
+          <h1 className="text-3xl font-semibold mb-3 text-black md:text-4xl">
             {name || "Loading..."}
           </h1>
           <InfoPill text={`${duration} days`} icon={<MdOutlineDateRange />} />
@@ -156,54 +157,61 @@ const TripDetails = () => {
           ))}
         </section>
 
-        <section className="flex gap-3 md:gap-5 items-center flex-wrap">
-          {chipsData.map((data, index) => (
-            <Chip
-              key={index}
-              label={data}
-              variant={
-                budget === data
-                  ? "primary"
-                  : travelStyle === data
-                  ? "pink"
-                  : interests === data
-                  ? "success"
-                  : groupType === data
-                  ? "purple"
-                  : "default"
-              }
-              className="mr-3"
-            />
-          ))}
-
-          <ul className="flex gap-1 items-center">
-            {Array(5)
-              .fill(null)
-              .map((_, index) => (
-                <li key={index} className="text-yellow-400">
-                  <FaStar />
-                </li>
+        <section className="flex flex-col gap-6">
+          <section className="flex gap-3 md:gap-5 justify-between items-center flex-wrap">
+            <div className="flex gap-0.5 justify-between">
+              {chipsData.map((data, index) => (
+                <Chip
+                  key={index}
+                  label={data}
+                  variant={
+                    budget === data
+                      ? "primary"
+                      : travelStyle === data
+                      ? "pink"
+                      : interests === data
+                      ? "success"
+                      : groupType === data
+                      ? "purple"
+                      : "default"
+                  }
+                  className="mr-3"
+                />
               ))}
+            </div>
+            <div>
+              <ul className="flex gap-1 justify-between items-center">
+                {Array(5)
+                  .fill(null)
+                  .map((_, index) => (
+                    <li key={index} className="text-yellow-400">
+                      <FaStar />
+                    </li>
+                  ))}
 
-            <li className="ml-1">
-              <Chip label="4.9/5" variant="warning" />
-            </li>
+                <li className="ml-1">
+                  <Chip label="4.9/5" variant="warning" />
+                </li>
+              </ul>
+            </div>
+          </section>
 
-            <section className="flex justify-between gap-5">
-              <article className="flex flex-col gap-4">
-                <h3 className=" text-xl md:text-3xl text-dark-100 font-semibold">
-                  {duration}-Day {country} {travelStyle}
-                </h3>
-                <p className="text-base md:text-2xl text-gray-100 font-normal">
-                  {budget}, {groupType} and {interests}{" "}
-                </p>
-              </article>
+          <section className="flex justify-between gap-5 w-full">
+            <article className="flex flex-col gap-4">
+              <h3 className=" text-xl md:text-3xl text-dark-100 font-semibold">
+                {duration}-Day {country} {travelStyle}
+              </h3>
+              <p className="text-base md:text-xl text-gray-400 font-normal">
+                {budget}, {groupType} and {interests}{" "}
+              </p>
+            </article>
 
-              <h2>{estimatedPrice}</h2>
-            </section>
-          </ul>
+            <h2 className=" text-lg md:text-2xl text-dark-100 font-semibold">
+              {estimatedPrice}
+            </h2>
+          </section>
         </section>
-        <p className="text-sm md:text-lg font-normal text-gray-600">
+        <p className="text-sm md:text-lg font-normal first-letter:text-3xl first-letter:font-semibold">
           {description}
         </p>
 
@@ -211,21 +219,21 @@ const TripDetails = () => {
           {itinerary?.map((dayPlan: DayPlan, index: number) => (
             <li
               key={index}
-              className="flex max-sm:flex-col flex-row justify-between sm:gap-7 gap-3 text-sm md:text-lg font-normal text-dark-400 !list-disc"
+              className="flex flex-col max-sm:flex-col  justify-between sm:gap-7 gap-3 text-sm md:text-lg font-normal text-dark-400 list-disc!"
             >
-              <h3 className="text-base md:text-xl font-semibold text-dark-400">
+              <h3 className="text-base md:text-xl font-semibold text-black">
                 Day {dayPlan.day}: {dayPlan.location}
               </h3>
               <ul className="flex flex-col sm:gap-3 gap-7">
                 {dayPlan.activities.map((activity, number) => (
                   <li
                     key={number}
-                    className="flex max-sm:flex-col flex-row justify-between sm:gap-7 gap-3 text-sm md:text-lg font-normal text-dark-400 !list-disc"
+                    className="flex flex-col max-sm:flex-col justify-between sm:gap-7 gap-3 text-sm md:text-lg font-normal text-dark-400 list-disc!"
                   >
                     <span className="w-[90px] font-medium">
                       {activity.time}
                     </span>
-                    <span>{activity.description}</span>
+                    <p>{activity.description}</p>
                   </li>
                 ))}
               </ul>
@@ -245,13 +253,31 @@ const TripDetails = () => {
                     key={item}
                     className="flex justify-between gap-7 text-sm md:text-lg font-normal text-dark-400 list-disc"
                   >
-                    <p className="flex-grow">{item}</p>
+                    <p className="grow">{item}</p>
                   </li>
                 ))}
               </ul>
             </div>
           </section>
         ))}
+
+        <section className="location-map">
+          <div className="bg-gray-200 h-px w-full" />
+          <WorldMap />
+          <div className="bg-gray-200 h-px w-full" />
+        </section>
+
+        <div>
+          <Button
+            ctaText={`Pay & Join Trip ${estimatedPrice}`}
+            variant="primary"
+            className="md:w-full"
+            disabled
+
+          />
+        </div>
+
+        <div className="bg-gray-200 h-px w-full" />
 
         <section className="flex flex-col gap-6">
           <h2 className="text-2xl font-semibold">Popular Trips</h2>

@@ -29,7 +29,7 @@ const TripCard = ({
           ? `/trip/${id}`
           : `/trip/${id}`
       }
-      className="shadow-300 bg-white rounded-[16px] flex-col w-full relative shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out"
+      className="shadow-md bg-white rounded-[16px] flex-col w-full relative shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out"
     >
       <img
         src={imageUrl}
