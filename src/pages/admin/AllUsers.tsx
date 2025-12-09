@@ -8,6 +8,8 @@ import Chip from "../../components/Chip";
 import { useEffect, useState } from "react";
 import { getAllUsers } from "../../services/auth";
 import { formatDate } from "../../lib/utils";
+import { FaPlus } from "react-icons/fa6";
+
 
 const AllUsers = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -160,7 +162,7 @@ const AllUsers = () => {
 
   return (
     <main className="w-full min-h-screen flex flex-col gap-10 max-w-7xl mx-auto px-4 lg:px-8">
-      <Header title="All Users" description="Manage all users here" />
+      <Header title="All Users" description="Manage all users here" ctaText="Add new User" ctaURL="/user/create" icon={<FaPlus />} />
       <section>
         {loading ? (
           <div className="flex justify-center items-center py-12">

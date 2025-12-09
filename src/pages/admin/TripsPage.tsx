@@ -3,6 +3,7 @@ import Header from "../../components/Header"
 import TripCard from "../../components/TripCard";
 import { getAllTrips } from "../../services/trip";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FaPlus } from "react-icons/fa6";
 
 
 const TripsPage = () => {
@@ -34,7 +35,7 @@ const TripsPage = () => {
 
   return (
     <main className="w-full min-h-screen  flex flex-col gap-10 max-w-7xl mx-auto px-4 lg:px-8">
-      <Header title="Trips" description="Manage all trips here" ctaText="Create a Trip" ctaURL="/trip/create" />
+      <Header title="Trips" description="Manage all trips here" ctaText="Create a Trip" ctaURL="/trip/create" icon={<FaPlus />} />
       <section>
         <h1 className="text-xl font-semibold mb-6">Manage Created Trips</h1>
         {loading ? (

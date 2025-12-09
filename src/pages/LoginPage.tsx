@@ -30,7 +30,7 @@ const LoginPage = () => {
         const userDetails = response.data.user;
         setUser(userDetails);
 
-        navigate("/dashboard");
+        navigate("/admin/dashboard");
       }
 
 

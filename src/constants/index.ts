@@ -5,19 +5,19 @@ export const sidebarItems = [
     id: 1,
     icon: "src/assets/icons/home.svg",
     label: "Dashboard",
-    href: "/dashboard",
+    href: "admin/dashboard",
   },
   {
     id: 2,
     icon: "src/assets/icons/users.svg",
     label: "All Users",
-    href: "/all-users",
+    href: "all-users",
   },
   {
     id: 3,
     icon: "src/assets/icons/itinerary.svg",
     label: "AI Trips",
-    href: "/trips",
+    href: "trips",
   },
 ];
 
@@ -121,8 +121,6 @@ export const RIGHT_CONFETTI = {
 };
 
 //////////////////////////////////////////////////////////////////////////////////
-export const user = { name: "Lithira" };
-
 export const dashboardStats = {
     totalUsers: 1500,
     totalTrips: 300,

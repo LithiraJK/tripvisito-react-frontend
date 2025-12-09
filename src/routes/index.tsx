@@ -4,8 +4,9 @@ import AdminLayout from "../components/AdminLayout";
 import AllUsers from "../pages/admin/AllUsers";
 import { useAuth } from "../contexts/authContext";
 import { Toaster } from "react-hot-toast";
-import {CreateTrip} from "../pages/trip/CreateTrip";
+import { CreateTrip } from "../pages/trip/CreateTrip";
 import TripDetails from "../pages/trip/TripDetails";
+import LandingLayout from "../components/LandingLayout";
 
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
@@ -54,27 +55,40 @@ const Router = () => {
           </div>
         }
       >
-         <Toaster position="top-right" />
+        <Toaster position="top-right" />
         <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/" element={<AdminLayout />}/>
+          {/* Landing Page with Layout */}
+          <Route element={<LandingLayout />}>
+            <Route path="/" element={<Index />} />
+          </Route>
+
+          {/* Auth Pages - Full Page (No Layout) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected Routes */}
-          <Route element={<RequireAuth><AdminLayout /></RequireAuth> }>
-            <Route path="/dashboard" element={<Dashboard />} />
+          <Route
+            element={
+              <RequireAuth>
+                <AdminLayout />
+              </RequireAuth>
+            }
+          >
+            <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/all-users" element={<AllUsers />} />
             <Route path="/trips" element={<Trips />} />
           </Route>
-          <Route element={<RequireAuth roles={['ADMIN']}><AdminLayout /></RequireAuth> }>
+          <Route
+            element={
+              <RequireAuth roles={["ADMIN"]}>
+                <AdminLayout />
+              </RequireAuth>
+            }
+          >
             <Route path="/trip/create" element={<CreateTrip />} />
             {/* Dynamic Routes */}
             <Route path="/trip/:tripId" element={<TripDetails />} />
           </Route>
-          
-
         </Routes>
       </Suspense>
     </BrowserRouter>

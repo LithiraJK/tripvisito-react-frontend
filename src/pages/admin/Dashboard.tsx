@@ -4,6 +4,9 @@ import StatsCard from "../../components/StatsCard";
 import TripCard from "../../components/TripCard";
 import {dashboardStats, allTrips } from "../../constants";
 import { getMyDetails } from "../../services/auth";
+import { FaPlus } from "react-icons/fa6";
+
+
 
 const { totalUsers, usersJoined, totalTrips, tripsCreated, userGrowth } =
   dashboardStats;
@@ -41,6 +44,9 @@ const Dashboard = () => {
       <Header
         title={`Welcome, ${user?.name ?? "Guest"} 👋`}
         description="Track activity, trends and popular destinations"
+        ctaText="Create a trip"
+        ctaURL="/trip/create"
+        icon={<FaPlus />}
       />
 
       <section className="flex flex-col gap-6">

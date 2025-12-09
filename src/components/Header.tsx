@@ -1,14 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
-import { FaPlus } from "react-icons/fa6";
 
 interface Props {
   title: string;
   description: string;
   ctaText?: string;
   ctaURL?: string;
+  icon?: React.ReactNode;
 }
-const Header = ({ title, description, ctaText , ctaURL }: Props) => {
+const Header = ({ title, description, ctaText , ctaURL, icon }: Props) => {
 
   {/* Track location for dynamic styling Header using useLocation hook */}
   const location = useLocation()
@@ -20,9 +20,9 @@ const Header = ({ title, description, ctaText , ctaURL }: Props) => {
         <p className={ cn("text-gray-600 mb-4" , location.pathname === '/' ? 'text-lg md:text-xl' : 'text-sm md:text-base' ) }>{description}</p>
       </article> 
 
-      {ctaText && ctaURL && (
+      {ctaText && ctaURL && icon && (
         <Link to={ctaURL}>
-          <button className="bg-blue-500 w-full md:w-60 text-white p-2 font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-none"><FaPlus />{ctaText}</button>
+          <button className="bg-blue-500 w-full md:w-60 text-white p-2 font-semibold rounded-lg flex items-center justify-center gap-1.5 shadow-none">{icon}{ctaText}</button>
         </Link>
       )}
 
