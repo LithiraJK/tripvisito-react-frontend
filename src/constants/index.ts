@@ -1,23 +1,27 @@
 import { formatDate } from "../lib/utils";
+import { IoMdHome } from "react-icons/io";
+import { FaUsers } from "react-icons/fa";
+import { FaRegMap } from "react-icons/fa";
+
 
 export const sidebarItems = [
   {
     id: 1,
-    icon: "src/assets/icons/home.svg",
+    icon: IoMdHome,
     label: "Dashboard",
     href: "admin/dashboard",
   },
   {
     id: 2,
-    icon: "src/assets/icons/users.svg",
+    icon: FaUsers,
     label: "All Users",
-    href: "all-users",
+    href: "admin/all-users",
   },
   {
     id: 3,
-    icon: "src/assets/icons/itinerary.svg",
+    icon: FaRegMap,
     label: "AI Trips",
-    href: "trips",
+    href: "admin/trips",
   },
 ];
 
@@ -129,41 +133,3 @@ export const dashboardStats = {
     userGrowth: { total: 60, currentMonth: 25, lastMonth: 20 },
   };
 
-export const allTrips = [
-  {
-    id: 1,
-    name: "Tropical Rewind",
-    imageUrls: ["src/assets/images/sample1.jpg"],
-    itinerary: [{ location: "Thailand" }],
-    tags: ["Adventure", "Culture"],
-    travelStyle: "Solo",
-    estimatedPrice: "$1,000",
-  },
-  {
-    id: 2,
-    name: "French Reverie",
-    imageUrls: ["src/assets/images/sample2.jpg"],
-    itinerary: [{ location: "Paris" }],
-    tags: ["Relaxation", "Culinary"],
-    travelStyle: "Family",
-    estimatedPrice: "$2,000",
-  },
-  {
-    id: 3,
-    name: "Zen Break",
-    imageUrls: ["src/assets/images/sample3.jpg"],
-    itinerary: [{ location: "Japan" }],
-    tags: ["Shopping", "Culinary" ,"Luxury"],
-    travelStyle: "Couple",
-    estimatedPrice: "$3,000",
-  },
-  {
-    id: 4,
-    name: "Adventure in Westeros",
-    imageUrls: ["src/assets/images/sample4.jpg"],
-    itinerary: [{ location: "Croatia" }],
-    tags: ["Historical", "Culture"],
-    travelStyle: "Friends",
-    estimatedPrice: "$4,000",
-  },
-];

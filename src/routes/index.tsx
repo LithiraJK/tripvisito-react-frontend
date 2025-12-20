@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import { CreateTrip } from "../pages/trip/CreateTrip";
 import TripDetails from "../pages/trip/TripDetails";
 import LandingLayout from "../components/LandingLayout";
+import CreateUser from "../pages/admin/CreateUser";
 
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
@@ -60,6 +61,7 @@ const Router = () => {
           {/* Landing Page with Layout */}
           <Route element={<LandingLayout />}>
             <Route path="/" element={<Index />} />
+            <Route path="/trip/:tripId" element={<TripDetails />} />
           </Route>
 
           {/* Auth Pages - Full Page (No Layout) */}
@@ -75,8 +77,9 @@ const Router = () => {
             }
           >
             <Route path="/admin/dashboard" element={<Dashboard />} />
-            <Route path="/all-users" element={<AllUsers />} />
-            <Route path="/trips" element={<Trips />} />
+            <Route path="/admin/all-users" element={<AllUsers />} />
+            <Route path="/admin/trips" element={<Trips />} />
+            <Route path="/admin/user/create" element={<CreateUser />} />
           </Route>
           <Route
             element={
@@ -85,9 +88,9 @@ const Router = () => {
               </RequireAuth>
             }
           >
-            <Route path="/trip/create" element={<CreateTrip />} />
+            <Route path="/admin/trip/create" element={<CreateTrip />} />
             {/* Dynamic Routes */}
-            <Route path="/trip/:tripId" element={<TripDetails />} />
+            <Route path="/admin/trip/:tripId" element={<TripDetails />} />
           </Route>
         </Routes>
       </Suspense>

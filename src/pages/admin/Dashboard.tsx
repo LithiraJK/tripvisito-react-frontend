@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import StatsCard from "../../components/StatsCard";
 import TripCard from "../../components/TripCard";
-import {dashboardStats, allTrips } from "../../constants";
+import {dashboardStats } from "../../constants";
 import { getMyDetails } from "../../services/auth";
 import { FaPlus } from "react-icons/fa6";
+import { getAllTrips } from "../../services/trip";
 
 
 
@@ -14,6 +15,7 @@ const { totalUsers, usersJoined, totalTrips, tripsCreated, userGrowth } =
 const Dashboard = () => {
 
    const [user, setUser] = useState<any>(null);
+   const [allTrips, setAllTrips] = useState<any[]>([]);
 
 
    useEffect(() => {
@@ -31,8 +33,18 @@ const Dashboard = () => {
       }
     }
 
-    getUserDetails();
+    const fetchAllTrips = async () => {
+          try {
+            const response = await getAllTrips(1, 4);
+            console.log("All Trips Data:", response);
+            setAllTrips(response.data.trips || []);
+          } catch (error) {
+            console.error("Error loading popular trips:", error);
+          }
+        };
 
+    getUserDetails();
+    fetchAllTrips();
     return () => {
       isMounted = false;
     };
@@ -45,7 +57,7 @@ const Dashboard = () => {
         title={`Welcome, ${user?.name ?? "Guest"} 👋`}
         description="Track activity, trends and popular destinations"
         ctaText="Create a trip"
-        ctaURL="/trip/create"
+        ctaURL="/admin/trip/create"
         icon={<FaPlus />}
       />
 
@@ -74,27 +86,28 @@ const Dashboard = () => {
         </div>
       </section>
 
-      <section className="flex flex-col gap-6">
+       <section className="flex flex-col gap-6">
         <div className="flex flex-col gap-9 mt-2.5">
           <h1 className="text-xl font-semibold text-black">Trips</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7">
-            {allTrips
-              .slice(0, 4)
-              .map(
-                ({ id, name, imageUrls, itinerary, tags, estimatedPrice }) => (
-                  <TripCard
-                    id={id.toString()}
-                    name={name}
-                    imageUrl={imageUrls[0]}
-                    location={itinerary?.[0]?.location ?? ""}
-                    tags={tags}
-                    price={estimatedPrice}
-                  />
-                )
-              )}
+            {allTrips.map((trip) => (
+              <TripCard
+                key={trip.id}
+                id={trip.id}
+                name={trip.tripDetails?.name || ""}
+                location={trip.tripDetails?.location?.city || ""}
+                imageUrl={trip.imageUrls?.[0] || ""}
+                tags={[
+                  trip.tripDetails?.budget,
+                  trip.tripDetails?.travelStyle,
+                  trip.tripDetails?.interests,
+                ].filter(Boolean)}
+                price={trip.tripDetails?.estimatedPrice || ""}
+              />
+            ))}
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
     </main>
   );
 };

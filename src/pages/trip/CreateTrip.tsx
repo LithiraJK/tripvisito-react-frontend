@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect} from "react";
 import ComboBox from "../../components/ComboBox";
 import Header from "../../components/Header";
 import WorldMap from "../../components/WorldMap";
@@ -131,7 +131,7 @@ export const CreateTrip = () => {
 
       //navigate to edit page with tripData
       if(tripData.data && tripData.data.tripId){
-        navigate(`/trip/${tripData.data.tripId}`);
+        navigate(`/admin/trip/${tripData.data.tripId}`);
       }else{
         setError("Invalid trip data received from server");
       }

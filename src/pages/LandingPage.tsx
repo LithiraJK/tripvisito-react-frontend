@@ -50,7 +50,7 @@ const Index = () => {
                 Customize your travel itinerary in minutes—pick your destination, set your preferences, and explore with confidence.
               </p>
               <Link
-                to="/register"
+                to="/login"
                 className="inline-block bg-blue-600 hover:bg-blue-700 transition-colors px-8 py-3 text-white font-semibold rounded-lg shadow-lg"
               >
                 Get Started

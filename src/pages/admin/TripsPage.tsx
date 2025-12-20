@@ -37,7 +37,7 @@ const TripsPage = () => {
         title="Trips"
         description="Manage all trips here"
         ctaText="Create a Trip"
-        ctaURL="/trip/create"
+        ctaURL="/admin/trip/create"
         icon={<FaPlus />}
       />
       <section>

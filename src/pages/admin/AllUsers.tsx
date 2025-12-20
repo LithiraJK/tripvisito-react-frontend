@@ -121,7 +121,6 @@ const AllUsers = () => {
         );
       }
 
-      // Show ellipsis before last page
       if (page < totalPages - 2) {
         buttons.push(
           <span key="ellipsis2" className="text-gray-400 px-1">
@@ -130,7 +129,6 @@ const AllUsers = () => {
         );
       }
 
-      // Show last page
       buttons.push(
         <button
           key={totalPages}
@@ -162,7 +160,7 @@ const AllUsers = () => {
 
   return (
     <main className="w-full min-h-screen flex flex-col gap-10 max-w-7xl mx-auto px-4 lg:px-8">
-      <Header title="All Users" description="Manage all users here" ctaText="Add new User" ctaURL="/user/create" icon={<FaPlus />} />
+      <Header title="All Users" description="Manage all users here" ctaText="Add new User" ctaURL="/admin/user/create" icon={<FaPlus />} />
       <section>
         {loading ? (
           <div className="flex justify-center items-center py-12">

@@ -22,13 +22,16 @@ const TripCard = ({
 }: TripCardProps) => {
   const path = useLocation();
 
+
+  const isAdmin = path.pathname.startsWith("/admin");
+
+  const tripLink = isAdmin
+    ? `/admin/trip/${id}`
+    : `/trip/${id}`;
+
   return (
     <Link
-      to={
-        path.pathname === "/" || path.pathname.startsWith("/trip")
-          ? `/trip/${id}`
-          : `/trip/${id}`
-      }
+      to={tripLink}
       className="shadow-md bg-white rounded-[16px] flex-col w-full relative shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out"
     >
       <img

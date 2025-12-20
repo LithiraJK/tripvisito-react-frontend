@@ -49,10 +49,9 @@ const NavItems = () => {
 
         <div className="flex flex-col gap-9 mt-2.5 flex-1">
             <nav>
-                {sidebarItems.map(({id, href , icon , label}) => (
+                {sidebarItems.map(({id, href , icon: Icon , label}) => (
                     <NavLink to={href} key={id} className={({isActive}) => `flex items-center gap-2 p-4 font-medium border-0 rounded-lg mb-2 transition-colors ${isActive ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-100'}`}>
-                      {icon && <img src={icon} alt={label} className='size-5' />}
-                      {label}
+                      <Icon className='size-5' />{label}
                     </NavLink>
                 ))}
             </nav>
