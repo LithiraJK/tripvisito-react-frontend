@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 interface ButtonProps {
     ctaText?: string;
     ctaURL?: string;
-    variant?: 'primary' | 'secondary' | 'outline';
+    variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'warning';
     fullWidth?: boolean;
     onClick?: () => void;
     disabled?: boolean;
@@ -31,7 +31,9 @@ const Button = ({
     const variantStyles = {
         primary: "bg-blue-500 text-white hover:bg-blue-600 disabled:bg-blue-300",
         secondary: "bg-gray-500 text-white hover:bg-gray-600 disabled:bg-gray-300",
-        outline: "border-2 border-blue-500 text-blue-500 hover:bg-blue-50 disabled:border-gray-300 disabled:text-gray-300"
+        outline: "border-2 border-blue-500 text-blue-500 hover:bg-blue-50 disabled:border-gray-300 disabled:text-gray-300",
+        danger: "bg-red-500 text-white hover:bg-red-600 disabled:bg-red-300",
+        warning: "bg-yellow-500 text-white hover:bg-yellow-600 disabled:bg-yellow-300",
     };
 
     const buttonClasses = `${baseStyles} ${widthStyles} ${variantStyles[variant]} ${className}`;

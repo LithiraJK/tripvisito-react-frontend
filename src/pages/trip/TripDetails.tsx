@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import { getTripDetails, getAllTrips } from "../../services/trip";
 import InfoPill from "../../components/InfoPill";
@@ -11,6 +11,7 @@ import { FaStar } from "react-icons/fa";
 import TripCard from "../../components/TripCard";
 import Button from "../../components/Button";
 import WorldMap from "../../components/WorldMap";
+import { AiFillEdit } from "react-icons/ai";
 
 export interface DayPlan {
   day: number;
@@ -32,6 +33,10 @@ const TripDetails = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const path = useLocation();
+
+  const isAdmin = path.pathname.startsWith("/admin");
 
   const {
     name,
@@ -97,6 +102,9 @@ const TripDetails = () => {
         <Header
           title="Trip Details"
           description="View and edit AI-generated travel plans"
+          ctaText="Edit Trip Data"
+          ctaURL="/admin/trip/edit"
+          icon = {<AiFillEdit />}
         />
         <div className="flex items-center justify-center py-20">
           <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
@@ -111,6 +119,11 @@ const TripDetails = () => {
         <Header
           title="Trip Details"
           description="View and edit AI-generated travel plans"
+          {...(isAdmin && {
+            ctaText: "Edit Trip Data",
+            ctaURL: "/admin/trip/edit",
+            icon: <AiFillEdit />
+          })}
         />
         <div className="text-center py-20">
           <h2 className="text-xl font-bold mb-2 text-red-600">{error}</h2>
@@ -122,9 +135,14 @@ const TripDetails = () => {
   return (
     <main className="flex flex-col gap-10 pb-20 w-full max-w-7xl mx-auto px-4 lg:px-8">
       <Header
-        title="Trip Details"
-        description="View and edit AI-generated travel plans"
-      />
+          title="Trip Details"
+          description="View and edit AI-generated travel plans"
+          {...(isAdmin && {
+            ctaText: "Edit Trip Data",
+            ctaURL: "/admin/trip/edit",
+            icon: <AiFillEdit />
+          })}
+        />
       <section className="flex flex-col gap-9 mt-2.5  w-full max-w-3xl px-4 lg:px-8 mx-auto">
         <header>
           <h1 className="text-3xl font-semibold mb-3 text-black md:text-4xl">
