@@ -9,6 +9,8 @@ import TripDetails from "../pages/trip/TripDetails";
 import LandingLayout from "../components/LandingLayout";
 import CreateUser from "../pages/admin/CreateUser";
 import UpdateTrip from "../pages/trip/UpdateTrip";
+import Payment from "../pages/trip/Payment";
+import ThankyouMessage from "../components/ThankyouMessage";
 
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
@@ -63,6 +65,11 @@ const Router = () => {
           <Route element={<LandingLayout />}>
             <Route path="/" element={<Index />} />
             <Route path="/trip/:tripId" element={<TripDetails />} />
+            <Route path="/trip/payment" element={<Payment />} />
+            <Route path="/trip/payment/success" element={<ThankyouMessage />} />
+
+
+
           </Route>
 
           {/* Auth Pages - Full Page (No Layout) */}

@@ -33,7 +33,7 @@ const TripDetails = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const path = useLocation();
 
   const isAdmin = path.pathname.startsWith("/admin");
@@ -84,7 +84,7 @@ const TripDetails = () => {
 
     const fetchAllTrips = async () => {
       try {
-        const response = await getAllTrips(1, 2);
+        const response = await getAllTrips(1, 4);
         console.log("All Trips Data:", response);
         setPopularTrips(response.data.trips || []);
       } catch (error) {
@@ -104,7 +104,7 @@ const TripDetails = () => {
           description="View and edit AI-generated travel plans"
           ctaText="Edit Trip Data"
           ctaURL="/admin/trip/edit"
-          icon = {<AiFillEdit />}
+          icon={<AiFillEdit />}
         />
         <div className="flex items-center justify-center py-20">
           <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
@@ -122,7 +122,7 @@ const TripDetails = () => {
           {...(isAdmin && {
             ctaText: "Edit Trip Data",
             ctaURL: "/admin/trip/edit",
-            icon: <AiFillEdit />
+            icon: <AiFillEdit />,
           })}
         />
         <div className="text-center py-20">
@@ -135,14 +135,14 @@ const TripDetails = () => {
   return (
     <main className="flex flex-col gap-10 pb-20 w-full max-w-7xl mx-auto px-4 lg:px-8">
       <Header
-          title="Trip Details"
-          description="View and edit AI-generated travel plans"
-          {...(isAdmin && {
-            ctaText: "Edit Trip Data",
-            ctaURL: "/admin/trip/edit",
-            icon: <AiFillEdit />
-          })}
-        />
+        title="Trip Details"
+        description="View and edit AI-generated travel plans"
+        {...(isAdmin && {
+          ctaText: "Edit Trip Data",
+          ctaURL: "/admin/trip/edit",
+          icon: <AiFillEdit />,
+        })}
+      />
       <section className="flex flex-col gap-9 mt-2.5  w-full max-w-3xl px-4 lg:px-8 mx-auto">
         <header>
           <h1 className="text-3xl font-semibold mb-3 text-black md:text-4xl">
@@ -288,35 +288,34 @@ const TripDetails = () => {
         <div>
           <Button
             ctaText={`Pay & Join Trip ${estimatedPrice}`}
+            ctaURL="/trip/payment"
             variant="primary"
-            className="md:w-full"
-            disabled
-
+            className="md:w-full cursor-pointer"
+            disabled={isAdmin}
           />
         </div>
-
+      </section>
+      
+      <section className="flex flex-col gap-6">
         <div className="bg-gray-200 h-px w-full" />
-
-        <section className="flex flex-col gap-6">
-          <h2 className="text-2xl font-semibold">Popular Trips</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-7">
-            {popularTrips.map((trip) => (
-              <TripCard
-                key={trip.id}
-                id={trip.id}
-                name={trip.tripDetails?.name || ""}
-                location={trip.tripDetails?.location?.city || ""}
-                imageUrl={trip.imageUrls?.[0] || ""}
-                tags={[
-                  trip.tripDetails?.budget,
-                  trip.tripDetails?.travelStyle,
-                  trip.tripDetails?.interests,
-                ].filter(Boolean)}
-                price={trip.tripDetails?.estimatedPrice || ""}
-              />
-            ))}
-          </div>
-        </section>
+        <h2 className="text-2xl font-semibold">Popular Trips</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7">
+          {popularTrips.map((trip) => (
+            <TripCard
+              key={trip.id}
+              id={trip.id}
+              name={trip.tripDetails?.name || ""}
+              location={trip.tripDetails?.location?.city || ""}
+              imageUrl={trip.imageUrls?.[0] || ""}
+              tags={[
+                trip.tripDetails?.budget,
+                trip.tripDetails?.travelStyle,
+                trip.tripDetails?.interests,
+              ].filter(Boolean)}
+              price={trip.tripDetails?.estimatedPrice || ""}
+            />
+          ))}
+        </div>
       </section>
     </main>
   );

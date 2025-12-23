@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { getAllTrips } from "../services/trip";
 import TripCard from "../components/TripCard";
+import Footer from "../components/Footer";
 
 
 const Index = () => {
@@ -35,15 +36,15 @@ const Index = () => {
 
 
   return (
-    <>
+    <div className="absolute w-full top-0 left-0">
       {/* Hero Section */}
-      <section className='relative w-full min-h-screen flex items-center bg-[url("src/assets/images/hero-img.png")] bg-cover bg-center bg-no-repeat'>
-        <div className="absolute inset-0 bg-gradient-to-br from-white/100 via-white/20 to-transparent"></div>
+      <section className='w-full min-h-screen flex items-center bg-[url("src/assets/images/hero-img.png")] bg-cover bg-center bg-no-repeat'>
+        <div className="absolute h-screen inset-0 bg-linear-to-br from-[#c9efff] via-[#cff1ff3f] to-transparent"></div>
         
         <div className="relative w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="max-w-2xl">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-black mb-6 leading-tight">
                 Plan Your<br />Trip with Ease
               </h1>
               <p className="text-base sm:text-lg text-gray-700 mb-8 leading-relaxed">
@@ -76,7 +77,7 @@ const Index = () => {
                 alt="Australia Tour" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent">
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
                   <span className="bg-white text-orange-500 font-semibold px-2.5 py-1 sm:px-3 rounded-full text-xs sm:text-sm">3.5</span>
                 </div>
@@ -96,7 +97,7 @@ const Index = () => {
                 alt="Australia Tour" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent">
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
                   <span className="bg-white text-orange-500 font-semibold px-2.5 py-1 sm:px-3 rounded-full text-xs sm:text-sm">3.5</span>
                 </div>
@@ -116,7 +117,7 @@ const Index = () => {
                 alt="Japan Tour" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent">
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
                   <span className="bg-white text-orange-500 font-semibold px-2.5 py-1 sm:px-3 rounded-full text-xs sm:text-sm">3.5</span>
                 </div>
@@ -136,7 +137,7 @@ const Index = () => {
                 alt="London, United State" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent">
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
                   <span className="bg-white text-orange-500 font-semibold px-2.5 py-1 sm:px-3 rounded-full text-xs sm:text-sm">3.5</span>
                 </div>
@@ -158,7 +159,7 @@ const Index = () => {
                 alt="Japan Tour" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent">
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
                   <span className="bg-white text-orange-500 font-semibold px-2.5 py-1 sm:px-3 rounded-full text-xs sm:text-sm">3.5</span>
                 </div>
@@ -177,8 +178,8 @@ const Index = () => {
                 src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?" 
                 alt="Japan Tour" 
                 className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent">
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
                   <span className="bg-white text-orange-500 font-semibold px-2.5 py-1 sm:px-3 rounded-full text-xs sm:text-sm">3.5</span>
                 </div>
@@ -310,21 +311,9 @@ const Index = () => {
 
      
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <span className="text-xl font-bold text-blue-600">🌍 Tourvisto</span>
-            </div>
-            <div className="flex gap-6 text-sm text-gray-600">
-              <a href="#" className="hover:text-gray-900">Terms & Condition</a>
-              <a href="#" className="hover:text-gray-900">Privacy Policy</a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </>
+     
+    <Footer />
+    </div>
   );
 };
 

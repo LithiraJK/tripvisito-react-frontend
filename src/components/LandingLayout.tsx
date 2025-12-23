@@ -1,19 +1,24 @@
 import { Outlet } from 'react-router-dom'
 import NavBar from './NavBar'
+import Footer from './Footer'
 
 
 const LandingLayout = () => {
   return (
     <div className='min-h-screen min-w-[375px]'>
-      <header className='absolute top-0 left-0 right-0 z-50 glassmorphism backdrop-blur-sm'>
+      <header className='absolute top-0 left-0 w-full glassmorphism border-0 rounded-2xl shadow-lg'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <NavBar />
         </div>
       </header>
 
-      <main>
+      <main className='pt-24'>
         <Outlet />
       </main>
+
+      <footer>
+        <Footer />
+      </footer>
     </div>
   )
 }
