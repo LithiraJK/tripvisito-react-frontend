@@ -14,3 +14,8 @@ export const getAllTrips = async (page: number , limit:number) => {
   const res = await api.get(`/trip/all?page=${page}&limit=${limit}`);
   return res.data;
 }
+
+export const getTripsByUser = async (page: number , limit:number) => {
+  const res = await api.get(`/trip/user-trips?page=${page}&limit=${limit}`);
+  return res.data;
+}

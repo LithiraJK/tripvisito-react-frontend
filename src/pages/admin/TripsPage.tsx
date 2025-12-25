@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import TripCard from "../../components/TripCard";
-import { getAllTrips } from "../../services/trip";
+import { getAllTrips, getTripsByUser } from "../../services/trip";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { FaPlus } from "react-icons/fa6";
 
@@ -17,7 +17,7 @@ const TripsPage = () => {
     const fetchTrips = async () => {
       setLoading(true);
       try {
-        const response = await getAllTrips(page, 8);
+        const response = await getTripsByUser(page, 8);
         setTrips(response.data.trips || []);
         setTotalPages(response.data.totalPages || 1);
         setLoading(false);

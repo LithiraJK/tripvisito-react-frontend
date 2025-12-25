@@ -44,7 +44,7 @@ const Index = () => {
         <div className="relative w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="max-w-2xl">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-black mb-6 leading-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-gray-800 mb-6 leading-tight">
                 Plan Your<br />Trip with Ease
               </h1>
               <p className="text-base sm:text-lg text-gray-700 mb-8 leading-relaxed">
