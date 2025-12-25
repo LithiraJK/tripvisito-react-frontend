@@ -103,7 +103,7 @@ const TripDetails = () => {
           title="Trip Details"
           description="View and edit AI-generated travel plans"
           ctaText="Edit Trip Data"
-          ctaURL="/admin/trip/edit"
+          ctaURL={`/admin/trip/edit/${tripId}`}
           icon={<AiFillEdit />}
         />
         <div className="flex items-center justify-center py-20">
@@ -121,7 +121,7 @@ const TripDetails = () => {
           description="View and edit AI-generated travel plans"
           {...(isAdmin && {
             ctaText: "Edit Trip Data",
-            ctaURL: "/admin/trip/edit",
+            ctaURL: `/admin/trip/edit/${tripId}`,
             icon: <AiFillEdit />,
           })}
         />
@@ -139,7 +139,7 @@ const TripDetails = () => {
         description="View and edit AI-generated travel plans"
         {...(isAdmin && {
           ctaText: "Edit Trip Data",
-          ctaURL: "/admin/trip/edit",
+          ctaURL: `/admin/trip/edit/${tripId}`,
           icon: <AiFillEdit />,
         })}
       />

@@ -99,7 +99,7 @@ const Router = () => {
             <Route path="/admin/trip/create" element={<CreateTrip />} />
             {/* Dynamic Routes */}
             <Route path="/admin/trip/:tripId" element={<TripDetails />} />
-            <Route path="/admin/trip/edit" element={<UpdateTrip/>} />
+            <Route path="/admin/trip/edit/:tripId" element={<UpdateTrip/>} />
           </Route>
         </Routes>
       </Suspense>

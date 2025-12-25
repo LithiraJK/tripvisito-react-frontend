@@ -1,9 +1,12 @@
 import Header from '../../components/Header'
 import Button from '../../components/Button'
 import ComboBox from '../../components/ComboBox'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FiUpload, FiX } from 'react-icons/fi'
 import { MdAdd, MdDelete } from 'react-icons/md'
+import { useParams, useNavigate } from 'react-router-dom'
+import { getTripDetails, updateTrip } from '../../services/trip'
+import toast from 'react-hot-toast'
 
 interface Activity {
   time: 'Morning' | 'Afternoon' | 'Evening'
@@ -17,6 +20,12 @@ interface DayItinerary {
 }
 
 const UpdateTrip = () => {
+
+  const { tripId } = useParams<{ tripId: string }>();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [imageFiles, setImageFiles] = useState<(File | null)[]>([null, null, null]);
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -45,6 +54,81 @@ const UpdateTrip = () => {
   const [weatherInfo, setWeatherInfo] = useState<string[]>([''])
 
   const [images, setImages] = useState<(string | null)[]>([null, null, null])
+
+  useEffect(() => {
+    const fetchTripData = async () => {
+      if (!tripId) {
+        toast.error('Trip ID is missing');
+        navigate('/admin/trips');
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await getTripDetails(tripId);
+        const trip = response.data.trip;
+
+        console.log(trip)
+        
+        const tripDetails = typeof trip.tripDetails === 'string' 
+          ? JSON.parse(trip.tripDetails) 
+          : trip.tripDetails;
+
+        // Helper function to capitalize first letter of each word
+        const capitalizeWords = (str: string) => {
+          if (!str) return '';
+          return str.split('-').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          ).join('-');
+        };
+
+        setFormData({
+          name: tripDetails.name || '',
+          description: tripDetails.description || '',
+          estimatedPrice: tripDetails.estimatedPrice || '',
+          duration: tripDetails.duration || 5,
+          budget: capitalizeWords(tripDetails.budget || ''),
+          travelStyle: capitalizeWords(tripDetails.travelStyle || ''),
+          country: tripDetails.country || '',
+          interests: capitalizeWords(tripDetails.interests || ''),
+          groupType: capitalizeWords(tripDetails.groupType || '')
+        });
+
+        if (tripDetails.itinerary && tripDetails.itinerary.length > 0) {
+          setItinerary(tripDetails.itinerary);
+        }
+
+        if (tripDetails.bestTimeToVisit && tripDetails.bestTimeToVisit.length > 0) {
+          setBestTimeToVisit(tripDetails.bestTimeToVisit);
+        }
+
+        if (tripDetails.weatherInfo && tripDetails.weatherInfo.length > 0) {
+          setWeatherInfo(tripDetails.weatherInfo);
+        }
+
+        // Set existing images
+        if (trip.imageUrls && trip.imageUrls.length > 0) {
+          const existingImages = [...images];
+          trip.imageUrls.forEach((url: string, index: number) => {
+            if (index < 3) {
+              existingImages[index] = url;
+            }
+          });
+          setImages(existingImages);
+        }
+
+        toast.success('Trip data loaded successfully');
+      } catch (error: any) {
+        console.error('Error fetching trip:', error);
+        toast.error(error.response?.data?.message || 'Failed to load trip data');
+        navigate('/admin/trips');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTripData();
+  }, [tripId, navigate]);
 
   const handleChange = (key: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [key]: value }))
@@ -120,6 +204,13 @@ const UpdateTrip = () => {
   const handleImageUpload = (index: number, file: File | null) => {
     if (!file) return
     
+    // Store the actual file for upload
+    setImageFiles(prev => {
+      const newFiles = [...prev];
+      newFiles[index] = file;
+      return newFiles;
+    });
+    
     const reader = new FileReader()
     reader.onloadend = () => {
       setImages(prev => {
@@ -137,18 +228,85 @@ const UpdateTrip = () => {
       newImages[index] = null
       return newImages
     })
+    setImageFiles(prev => {
+      const newFiles = [...prev];
+      newFiles[index] = null;
+      return newFiles;
+    });
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const tripData = {
-      ...formData,
-      itinerary,
-      bestTimeToVisit,
-      weatherInfo,
-      images: images.filter(img => img !== null)
+    
+    // Validate that at least 3 images are present
+    const validImages = images.filter(img => img !== null);
+    if (validImages.length < 3) {
+      toast.error('Please upload at least 3 images');
+      return;
     }
-    console.log('Trip data to submit:', tripData)
+
+    try {
+      const formDataToSend = new FormData();
+
+      // Create trip details object
+      const tripDetails = {
+        name: formData.name,
+        description: formData.description,
+        estimatedPrice: formData.estimatedPrice,
+        duration: formData.duration,
+        budget: formData.budget,
+        travelStyle: formData.travelStyle,
+        country: formData.country,
+        interests: formData.interests,
+        groupType: formData.groupType,
+        itinerary: itinerary,
+        bestTimeToVisit: bestTimeToVisit.filter(item => item.trim() !== ''),
+        weatherInfo: weatherInfo.filter(item => item.trim() !== '')
+      };
+
+      // Append trip details as JSON string
+      formDataToSend.append('tripDetails', JSON.stringify(tripDetails));
+
+      imageFiles.forEach((file, index) => {
+        if (file) {
+          formDataToSend.append('imageURLs', file);
+        }
+      });
+
+      const existingImages = images
+        .map((img, index) => imageFiles[index] ? null : img)
+        .filter(img => img !== null && typeof img === 'string');
+      
+      if (existingImages.length > 0) {
+        formDataToSend.append('existingImages', JSON.stringify(existingImages));
+      }
+
+      toast.loading('Updating trip...');
+      
+      await updateTrip(tripId!, formDataToSend);
+      
+      toast.dismiss();
+      toast.success('Trip updated successfully!');
+      navigate('/admin/trips');
+    } catch (error: any) {
+      toast.dismiss();
+      console.error('Error updating trip:', error);
+      toast.error(error.response?.data?.message || 'Failed to update trip');
+    }
+  }
+
+  if (loading) {
+    return (
+      <main className='flex flex-col gap-10 pb-20 w-full max-w-7xl mx-auto px-4 lg:px-8'>
+        <Header
+          title="Loading Trip Details..."
+          description="Please wait while we fetch the trip information"
+        />
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </main>
+    );
   }
 
   return (

@@ -19,3 +19,12 @@ export const getTripsByUser = async (page: number , limit:number) => {
   const res = await api.get(`/trip/user-trips?page=${page}&limit=${limit}`);
   return res.data;
 }
+
+export const updateTrip = async (tripId: string, formData: FormData) => {
+  const res = await api.put(`/trip/edit/${tripId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+  return res.data;
+}
