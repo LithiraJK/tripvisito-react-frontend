@@ -1,65 +1,89 @@
-import Header from '../../components/Header'
-import Button from '../../components/Button'
-import ComboBox from '../../components/ComboBox'
-import { useState, useEffect } from 'react'
-import { FiUpload, FiX } from 'react-icons/fi'
-import { MdAdd, MdDelete } from 'react-icons/md'
-import { useParams, useNavigate } from 'react-router-dom'
-import { getTripDetails, updateTrip } from '../../services/trip'
-import toast from 'react-hot-toast'
+import Header from "../../components/Header";
+import Button from "../../components/Button";
+import ComboBox from "../../components/ComboBox";
+import { useState, useEffect } from "react";
+import { FiUpload, FiX } from "react-icons/fi";
+import { MdAdd, MdDelete } from "react-icons/md";
+import { useParams, useNavigate } from "react-router-dom";
+import { deleteTrip, getTripDetails, updateTrip } from "../../services/trip";
+import toast from "react-hot-toast";
 
 interface Activity {
-  time: 'Morning' | 'Afternoon' | 'Evening'
-  description: string
+  time: "Morning" | "Afternoon" | "Evening";
+  description: string;
 }
 
 interface DayItinerary {
-  day: number
-  location: string
-  activities: Activity[]
+  day: number;
+  location: string;
+  activities: Activity[];
 }
 
 const UpdateTrip = () => {
+  
+  const handleDelete = async () => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this trip? This action cannot be undone."
+      )
+    ) {
+      try {
+        toast.loading("Deleting trip...");
+        await deleteTrip(tripId!);
+        toast.dismiss();
+        toast.success("Trip deleted successfully!");
+        navigate("/admin/trips");
+      } catch (error: any) {
+        toast.dismiss();
+        console.error("Error deleting trip:", error);
+        toast.error(error.response?.data?.message || "Failed to delete trip");
+      }
+    }
+  };
 
   const { tripId } = useParams<{ tripId: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [imageFiles, setImageFiles] = useState<(File | null)[]>([null, null, null]);
+  const [imageFiles, setImageFiles] = useState<(File | null)[]>([
+    null,
+    null,
+    null,
+  ]);
 
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    estimatedPrice: '',
+    name: "",
+    description: "",
+    estimatedPrice: "",
     duration: 5,
-    budget: '',
-    travelStyle: '',
-    country: '',
-    interests: '',
-    groupType: ''
-  })
+    budget: "",
+    travelStyle: "",
+    country: "",
+    interests: "",
+    groupType: "",
+  });
 
   const [itinerary, setItinerary] = useState<DayItinerary[]>([
     {
       day: 1,
-      location: '',
+      location: "",
       activities: [
-        { time: 'Morning', description: '' },
-        { time: 'Afternoon', description: '' },
-        { time: 'Evening', description: '' }
-      ]
-    }
-  ])
+        { time: "Morning", description: "" },
+        { time: "Afternoon", description: "" },
+        { time: "Evening", description: "" },
+      ],
+    },
+  ]);
 
-  const [bestTimeToVisit, setBestTimeToVisit] = useState<string[]>([''])
-  const [weatherInfo, setWeatherInfo] = useState<string[]>([''])
+  const [bestTimeToVisit, setBestTimeToVisit] = useState<string[]>([""]);
+  const [weatherInfo, setWeatherInfo] = useState<string[]>([""]);
 
-  const [images, setImages] = useState<(string | null)[]>([null, null, null])
+  const [images, setImages] = useState<(string | null)[]>([null, null, null]);
 
   useEffect(() => {
     const fetchTripData = async () => {
       if (!tripId) {
-        toast.error('Trip ID is missing');
-        navigate('/admin/trips');
+        toast.error("Trip ID is missing");
+        navigate("/admin/trips");
         return;
       }
 
@@ -68,37 +92,45 @@ const UpdateTrip = () => {
         const response = await getTripDetails(tripId);
         const trip = response.data.trip;
 
-        console.log(trip)
-        
-        const tripDetails = typeof trip.tripDetails === 'string' 
-          ? JSON.parse(trip.tripDetails) 
-          : trip.tripDetails;
+        console.log(trip);
+
+        const tripDetails =
+          typeof trip.tripDetails === "string"
+            ? JSON.parse(trip.tripDetails)
+            : trip.tripDetails;
 
         // Helper function to capitalize first letter of each word
         const capitalizeWords = (str: string) => {
-          if (!str) return '';
-          return str.split('-').map(word => 
-            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          ).join('-');
+          if (!str) return "";
+          return str
+            .split("-")
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
+            .join("-");
         };
 
         setFormData({
-          name: tripDetails.name || '',
-          description: tripDetails.description || '',
-          estimatedPrice: tripDetails.estimatedPrice || '',
+          name: tripDetails.name || "",
+          description: tripDetails.description || "",
+          estimatedPrice: tripDetails.estimatedPrice || "",
           duration: tripDetails.duration || 5,
-          budget: capitalizeWords(tripDetails.budget || ''),
-          travelStyle: capitalizeWords(tripDetails.travelStyle || ''),
-          country: tripDetails.country || '',
-          interests: capitalizeWords(tripDetails.interests || ''),
-          groupType: capitalizeWords(tripDetails.groupType || '')
+          budget: capitalizeWords(tripDetails.budget || ""),
+          travelStyle: capitalizeWords(tripDetails.travelStyle || ""),
+          country: tripDetails.country || "",
+          interests: capitalizeWords(tripDetails.interests || ""),
+          groupType: capitalizeWords(tripDetails.groupType || ""),
         });
 
         if (tripDetails.itinerary && tripDetails.itinerary.length > 0) {
           setItinerary(tripDetails.itinerary);
         }
 
-        if (tripDetails.bestTimeToVisit && tripDetails.bestTimeToVisit.length > 0) {
+        if (
+          tripDetails.bestTimeToVisit &&
+          tripDetails.bestTimeToVisit.length > 0
+        ) {
           setBestTimeToVisit(tripDetails.bestTimeToVisit);
         }
 
@@ -117,11 +149,13 @@ const UpdateTrip = () => {
           setImages(existingImages);
         }
 
-        toast.success('Trip data loaded successfully');
+        toast.success("Trip data loaded successfully");
       } catch (error: any) {
-        console.error('Error fetching trip:', error);
-        toast.error(error.response?.data?.message || 'Failed to load trip data');
-        navigate('/admin/trips');
+        console.error("Error fetching trip:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to load trip data"
+        );
+        navigate("/admin/trips");
       } finally {
         setLoading(false);
       }
@@ -131,117 +165,132 @@ const UpdateTrip = () => {
   }, [tripId, navigate]);
 
   const handleChange = (key: string, value: string | number) => {
-    setFormData(prev => ({ ...prev, [key]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
 
-  const handleItineraryChange = (dayIndex: number, field: 'location', value: string) => {
-    setItinerary(prev => {
-      const updated = [...prev]
-      updated[dayIndex].location = value
-      return updated
-    })
-  }
+  const handleItineraryChange = (
+    dayIndex: number,
+    field: "location",
+    value: string
+  ) => {
+    setItinerary((prev) => {
+      const updated = [...prev];
+      updated[dayIndex].location = value;
+      return updated;
+    });
+  };
 
-  const handleActivityChange = (dayIndex: number, activityIndex: number, value: string) => {
-    setItinerary(prev => {
-      const updated = [...prev]
-      updated[dayIndex].activities[activityIndex].description = value
-      return updated
-    })
-  }
+  const handleActivityChange = (
+    dayIndex: number,
+    activityIndex: number,
+    value: string
+  ) => {
+    setItinerary((prev) => {
+      const updated = [...prev];
+      updated[dayIndex].activities[activityIndex].description = value;
+      return updated;
+    });
+  };
 
   const addDay = () => {
-    setItinerary(prev => [...prev, {
-      day: prev.length + 1,
-      location: '',
-      activities: [
-        { time: 'Morning', description: '' },
-        { time: 'Afternoon', description: '' },
-        { time: 'Evening', description: '' }
-      ]
-    }])
-  }
+    setItinerary((prev) => [
+      ...prev,
+      {
+        day: prev.length + 1,
+        location: "",
+        activities: [
+          { time: "Morning", description: "" },
+          { time: "Afternoon", description: "" },
+          { time: "Evening", description: "" },
+        ],
+      },
+    ]);
+  };
 
   const removeDay = (dayIndex: number) => {
-    setItinerary(prev => prev.filter((_, index) => index !== dayIndex).map((day, index) => ({
-      ...day,
-      day: index + 1
-    })))
-  }
+    setItinerary((prev) =>
+      prev
+        .filter((_, index) => index !== dayIndex)
+        .map((day, index) => ({
+          ...day,
+          day: index + 1,
+        }))
+    );
+  };
 
   const handleBestTimeChange = (index: number, value: string) => {
-    setBestTimeToVisit(prev => {
-      const updated = [...prev]
-      updated[index] = value
-      return updated
-    })
-  }
+    setBestTimeToVisit((prev) => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
 
   const addBestTime = () => {
-    setBestTimeToVisit(prev => [...prev, ''])
-  }
+    setBestTimeToVisit((prev) => [...prev, ""]);
+  };
 
   const removeBestTime = (index: number) => {
-    setBestTimeToVisit(prev => prev.filter((_, i) => i !== index))
-  }
+    setBestTimeToVisit((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleWeatherChange = (index: number, value: string) => {
-    setWeatherInfo(prev => {
-      const updated = [...prev]
-      updated[index] = value
-      return updated
-    })
-  }
+    setWeatherInfo((prev) => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
 
   const addWeather = () => {
-    setWeatherInfo(prev => [...prev, ''])
-  }
+    setWeatherInfo((prev) => [...prev, ""]);
+  };
 
   const removeWeather = (index: number) => {
-    setWeatherInfo(prev => prev.filter((_, i) => i !== index))
-  }
+    setWeatherInfo((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleImageUpload = (index: number, file: File | null) => {
-    if (!file) return
-    
+    if (!file) return;
+
     // Store the actual file for upload
-    setImageFiles(prev => {
+    setImageFiles((prev) => {
       const newFiles = [...prev];
       newFiles[index] = file;
       return newFiles;
     });
-    
-    const reader = new FileReader()
+
+    const reader = new FileReader();
     reader.onloadend = () => {
-      setImages(prev => {
-        const newImages = [...prev]
-        newImages[index] = reader.result as string
-        return newImages
-      })
-    }
-    reader.readAsDataURL(file)
-  }
+      setImages((prev) => {
+        const newImages = [...prev];
+        newImages[index] = reader.result as string;
+        return newImages;
+      });
+    };
+    reader.readAsDataURL(file);
+  };
 
   const removeImage = (index: number) => {
-    setImages(prev => {
-      const newImages = [...prev]
-      newImages[index] = null
-      return newImages
-    })
-    setImageFiles(prev => {
+    setImages((prev) => {
+      const newImages = [...prev];
+      newImages[index] = null;
+      return newImages;
+    });
+    setImageFiles((prev) => {
       const newFiles = [...prev];
       newFiles[index] = null;
       return newFiles;
     });
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     // Validate that at least 3 images are present
-    const validImages = images.filter(img => img !== null);
+    const validImages = images.filter((img) => img !== null);
     if (validImages.length < 3) {
-      toast.error('Please upload at least 3 images');
+      toast.error("Please upload at least 3 images");
       return;
     }
 
@@ -260,44 +309,44 @@ const UpdateTrip = () => {
         interests: formData.interests,
         groupType: formData.groupType,
         itinerary: itinerary,
-        bestTimeToVisit: bestTimeToVisit.filter(item => item.trim() !== ''),
-        weatherInfo: weatherInfo.filter(item => item.trim() !== '')
+        bestTimeToVisit: bestTimeToVisit.filter((item) => item.trim() !== ""),
+        weatherInfo: weatherInfo.filter((item) => item.trim() !== ""),
       };
 
       // Append trip details as JSON string
-      formDataToSend.append('tripDetails', JSON.stringify(tripDetails));
+      formDataToSend.append("tripDetails", JSON.stringify(tripDetails));
 
       imageFiles.forEach((file, index) => {
         if (file) {
-          formDataToSend.append('imageURLs', file);
+          formDataToSend.append("imageURLs", file);
         }
       });
 
       const existingImages = images
-        .map((img, index) => imageFiles[index] ? null : img)
-        .filter(img => img !== null && typeof img === 'string');
-      
+        .map((img, index) => (imageFiles[index] ? null : img))
+        .filter((img) => img !== null && typeof img === "string");
+
       if (existingImages.length > 0) {
-        formDataToSend.append('existingImages', JSON.stringify(existingImages));
+        formDataToSend.append("existingImages", JSON.stringify(existingImages));
       }
 
-      toast.loading('Updating trip...');
-      
+      toast.loading("Updating trip...");
+
       await updateTrip(tripId!, formDataToSend);
-      
+
       toast.dismiss();
-      toast.success('Trip updated successfully!');
-      navigate('/admin/trips');
+      toast.success("Trip updated successfully!");
+      navigate("/admin/trips");
     } catch (error: any) {
       toast.dismiss();
-      console.error('Error updating trip:', error);
-      toast.error(error.response?.data?.message || 'Failed to update trip');
+      console.error("Error updating trip:", error);
+      toast.error(error.response?.data?.message || "Failed to update trip");
     }
-  }
+  };
 
   if (loading) {
     return (
-      <main className='flex flex-col gap-10 pb-20 w-full max-w-7xl mx-auto px-4 lg:px-8'>
+      <main className="flex flex-col gap-10 pb-20 w-full max-w-7xl mx-auto px-4 lg:px-8">
         <Header
           title="Loading Trip Details..."
           description="Please wait while we fetch the trip information"
@@ -310,23 +359,30 @@ const UpdateTrip = () => {
   }
 
   return (
-    <main className='flex flex-col gap-10 pb-20 w-full max-w-7xl mx-auto px-4 lg:px-8'>
+    <main className="flex flex-col gap-10 pb-20 w-full max-w-7xl mx-auto px-4 lg:px-8">
       <Header
         title="Edit Trip Details"
         description="Modify existing trip information here"
       />
       <section className="mt-2.5 w-full px-4 lg:px-8 mx-auto">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-xl p-8">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-xl shadow-xl p-8"
+        >
           <div className="grid grid-cols-1 gap-10">
-            
             {/* Basic Trip Information */}
             <div className="flex flex-col gap-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Basic Trip Information</h2>
-              
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                Basic Trip Information
+              </h2>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Trip Name */}
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-normal text-gray-400" htmlFor="name">
+                  <label
+                    className="text-sm font-normal text-gray-400"
+                    htmlFor="name"
+                  >
                     Trip Name
                   </label>
                   <input
@@ -334,14 +390,17 @@ const UpdateTrip = () => {
                     type="text"
                     placeholder="Enter trip name..."
                     value={formData.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
+                    onChange={(e) => handleChange("name", e.target.value)}
                     className="w-full px-4 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
                   />
                 </div>
 
                 {/* Country */}
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-normal text-gray-400" htmlFor="country">
+                  <label
+                    className="text-sm font-normal text-gray-400"
+                    htmlFor="country"
+                  >
                     Country
                   </label>
                   <input
@@ -349,7 +408,7 @@ const UpdateTrip = () => {
                     type="text"
                     placeholder="Enter country..."
                     value={formData.country}
-                    onChange={(e) => handleChange('country', e.target.value)}
+                    onChange={(e) => handleChange("country", e.target.value)}
                     className="w-full px-4 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
                   />
                 </div>
@@ -357,14 +416,17 @@ const UpdateTrip = () => {
 
               {/* Description */}
               <div className="flex flex-col gap-2.5">
-                <label className="text-sm font-normal text-gray-400" htmlFor="description">
+                <label
+                  className="text-sm font-normal text-gray-400"
+                  htmlFor="description"
+                >
                   Description
                 </label>
                 <textarea
                   id="description"
                   placeholder="Enter trip description..."
                   value={formData.description}
-                  onChange={(e) => handleChange('description', e.target.value)}
+                  onChange={(e) => handleChange("description", e.target.value)}
                   rows={4}
                   className="w-full px-4 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none resize-none"
                 />
@@ -373,7 +435,10 @@ const UpdateTrip = () => {
               {/* Price & Duration */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-normal text-gray-400" htmlFor="estimatedPrice">
+                  <label
+                    className="text-sm font-normal text-gray-400"
+                    htmlFor="estimatedPrice"
+                  >
                     Estimated Price
                   </label>
                   <input
@@ -381,54 +446,67 @@ const UpdateTrip = () => {
                     type="text"
                     placeholder="$1000"
                     value={formData.estimatedPrice}
-                    onChange={(e) => handleChange('estimatedPrice', e.target.value)}
+                    onChange={(e) =>
+                      handleChange("estimatedPrice", e.target.value)
+                    }
                     className="w-full px-4 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-normal text-gray-400" htmlFor="duration">
+                  <label
+                    className="text-sm font-normal text-gray-400"
+                    htmlFor="duration"
+                  >
                     Duration (days)
                   </label>
                   <input
                     id="duration"
                     type="number"
                     placeholder="5"
-                    value={formData.duration || ''}
-                    onChange={(e) => handleChange('duration', Number(e.target.value))}
+                    value={formData.duration || ""}
+                    onChange={(e) =>
+                      handleChange("duration", Number(e.target.value))
+                    }
                     className="w-full px-4 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
                   />
                 </div>
 
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-normal text-gray-400" htmlFor="budget">
+                  <label
+                    className="text-sm font-normal text-gray-400"
+                    htmlFor="budget"
+                  >
                     Budget
                   </label>
                   <ComboBox
                     options={[
-                      { value: 'Budget', label: 'Budget' },
-                      { value: 'Mid-Range', label: 'Mid-Range' },
-                      { value: 'Luxury', label: 'Luxury' }
+                      { value: "Budget", label: "Budget" },
+                      { value: "Mid-Range", label: "Mid-Range" },
+                      { value: "Luxury", label: "Luxury" },
                     ]}
                     value={formData.budget}
-                    onChange={(value) => handleChange('budget', value)}
+                    onChange={(value) => handleChange("budget", value)}
                     placeholder="Select budget..."
                   />
                 </div>
 
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-normal text-gray-400" htmlFor="groupType">
+                  <label
+                    className="text-sm font-normal text-gray-400"
+                    htmlFor="groupType"
+                  >
                     Group Type
                   </label>
                   <ComboBox
                     options={[
-                      { value: 'Solo', label: 'Solo' },
-                      { value: 'Couple', label: 'Couple' },
-                      { value: 'Family', label: 'Family' },
-                      { value: 'Friends', label: 'Friends' }
+                      { value: "Solo", label: "Solo" },
+                      { value: "Couple", label: "Couple" },
+                      { value: "Family", label: "Family" },
+                      { value: "Friends", label: "Friends" },
                     ]}
                     value={formData.groupType}
-                    onChange={(value) => handleChange('groupType', value)}
+                    onChange={(value) => handleChange("groupType", value)}
                     placeholder="Select group..."
                   />
                 </div>
@@ -437,35 +515,41 @@ const UpdateTrip = () => {
               {/* Travel Style & Interests */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-normal text-gray-400" htmlFor="travelStyle">
+                  <label
+                    className="text-sm font-normal text-gray-400"
+                    htmlFor="travelStyle"
+                  >
                     Travel Style
                   </label>
                   <ComboBox
                     options={[
-                      { value: 'Adventure', label: 'Adventure' },
-                      { value: 'Relaxation', label: 'Relaxation' },
-                      { value: 'Cultural', label: 'Cultural' },
-                      { value: 'Romantic', label: 'Romantic' }
+                      { value: "Adventure", label: "Adventure" },
+                      { value: "Relaxation", label: "Relaxation" },
+                      { value: "Cultural", label: "Cultural" },
+                      { value: "Romantic", label: "Romantic" },
                     ]}
                     value={formData.travelStyle}
-                    onChange={(value) => handleChange('travelStyle', value)}
+                    onChange={(value) => handleChange("travelStyle", value)}
                     placeholder="Select style..."
                   />
                 </div>
 
                 <div className="flex flex-col gap-2.5">
-                  <label className="text-sm font-normal text-gray-400" htmlFor="interests">
+                  <label
+                    className="text-sm font-normal text-gray-400"
+                    htmlFor="interests"
+                  >
                     Interests
                   </label>
                   <ComboBox
                     options={[
-                      { value: 'Nature', label: 'Nature' },
-                      { value: 'History', label: 'History' },
-                      { value: 'Food', label: 'Food' },
-                      { value: 'Art', label: 'Art' }
+                      { value: "Nature", label: "Nature" },
+                      { value: "History", label: "History" },
+                      { value: "Food", label: "Food" },
+                      { value: "Art", label: "Art" },
                     ]}
                     value={formData.interests}
-                    onChange={(value) => handleChange('interests', value)}
+                    onChange={(value) => handleChange("interests", value)}
                     placeholder="Select interests..."
                   />
                 </div>
@@ -477,7 +561,9 @@ const UpdateTrip = () => {
             {/* Day-by-Day Itinerary */}
             <div className="flex flex-col gap-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-800">Day-by-Day Itinerary</h2>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Day-by-Day Itinerary
+                </h2>
                 <button
                   type="button"
                   onClick={addDay}
@@ -489,9 +575,14 @@ const UpdateTrip = () => {
               </div>
 
               {itinerary.map((day, dayIndex) => (
-                <div key={dayIndex} className="border-2 border-gray-200 rounded-lg p-6">
+                <div
+                  key={dayIndex}
+                  className="border-2 border-gray-200 rounded-lg p-6"
+                >
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800">Day {day.day}</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Day {day.day}
+                    </h3>
                     {itinerary.length > 1 && (
                       <button
                         type="button"
@@ -512,20 +603,35 @@ const UpdateTrip = () => {
                         type="text"
                         placeholder="Enter location..."
                         value={day.location}
-                        onChange={(e) => handleItineraryChange(dayIndex, 'location', e.target.value)}
+                        onChange={(e) =>
+                          handleItineraryChange(
+                            dayIndex,
+                            "location",
+                            e.target.value
+                          )
+                        }
                         className="w-full px-4 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
                       />
                     </div>
 
                     {day.activities.map((activity, activityIndex) => (
-                      <div key={activityIndex} className="flex flex-col gap-2.5">
+                      <div
+                        key={activityIndex}
+                        className="flex flex-col gap-2.5"
+                      >
                         <label className="text-sm font-semibold text-gray-600">
                           {activity.time}
                         </label>
                         <textarea
                           placeholder={`Enter ${activity.time.toLowerCase()} activity...`}
                           value={activity.description}
-                          onChange={(e) => handleActivityChange(dayIndex, activityIndex, e.target.value)}
+                          onChange={(e) =>
+                            handleActivityChange(
+                              dayIndex,
+                              activityIndex,
+                              e.target.value
+                            )
+                          }
                           rows={3}
                           className="w-full px-4 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none resize-none"
                         />
@@ -541,7 +647,9 @@ const UpdateTrip = () => {
             {/* Best Time to Visit */}
             <div className="flex flex-col gap-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-800">Best Time to Visit</h2>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Best Time to Visit
+                </h2>
                 <button
                   type="button"
                   onClick={addBestTime}
@@ -558,7 +666,9 @@ const UpdateTrip = () => {
                     type="text"
                     placeholder="☀️ December to March: Best time for..."
                     value={item}
-                    onChange={(e) => handleBestTimeChange(index, e.target.value)}
+                    onChange={(e) =>
+                      handleBestTimeChange(index, e.target.value)
+                    }
                     className="flex-1 px-4 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
                   />
                   {bestTimeToVisit.length > 1 && (
@@ -579,7 +689,9 @@ const UpdateTrip = () => {
             {/* Weather Information */}
             <div className="flex flex-col gap-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-800">Weather Information</h2>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Weather Information
+                </h2>
                 <button
                   type="button"
                   onClick={addWeather}
@@ -616,23 +728,29 @@ const UpdateTrip = () => {
 
             {/* Trip Images */}
             <div className="flex flex-col gap-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Trip Images</h2>
-              
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                Trip Images
+              </h2>
+
               {/* Large Image Upload Box */}
               <div className="relative group">
                 <input
                   id="imageUpload0"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => e.target.files && handleImageUpload(0, e.target.files[0])}
+                  onChange={(e) =>
+                    e.target.files && handleImageUpload(0, e.target.files[0])
+                  }
                   className="hidden"
                 />
-                <label 
+                <label
                   htmlFor="imageUpload0"
                   className={`relative flex flex-col items-center justify-center cursor-pointer border-2 border-dashed rounded-lg transition-all duration-200 overflow-hidden ${
-                    images[0] ? 'border-gray-300' : 'border-gray-300 bg-gray-50 hover:border-blue-400'
+                    images[0]
+                      ? "border-gray-300"
+                      : "border-gray-300 bg-gray-50 hover:border-blue-400"
                   }`}
-                  style={{ height: '280px' }}
+                  style={{ height: "280px" }}
                 >
                   {images[0] ? (
                     <>
@@ -644,8 +762,8 @@ const UpdateTrip = () => {
                       <button
                         type="button"
                         onClick={(e) => {
-                          e.preventDefault()
-                          removeImage(0)
+                          e.preventDefault();
+                          removeImage(0);
                         }}
                         className="absolute top-3 right-3 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600"
                       >
@@ -675,15 +793,20 @@ const UpdateTrip = () => {
                       id={`imageUpload${index}`}
                       type="file"
                       accept="image/*"
-                      onChange={(e) => e.target.files && handleImageUpload(index, e.target.files[0])}
+                      onChange={(e) =>
+                        e.target.files &&
+                        handleImageUpload(index, e.target.files[0])
+                      }
                       className="hidden"
                     />
-                    <label 
+                    <label
                       htmlFor={`imageUpload${index}`}
                       className={`relative flex flex-col items-center justify-center cursor-pointer border-2 border-dashed rounded-lg transition-all duration-200 overflow-hidden ${
-                        images[index] ? 'border-gray-300' : 'border-gray-300 bg-gray-50 hover:border-blue-400'
+                        images[index]
+                          ? "border-gray-300"
+                          : "border-gray-300 bg-gray-50 hover:border-blue-400"
                       }`}
-                      style={{ height: '140px' }}
+                      style={{ height: "140px" }}
                     >
                       {images[index] ? (
                         <>
@@ -695,8 +818,8 @@ const UpdateTrip = () => {
                           <button
                             type="button"
                             onClick={(e) => {
-                              e.preventDefault()
-                              removeImage(index)
+                              e.preventDefault();
+                              removeImage(index);
                             }}
                             className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600"
                           >
@@ -735,6 +858,9 @@ const UpdateTrip = () => {
                   variant="danger"
                   fullWidth={false}
                   className="px-8"
+                  onClick={() => {
+                    handleDelete();
+                  }}
                 />
               </div>
             </div>
@@ -742,7 +868,7 @@ const UpdateTrip = () => {
         </form>
       </section>
     </main>
-  )
-}
+  );
+};
 
-export default UpdateTrip
+export default UpdateTrip;

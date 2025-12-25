@@ -28,3 +28,8 @@ export const updateTrip = async (tripId: string, formData: FormData) => {
   });
   return res.data;
 }
+
+export const deleteTrip = async (tripId: string) => {
+  const res = await api.delete(`/trip/delete/${tripId}`);
+  return res.data;
+}
