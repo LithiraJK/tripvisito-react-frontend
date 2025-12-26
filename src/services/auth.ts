@@ -28,3 +28,22 @@ export const refreshTokens = async (refreshToken: string) => {
   })
   return res.data
 }
+
+export const addNewUser = async (formData: FormData) => {
+  const res = await api.post("/auth/register/new-user", formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+  return res.data
+}
+
+export const updateUserStatus = async (userId: string, isBlock: boolean) => {
+  const res = await api.put(`/auth/status/${userId}`, { isBlock });
+  return res.data;
+}
+
+export const deleteUser = async (userId: string) => {
+  const res = await api.delete(`/auth/delete/${userId}`);
+  return res.data;
+}

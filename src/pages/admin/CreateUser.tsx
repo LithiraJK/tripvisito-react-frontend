@@ -1,13 +1,27 @@
 import Header from '../../components/Header'
 import Button from '../../components/Button'
 import { useState } from 'react'
+import { addNewUser } from '../../services/auth'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
 const CreateUser = () => {
+  const navigate = useNavigate()
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [selectedRole, setSelectedRole] = useState<'ADMIN' | 'USER'>('USER')
+  const [loading, setLoading] = useState(false)
+  
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: ''
+  })
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setImageFile(file)
       const reader = new FileReader()
       reader.onloadend = () => {
         setImagePreview(reader.result as string)
@@ -16,8 +30,59 @@ const CreateUser = () => {
     }
   }
 
-  const handleSubmit = ()=>{
-    
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Validation
+    if (!formData.name || !formData.email || !formData.password) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    if (formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters long')
+      return
+    }
+
+    try {
+      setLoading(true)
+      const formDataToSend = new FormData()
+      
+      formDataToSend.append('name', formData.name)
+      formDataToSend.append('email', formData.email)
+      formDataToSend.append('password', formData.password)
+      formDataToSend.append('roles', JSON.stringify([selectedRole]))
+
+      if (imageFile) {
+        formDataToSend.append('profileimg', imageFile)
+      }
+
+      const response = await addNewUser(formDataToSend)
+      
+      toast.success(response.message || 'User created successfully!')
+      
+      // Reset form
+      setFormData({ name: '', email: '', password: '' })
+      setImagePreview(null)
+      setImageFile(null)
+      setSelectedRole('USER')
+      
+      // Navigate to users list
+      setTimeout(() => {
+        navigate('/admin/all-users')
+      }, 1500)
+      
+    } catch (error: any) {
+      console.error('Error creating user:', error)
+      toast.error(error.response?.data?.message || 'Failed to create user')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -93,7 +158,11 @@ const CreateUser = () => {
             </label>
             <input 
               className="w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
-              type="text" 
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
             />
             
           </div>
@@ -106,7 +175,11 @@ const CreateUser = () => {
             </label>
             <input 
               className="w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
-              type="email" 
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
             />
             
           </div>
@@ -120,7 +193,12 @@ const CreateUser = () => {
             </label>
             <input 
               className="w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none"
-              type="password" 
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              required
+              minLength={6}
             />
             
           </div>
@@ -130,12 +208,17 @@ const CreateUser = () => {
               className="text-sm font-normal text-gray-400"
               htmlFor="role"
             >
-             Choose Role
+              Choose Role
             </label>
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-3">
               <button
                 type="button"
-                className="px-8 py-2.5 rounded-lg text-sm font-semibold w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none focus:bg-blue-50"
+                onClick={() => setSelectedRole('ADMIN')}
+                className={`px-8 py-2.5 rounded-lg text-sm font-semibold w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 font-medium hover:border-blue-400 cursor-pointer border-gray-200 focus:outline-none ${
+                  selectedRole === 'ADMIN' 
+                    ? 'bg-blue-50 border-blue-500' 
+                    : 'bg-white'
+                }`}
               >
                 <div className='flex flex-col justify-center items-baseline px-4 py-2'>
                   <h3 className='text-blue-600'>Admin</h3>
@@ -144,7 +227,12 @@ const CreateUser = () => {
               </button>
               <button
                 type="button"
-                className="px-8 text-sm w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 bg-white font-medium hover:border-blue-400 cursor-text border-gray-200 focus:border-blue-500 shadow-sm focus:outline-none focus:bg-blue-50"
+                onClick={() => setSelectedRole('USER')}
+                className={`px-8 text-sm w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 font-medium hover:border-blue-400 cursor-pointer border-gray-200 focus:outline-none ${
+                  selectedRole === 'USER' 
+                    ? 'bg-blue-50 border-blue-500' 
+                    : 'bg-white'
+                }`}
               >
                 <div className='flex flex-col justify-center items-baseline px-4 py-2'>
                   <h3 className='text-blue-600'>User</h3>
@@ -159,9 +247,10 @@ const CreateUser = () => {
           <footer className="w-full px-6">
             <Button
               type="submit"
-              ctaText="Create User"
+              ctaText={loading ? "Creating User..." : "Create User"}
               variant="primary"
               fullWidth={true}
+              disabled={loading}
             />
           </footer>
         </form>

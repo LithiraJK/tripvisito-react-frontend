@@ -12,7 +12,11 @@ const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register"];
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
-    const isPublic = PUBLIC_ENDPOINTS.some((url) => config.url?.includes(url));
+    // Check if the URL exactly matches or starts with public endpoints (but not sub-paths)
+    const isPublic = PUBLIC_ENDPOINTS.some((url) => {
+      const requestUrl = config.url || '';
+      return requestUrl === url || requestUrl === url.slice(1); // Remove leading slash
+    });
 
     if (!isPublic && token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -28,9 +32,10 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest: any = error.config;
 
-    const isProtected = !PUBLIC_ENDPOINTS.some((url) =>
-      originalRequest.url?.includes(url)
-    );
+    const isProtected = !PUBLIC_ENDPOINTS.some((url) => {
+      const requestUrl = originalRequest.url || '';
+      return requestUrl === url || requestUrl === url.slice(1);
+    });
 
     if (
       error.response?.status === 401 &&

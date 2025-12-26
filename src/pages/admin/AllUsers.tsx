@@ -6,9 +6,13 @@ import {
 } from "react-icons/fi";
 import Chip from "../../components/Chip";
 import { useEffect, useState } from "react";
-import { getAllUsers } from "../../services/auth";
+import { deleteUser, getAllUsers, updateUserStatus } from "../../services/auth";
 import { formatDate } from "../../lib/utils";
 import { FaPlus } from "react-icons/fa6";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const MySwal = withReactContent(Swal);
 
 
 const AllUsers = () => {
@@ -158,6 +162,83 @@ const AllUsers = () => {
     return "default";
   };
 
+  const handleUserStatusToggle = async (userId: string, isBlock: boolean) => {
+    const action = isBlock ? "Unblock" : "Block";
+    const result = await MySwal.fire({
+      title: `${action} User`,
+      text: `Are you sure you want to ${action.toLowerCase()} this user?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: isBlock ? '#3b82f6' : '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: `Yes, ${action}`,
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await updateUserStatus(userId, !isBlock);
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user._id === userId ? { ...user, isBlock: !isBlock } : user
+          )
+        );
+        MySwal.fire({
+          title: 'Success!',
+          text: `User has been ${action.toLowerCase()}ed successfully.`,
+          icon: 'success',
+          confirmButtonColor: '#3b82f6',
+          timer: 2000
+        });
+      } catch (error) {
+        console.error("Failed to update user status", error);
+        MySwal.fire({
+          title: 'Error!',
+          text: 'Failed to update user status. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#3b82f6'
+        });
+      }
+    }
+  };
+
+  const handleUserDelete = async (userId: string) => {
+    const result = await MySwal.fire({
+      title: 'Delete User',
+      text: 'Are you sure you want to delete this user? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteUser(userId);
+        setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
+        MySwal.fire({
+          title: 'Deleted!',
+          text: 'User has been deleted successfully.',
+          icon: 'success',
+          confirmButtonColor: '#3b82f6',
+          timer: 2000
+        });
+      } catch (error) {
+        console.error("Failed to delete user", error);
+        MySwal.fire({
+          title: 'Error!',
+          text: 'Failed to delete user. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#3b82f6'
+        });
+      }
+    }
+  };
+
   return (
     <main className="w-full min-h-screen flex flex-col gap-10 max-w-7xl mx-auto px-4 lg:px-8">
       <Header title="All Users" description="Manage all users here" ctaText="Add new User" ctaURL="/admin/user/create" icon={<FaPlus />} />
@@ -192,6 +273,7 @@ const AllUsers = () => {
                     <th className="py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                       Roles
                     </th>
+                    <th className="py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">Is Block</th>
                     <th className="py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right"></th>
                   </tr>
                 </thead>
@@ -225,7 +307,24 @@ const AllUsers = () => {
                         />
                       </td>
                       <td className="py-4 px-4 text-right">
-                        <button className="text-gray-400 hover:text-red-500 transition-colors">
+                        <button 
+                          onClick={() => {
+                          handleUserStatusToggle(user._id, user.isBlock);
+                          console.log('Toggle user:', user._id);
+                          }}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                          user.isBlock ? 'bg-blue-600' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span
+                          className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                            !user.isBlock ? 'translate-x-5' : 'translate-x-1'
+                          }`}
+                          />
+                        </button>
+                      </td>
+                      <td className="py-4 px-4 text-right">
+                        <button className="text-gray-400 hover:text-red-500 transition-colors" onClick={() => {handleUserDelete(user._id)}}>
                           <FiTrash2 size={18} />
                         </button>
                       </td>
