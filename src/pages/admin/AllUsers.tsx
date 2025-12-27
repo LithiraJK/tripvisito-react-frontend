@@ -58,7 +58,6 @@ const AllUsers = () => {
     setPage(pageNumber);
   };
 
-  // Generate pagination buttons
   const renderPaginationButtons = () => {
     const buttons = [];
     const maxVisiblePages = 5;
@@ -81,7 +80,6 @@ const AllUsers = () => {
         );
       }
     } else {
-      // Show first page
       buttons.push(
         <button
           key={1}
@@ -96,7 +94,6 @@ const AllUsers = () => {
         </button>
       );
 
-      // Show ellipsis or pages around current page
       if (page > 3) {
         buttons.push(
           <span key="ellipsis1" className="text-gray-400 px-1">
@@ -191,11 +188,11 @@ const AllUsers = () => {
           confirmButtonColor: '#3b82f6',
           timer: 2000
         });
-      } catch (error) {
-        console.error("Failed to update user status", error);
+      } catch (error: any) {
+        const errorMessage = error?.response?.data?.message || error?.message || 'Failed to update user status. Please try again.';
         MySwal.fire({
           title: 'Error!',
-          text: 'Failed to update user status. Please try again.',
+          text: errorMessage,
           icon: 'error',
           confirmButtonColor: '#3b82f6'
         });
@@ -227,11 +224,12 @@ const AllUsers = () => {
           confirmButtonColor: '#3b82f6',
           timer: 2000
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to delete user", error);
+        const errorMessage = error?.response?.data?.message || error?.message;
         MySwal.fire({
           title: 'Error!',
-          text: 'Failed to delete user. Please try again.',
+          text: errorMessage || 'Failed to delete user. Please try again.',
           icon: 'error',
           confirmButtonColor: '#3b82f6'
         });
@@ -313,12 +311,12 @@ const AllUsers = () => {
                           console.log('Toggle user:', user._id);
                           }}
                           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                          user.isBlock ? 'bg-blue-600' : 'bg-gray-300'
+                          user.isBlock ? 'bg-gray-600' : 'bg-gray-300'
                           }`}
                         >
                           <span
                           className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                            !user.isBlock ? 'translate-x-5' : 'translate-x-1'
+                            user.isBlock ? 'translate-x-5' : 'translate-x-1'
                           }`}
                           />
                         </button>
