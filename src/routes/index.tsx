@@ -65,11 +65,18 @@ const Router = () => {
           <Route element={<LandingLayout />}>
             <Route path="/" element={<Index />} />
             <Route path="/trip/:tripId" element={<TripDetails />} />
+          </Route>
+
+          {/* Protected Payment Routes */}
+          <Route
+            element={
+              <RequireAuth>
+                <LandingLayout />
+              </RequireAuth>
+            }
+          >
             <Route path="/trip/payment" element={<Payment />} />
             <Route path="/trip/payment/success" element={<ThankyouMessage />} />
-
-
-
           </Route>
 
           {/* Auth Pages - Full Page (No Layout) */}
@@ -99,7 +106,7 @@ const Router = () => {
             <Route path="/admin/trip/create" element={<CreateTrip />} />
             {/* Dynamic Routes */}
             <Route path="/admin/trip/:tripId" element={<TripDetails />} />
-            <Route path="/admin/trip/edit/:tripId" element={<UpdateTrip/>} />
+            <Route path="/admin/trip/edit/:tripId" element={<UpdateTrip />} />
           </Route>
         </Routes>
       </Suspense>

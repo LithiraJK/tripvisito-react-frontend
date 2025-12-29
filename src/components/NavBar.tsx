@@ -1,10 +1,51 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import logo from "../assets/icons/logo.svg";
 import logoutIcon from "../assets/icons/logout.svg";
+import { getMyDetails } from "../services/auth";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate()
+
+
+   useEffect(() => {
+    let isMounted = true;
+    
+    const getUserDetails = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setUser(null);
+        return;
+      }
+      
+      try {
+        const response = await getMyDetails();
+        console.log(response)
+        if (isMounted) {
+          setUser(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+        setUser(null);
+      }
+    }
+
+    getUserDetails();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    navigate('/login')
+
+  }
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -24,20 +65,38 @@ const NavBar = () => {
           </h1>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-4 z-50">
-          <img
-            src="/default-avatar.png"
-            alt="Guest"
-            className="size-10 rounded-full shrink-0"
-          />
-          <article className="flex-1 min-w-0">
-            <h2 className="font-medium truncate">Guest</h2>
-            <p className="text-sm text-gray-600 truncate">user@gmail.com</p>
-          </article>
-          <button className="btn-logout cursor-pointer shrink-0">
-            <img src={logoutIcon} alt="Logout" className="size-8" />
-          </button>
-        </div>
+        {user ? (
+          <div className="hidden lg:flex items-center gap-4 z-50">
+            <img
+              src={user?.profileimg}
+              alt={user?.name || "User"}
+              className="size-10 rounded-full shrink-0"
+            />
+            <article className="flex-1 min-w-0">
+              <h2 className="font-medium truncate">{user?.name || "Guest"}</h2>
+              <p className="text-sm text-gray-600 truncate">{user?.email || "guest@example.com"}</p>
+            </article>
+            <button className="btn-logout cursor-pointer shrink-0"
+              onClick={handleLogout}>
+              <img src={logoutIcon} alt="Logout" className="size-8" />
+            </button>
+          </div>
+        ) : (
+          <div className="hidden lg:flex items-center gap-3 z-50">
+            <Link 
+              to="/login" 
+              className="px-6 py-2 text-gray-700 font-medium hover:text-blue-600 transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link 
+              to="/register" 
+              className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Sign Up
+            </Link>
+          </div>
+        )}
 
         <button
           onClick={toggleSidebar}
@@ -113,7 +172,7 @@ const NavBar = () => {
                     <h2 className='font-medium truncate'>Guest</h2>
                     <p className='text-sm text-gray-600 truncate'>guest@example.com</p>
                   </article>
-                  <button className='btn-logout cursor-pointer shrink-0'>
+                  <button className='btn-logout cursor-pointer shrink-0' onClick={handleLogout}>
                     <img src={logoutIcon} alt="Logout" className='size-8' />
                   </button>
               </footer>

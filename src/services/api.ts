@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register"];
+const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register", "/trip"];
 
 // Request interceptor
 api.interceptors.request.use(
@@ -34,7 +34,7 @@ api.interceptors.response.use(
 
     const isProtected = !PUBLIC_ENDPOINTS.some((url) => {
       const requestUrl = originalRequest.url || '';
-      return requestUrl === url || requestUrl === url.slice(1);
+      return requestUrl === url || requestUrl === url.slice(1) || requestUrl.startsWith(url);
     });
 
     if (
