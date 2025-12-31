@@ -1,172 +1,154 @@
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import logo from "../../assets/icons/logo.svg";
+import { getTripDetails } from "../../services/trip";
+import api from "../../services/api"; // ඔයාගේ axios instance එක
+import toast from "react-hot-toast";
+
+interface Trip {
+  _id: string;
+  tripDetails: {
+    name: string;
+    description: string;
+    estimatedPrice: string;
+  };
+  imageUrls: string[];
+}
 
 const Payment = () => {
-
   const navigate = useNavigate();
+  const { tripId } = useParams<{ tripId: string }>();
+  const [trip, setTrip] = useState<Trip | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    const fetchTripDetails = async () => {
+      if (tripId) {
+        try {
+          setLoading(true);
+          const response = await getTripDetails(tripId);
+          setTrip(response.data.trip);
+        } catch (error) {
+          console.error("Failed to fetch trip details:", error);
+          toast.error("Trip details ලබා ගැනීමට නොහැකි විය.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchTripDetails();
+  }, [tripId]);
+
+  // --- STRIPE REDIRECTION LOGIC ---
+  const handlePayment = async () => {
+    if (!trip) return;
+
+    try {
+      setIsProcessing(true);
+      
+      // Backend එකේ අපි හදපු /checkout endpoint එකට request එක යැවීම
+      const response = await api.post("/payment/checkout", {
+        tripId: trip._id,
+        tripName: trip.tripDetails.name,
+        tripImage: trip.imageUrls[0],
+        tripDescription: trip.tripDetails.description,
+
+        amount: Number(trip.tripDetails.estimatedPrice.replace(/[^0-9.]/g, "")),
+      });
+
+      if (response.data.url) {
+        // Stripe Hosted Page එකට redirect කිරීම
+        window.location.href = response.data.url;
+      }
+    } catch (error: any) {
+      console.error("Checkout Error:", error);
+      toast.error(error.response?.data?.message || "ගෙවීමේ ක්‍රියාවලිය ආරම්භ කිරීමට නොහැකි විය.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (!trip) return <div className="flex justify-center items-center h-screen">Trip not found</div>;
 
   return (
-    <main className='min-h-screen bg-gray-50'>
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-0">
-        {/* Left Section - Trip Details */}
-        <section className="bg-white p-8 lg:p-12">
-          <header className="mb-8">
-            <Link to="/" className="flex flex-row items-center gap-2 text-gray-700 hover:text-gray-900">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <img src={logo} alt="logo" className="size-7" />
-              <h1 className="text-xl font-semibold text-gray-900">
-                Tourvisto
-              </h1>
-            </Link>
-          </header>
+    <main className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+        
+        {/* වම් පස - Trip Summary (එලෙසම පවතී) */}
+        <section className="bg-white p-8 lg:p-12 flex flex-col justify-between border-r border-gray-100">
+          <div>
+            <header className="mb-12">
+              <Link to="/" className="flex items-center gap-2">
+                <img src={logo} alt="logo" className="size-8" />
+                <h1 className="text-2xl font-bold text-gray-900">TripVisito</h1>
+              </Link>
+            </header>
 
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-3">
-              <p className="text-gray-600 text-sm">Pay 5-Day Japan Highlights: Culture, Food and Adventure</p>
-              <p className="text-4xl font-normal text-gray-900">$ 604.00</p>
-            </div>
+            <div className="space-y-6">
+              <div>
+                <p className="text-gray-500 font-medium">Pay for your adventure</p>
+                <h2 className="text-5xl font-bold text-gray-900 mt-2">
+                  {trip.tripDetails.estimatedPrice}
+                </h2>
+              </div>
 
-            <div className="mt-6">
-              <img 
-                src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=300&fit=crop" 
-                alt="Beach destination" 
-                className="w-full h-64 object-cover rounded-lg"
-               />
-              
-              <div className="mt-4 flex flex-col gap-1">
-                <h3 className="text-lg font-medium text-gray-900">5-Day Japan Adventure</h3>
-                <p className="text-gray-600 text-sm">Luxury, Diversity, and Harmony</p>
+              <div className="pt-8">
+                <img 
+                  src={trip.imageUrls[0]} 
+                  alt={trip.tripDetails.name} 
+                  className="w-full h-72 object-cover rounded-2xl shadow-sm"
+                />
+                <div className="mt-6">
+                  <h3 className="text-xl font-semibold text-gray-900">{trip.tripDetails.name}</h3>
+                  <p className="text-gray-600 mt-2 leading-relaxed">{trip.tripDetails.description}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <footer className="mt-auto pt-12 flex items-center gap-2 text-xs text-gray-500">
+          <footer className="mt-12 flex items-center gap-2 text-xs text-gray-400">
             <span>Powered by</span>
-            <span className="font-semibold text-[#635bff]">stripe</span>
-            <span className="mx-2">|</span>
-            <a href="#" className="hover:text-gray-700">Terms</a>
-            <a href="#" className="hover:text-gray-700">Privacy</a>
+            <span className="font-bold text-[#635bff] uppercase tracking-wider">stripe</span>
           </footer>
         </section>
 
-        {/* Right Section - Payment Form */}
-        <section className="bg-white lg:bg-gray-50 p-8 lg:p-12">
-          <div className="max-w-md mx-auto">
-            {/* Apple Pay Button */}
-            <button className="w-full bg-black text-white py-3 rounded-md mb-4 flex items-center justify-center hover:bg-gray-900 transition-colors">
-              <svg className="w-12 h-6" viewBox="0 0 48 20" fill="white">
-                <path d="M8.1 4.6c.5-.6 1.3-1.1 2.1-1.1.1 0 .3 0 .4.1-.1.8-.4 1.5-.9 2-.5.6-1.3 1-2.1 1-.1 0-.3 0-.4-.1.1-.7.4-1.4.9-1.9zm.6 2.5c.6 0 1.7-.8 3.1-.8 2.4 0 3.4 1.7 3.4 1.7s-1.9.9-1.9 3.3c0 2.8 2.5 3.7 2.5 3.7s-1.8 4.9-4.1 4.9c-1 0-1.8-.7-2.9-.7-1.1 0-2.2.7-2.9.7-2.1 0-4.8-4.6-4.8-8.3 0-3.6 2.3-5.5 4.4-5.5 1.3 0 2.3.8 3.2.8z"/>
-                <path d="M24.5 7.3c-3 0-5.4 2.4-5.4 5.4s2.4 5.4 5.4 5.4c1.4 0 2.7-.5 3.7-1.4v1.2h2.8V7.5h-2.8v1.2c-1-.9-2.3-1.4-3.7-1.4zm.4 2.5c1.6 0 2.9 1.3 2.9 2.9s-1.3 2.9-2.9 2.9-2.9-1.3-2.9-2.9 1.3-2.9 2.9-2.9z"/>
-                <path d="M40.7 7.5h-3.1l-2.8 7.4-2.8-7.4h-3.1l4.3 10.4-2.1 5h3l6.6-15.4z"/>
-              </svg>
-            </button>
-
-            <div className="text-center text-gray-500 text-sm mb-6">Or pay with card</div>
-
-            <form className="flex flex-col gap-4">
-              {/* Email */}
-              <div className="flex flex-col gap-1">
-                <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  className="w-full border border-gray-300 rounded-md px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                />
-              </div>
-
-              {/* Country or region */}
-              <div className="flex flex-col gap-1">
-                <label htmlFor="country" className="text-sm font-medium text-gray-700">Country or region</label>
-                <select 
-                  id="country" 
-                  className="w-full border border-gray-300 rounded-md px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>United Kingdom</option>
-                </select>
-              </div>
-
-              {/* Card Number */}
-              <div className="flex flex-col gap-1">
-                <div className="relative">
-                  <input 
-                    type="text" 
-                    placeholder="1234 1234 1234 1234" 
-                    className="w-full border border-gray-300 rounded-t-md px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
-                    <img src="https://js.stripe.com/v3/fingerprinted/img/visa-729c05c240c4bdb47b03ac81d9945bfe.svg" alt="Visa" className="h-5" />
-                    <img src="https://js.stripe.com/v3/fingerprinted/img/mastercard-4d8844094130711885b5e41b28c9848f.svg" alt="Mastercard" className="h-5" />
-                    <img src="https://js.stripe.com/v3/fingerprinted/img/amex-a49b82f46c5cd6a96a6e418a6ca1717c.svg" alt="Amex" className="h-5" />
-                    <img src="https://js.stripe.com/v3/fingerprinted/img/discover-ac52cd46f89fa40a29a0bfb954e33173.svg" alt="Discover" className="h-5" />
-                  </div>
+        {/* දකුණු පස - Simplified Payment Trigger */}
+        <section className="bg-gray-50 p-8 lg:p-12 flex items-center justify-center">
+          <div className="max-w-md w-full text-center">
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+              <div className="mb-8">
+                <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
                 </div>
-                
-                {/* Expiry and CVC */}
-                <div className="grid grid-cols-2 gap-0">
-                  <input 
-                    type="text" 
-                    placeholder="MM / YY" 
-                    className="border border-gray-300 border-t-0 rounded-bl-md px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                  />
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      placeholder="CVC" 
-                      className="w-full border border-gray-300 border-t-0 border-l-0 rounded-br-md px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                    />
-                    <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                    </svg>
-                  </div>
-                </div>
+                <h3 className="text-xl font-bold text-gray-900">Secure Checkout</h3>
+                <p className="text-gray-500 mt-2">You will be redirected to Stripe's secure payment gateway to complete your booking.</p>
               </div>
 
-              {/* Name on card */}
-              <div className="flex flex-col gap-1">
-                <label htmlFor="name" className="text-sm font-medium text-gray-700">Name on card</label>
-                <input 
-                  type="text" 
-                  id="name" 
-                  className="w-full border border-gray-300 rounded-md px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                />
-              </div>
-
-              {/* Country or region */}
-              <div className="flex flex-col gap-1">
-                <label htmlFor="billingCountry" className="text-sm font-medium text-gray-700">Country or region</label>
-                <select 
-                  id="billingCountry" 
-                  className="w-full border border-gray-300 rounded-t-md px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>United Kingdom</option>
-                </select>
-                <input 
-                  type="text" 
-                  placeholder="ZIP" 
-                  className="w-full border border-gray-300 border-t-0 rounded-b-md px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                />
-              </div>
-
-              {/* Submit Button */}
               <button 
-                type="button"
-                onClick={() => navigate('/trip/payment/success')} 
-                className="w-full bg-[#5469d4] hover:bg-[#4355c8] text-white font-medium py-3 rounded-md transition-colors mt-2"
+                onClick={handlePayment}
+                disabled={isProcessing}
+                className="w-full bg-[#635bff] hover:bg-[#5851e0] text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-purple-100 disabled:opacity-70 flex items-center justify-center gap-3"
               >
-                Pay $604.00
+                {isProcessing ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : null}
+                {isProcessing ? "Processing..." : `Proceed to Pay ${trip.tripDetails.estimatedPrice}`}
               </button>
-            </form>
+
+              <p className="text-xs text-gray-400 mt-6 leading-relaxed">
+                By clicking "Proceed to Pay", you agree to our terms and conditions. Your card information is never stored on our servers.
+              </p>
+            </div>
           </div>
         </section>
+
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default Payment
+export default Payment;

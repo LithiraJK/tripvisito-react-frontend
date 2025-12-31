@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import { getTripDetails, getAllTrips } from "../../services/trip";
 import InfoPill from "../../components/InfoPill";
@@ -12,6 +12,9 @@ import TripCard from "../../components/TripCard";
 import Button from "../../components/Button";
 import WorldMap from "../../components/WorldMap";
 import { AiFillEdit } from "react-icons/ai";
+import api from "../../services/api";
+import toast from "react-hot-toast";
+import { useAuth } from "../../contexts/authContext";
 
 export interface DayPlan {
   day: number;
@@ -33,8 +36,11 @@ const TripDetails = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const path = useLocation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const isAdmin = path.pathname.startsWith("/admin");
 
@@ -59,6 +65,41 @@ const TripDetails = () => {
     { title: "Best Time to Visit : ", item: bestTimeToVisit },
     { title: "Weather : ", item: weatherInfo },
   ];
+
+  // --- STRIPE REDIRECTION LOGIC ---
+  const handlePayment = async () => {
+    if (!user) {
+      toast.error("Please login to continue payment");
+      navigate("/login", { state: { from: path } });
+      return;
+    }
+
+    if (!tripDetails) return;
+
+    try {
+      setIsProcessing(true);
+
+      const response = await api.post("/payment/checkout", {
+        tripId: tripId,
+        tripName: name,
+        tripImage: imageUrls[0],
+        tripDescription: description,
+
+        amount: Number(estimatedPrice.replace(/[^0-9.]/g, "")),
+      });
+
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      }
+    } catch (error: any) {
+      console.error("Checkout Error:", error);
+      toast.error(
+        error.response?.data?.message || "Cannot initiate payment process."
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   useEffect(() => {
     const getTripData = async () => {
@@ -287,15 +328,23 @@ const TripDetails = () => {
 
         <div>
           <Button
-            ctaText={`Pay & Join Trip ${estimatedPrice}`}
-            ctaURL="/trip/payment"
+            ctaText={
+              isProcessing
+                ? "Processing..."
+                : `Proceed to Pay ${estimatedPrice}`
+            }
+            onClick={handlePayment}
+            disabled={isProcessing || isAdmin}
             variant="primary"
             className="md:w-full cursor-pointer"
-            disabled={isAdmin}
           />
+          <p className="text-xs text-gray-400 mt-6 leading-relaxed">
+            By clicking "Proceed to Pay", you agree to our terms and conditions.
+            Your card information is never stored on our servers.
+          </p>
         </div>
       </section>
-      
+
       <section className="flex flex-col gap-6">
         <div className="bg-gray-200 h-px w-full" />
         <h2 className="text-2xl font-semibold">Popular Trips</h2>
@@ -322,143 +371,3 @@ const TripDetails = () => {
 };
 
 export default TripDetails;
-
-/**
- "data": {
-        "trip": {
-            "_id": "69310faf1a773752a3c57f61",
-            "tripDetails": {
-                "name": "Sri Lankan Adventure for Two",
-                "description": "Experience the thrill of Sri Lanka with your loved one on this 5-day adventure! Hike to majestic waterfalls, explore ancient ruins, and surf the waves of the Indian Ocean. This itinerary balances adrenaline-pumping activities with moments of relaxation in stunning settings.",
-                "estimatedPrice": "$850",
-                "duration": 5,
-                "budget": "Mid-Range",
-                "travelStyle": "Adventure",
-                "country": "Sri Lanaka",
-                "interests": "undefined",
-                "groupType": "Couple",
-                "bestTimeToVisit": [
-                    "☀️ December to March: Best time for the west and south coasts and the hill country, offering dry weather for hiking and beach activities.",
-                    "🌸 April to September: Ideal for the east coast, with sunny skies and calm seas perfect for surfing and diving.",
-                    "🍁 Shoulder Seasons (March/April & September/October): Less crowded and offer a good balance of weather conditions across the island.",
-                    "🌧️ May to August: Monsoon season in the southwest, expect rain but lower prices."
-                ],
-                "weatherInfo": [
-                    "☀️ Dry Season (West & South): 27-31°C (81-88°F)",
-                    "☀️ Dry Season (East): 28-32°C (82-90°F)",
-                    "🌦️ Shoulder Seasons: 26-30°C (79-86°F)",
-                    "🌧️ Monsoon Season (Southwest): 25-29°C (77-84°F)"
-                ],
-                "location": {
-                    "city": "Colombo",
-                    "coordinates": [
-                        6.9271,
-                        79.8612
-                    ],
-                    "openStreetMap": "https://www.openstreetmap.org/#map=12/6.9271/79.8612"
-                },
-                "itinerary": [
-                    {
-                        "day": 1,
-                        "location": "Kitulgala",
-                        "activities": [
-                            {
-                                "time": "Morning",
-                                "description": "🚣‍♀️ Arrive in Kitulgala and embark on a white water rafting adventure on the Kelani River. Experience thrilling rapids and stunning scenery."
-                            },
-                            {
-                                "time": "Afternoon",
-                                "description": "🏞️ Go canyoning! Rappel down waterfalls and slide through natural rock formations in a lush jungle setting. Safety gear and instruction will be provided."
-                            },
-                            {
-                                "time": "Evening",
-                                "description": "🏕️ Check into your eco-lodge and enjoy a relaxing dinner with views of the surrounding rainforest. Afterwards chill."
-                            }
-                        ]
-                    },
-                    {
-                        "day": 2,
-                        "location": "Nuwara Eliya",
-                        "activities": [
-                            {
-                                "time": "Morning",
-                                "description": "⛰️ Hike to a scenic viewpoint in the surrounding hills of Kitulgala for panoramic vistas. Enjoy the trek!"
-                            },
-                            {
-                                "time": "Afternoon",
-                                "description": "🚂 Take a scenic train ride from Peradeniya to Nuwara Eliya, passing through tea plantations and rolling hills. A classic Sri Lankan experience."
-                            },
-                            {
-                                "time": "Evening",
-                                "description": "☕ Check into your hotel in Nuwara Eliya and enjoy a traditional high tea experience at The Grand Hotel. A touch of colonial elegance."
-                            }
-                        ]
-                    },
-                    {
-                        "day": 3,
-                        "location": "Ella",
-                        "activities": [
-                            {
-                                "time": "Morning",
-                                "description": "🌄 Hike to Little Adam's Peak for stunning sunrise views of the surrounding landscape. A relatively easy hike with rewarding vistas."
-                            },
-                            {
-                                "time": "Afternoon",
-                                "description": "🌉 Trek across the Nine Arch Bridge, a stunning example of colonial-era railway construction. Capture incredible photos!"
-                            },
-                            {
-                                "time": "Evening",
-                                "description": "🍲 Enjoy a delicious Sri Lankan cooking class and learn to prepare local specialties. Dine on your creations!"
-                            }
-                        ]
-                    },
-                    {
-                        "day": 4,
-                        "location": "Arugam Bay",
-                        "activities": [
-                            {
-                                "time": "Morning",
-                                "description": "🏄‍♀️ Travel to Arugam Bay, the surf capital of Sri Lanka. Take a surfing lesson and catch some waves. Perfect for beginners and experienced surfers alike."
-                            },
-                            {
-                                "time": "Afternoon",
-                                "description": "🐊 Take a lagoon safari to spot wildlife, including crocodiles, elephants, and various bird species. A unique and immersive experience."
-                            },
-                            {
-                                "time": "Evening",
-                                "description": "🏖️ Relax on the beach and enjoy a seafood dinner at a beachfront restaurant. Watch the sunset over the Indian Ocean."
-                            }
-                        ]
-                    },
-                    {
-                        "day": 5,
-                        "location": "Colombo",
-                        "activities": [
-                            {
-                                "time": "Morning",
-                                "description": "🌊 Enjoy a final morning of surfing or relaxing on the beach in Arugam Bay."
-                            },
-                            {
-                                "time": "Afternoon",
-                                "description": "✈️ Transfer to Colombo (domestic flight recommended to save time) for your departure flight."
-                            },
-                            {
-                                "time": "Evening",
-                                "description": "Departure from Colombo."
-                            }
-                        ]
-                    }
-                ]
-            },
-            "imageUrls": [
-                "https://images.unsplash.com/photo-1599668187742-d047e6c6e0ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4Mzg5MzR8MHwxfHNlYXJjaHwxfHxTcmklMjBMYW5ha2ElMjBBZHZlbnR1cmV8ZW58MHwwfHx8MTc2NDc4NjkwNXww&ixlib=rb-4.1.0&q=80&w=1080",
-                "https://images.unsplash.com/photo-1616479923713-a29f86b74895?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4Mzg5MzR8MHwxfHNlYXJjaHwyfHxTcmklMjBMYW5ha2ElMjBBZHZlbnR1cmV8ZW58MHwwfHx8MTc2NDc4NjkwNXww&ixlib=rb-4.1.0&q=80&w=1080",
-                "https://images.unsplash.com/photo-1657634889654-932db6ec0fcc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4Mzg5MzR8MHwxfHNlYXJjaHwzfHxTcmklMjBMYW5ha2ElMjBBZHZlbnR1cmV8ZW58MHwwfHx8MTc2NDc4NjkwNXww&ixlib=rb-4.1.0&q=80&w=1080"
-            ],
-            "paymentLink": "",
-            "createdAt": "2025-12-04T04:35:59.378Z",
-            "userId": "6922d9e5c9d0162d835b1122",
-            "__v": 0
-        }
-    }
- */
