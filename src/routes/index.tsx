@@ -9,7 +9,6 @@ import TripDetails from "../pages/trip/TripDetails";
 import LandingLayout from "../components/LandingLayout";
 import CreateUser from "../pages/admin/CreateUser";
 import UpdateTrip from "../pages/trip/UpdateTrip";
-import Payment from "../pages/trip/Payment";
 import ThankyouMessage from "../components/ThankyouMessage";
 import UserDashboard from "../pages/user/UserDashboard";
 
@@ -78,7 +77,6 @@ const Router = () => {
             }
           >
             <Route path="/customer/dashboard" element={<UserDashboard />} />
-            <Route path="/trip/payment/:tripId" element={<Payment />} />
             <Route path="/trip/payment/success" element={<ThankyouMessage />} />
           </Route>
 

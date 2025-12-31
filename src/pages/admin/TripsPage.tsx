@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import TripCard from "../../components/TripCard";
-import { getAllTrips, getTripsByUser } from "../../services/trip";
+import { getTripsByUser } from "../../services/trip";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { FaPlus } from "react-icons/fa6";
 
