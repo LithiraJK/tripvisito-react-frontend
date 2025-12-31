@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import AdminLayout from "../components/AdminLayout";
 import AllUsers from "../pages/admin/AllUsers";
@@ -11,6 +11,7 @@ import CreateUser from "../pages/admin/CreateUser";
 import UpdateTrip from "../pages/trip/UpdateTrip";
 import Payment from "../pages/trip/Payment";
 import ThankyouMessage from "../components/ThankyouMessage";
+import UserDashboard from "../pages/user/UserDashboard";
 
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
@@ -25,6 +26,7 @@ type RequiredAuthTypes = {
 
 const RequireAuth = ({ children, roles }: RequiredAuthTypes) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -35,7 +37,7 @@ const RequireAuth = ({ children, roles }: RequiredAuthTypes) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (roles && !roles.some((role) => user.roles?.includes(role))) {
@@ -75,7 +77,8 @@ const Router = () => {
               </RequireAuth>
             }
           >
-            <Route path="/trip/payment" element={<Payment />} />
+            <Route path="/customer/dashboard" element={<UserDashboard />} />
+            <Route path="/trip/payment/:tripId" element={<Payment />} />
             <Route path="/trip/payment/success" element={<ThankyouMessage />} />
           </Route>
 
