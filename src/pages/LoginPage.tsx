@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import React, { useState } from "react";
 import { login } from "../services/auth";
@@ -9,8 +9,11 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const {setUser} = useAuth()
-  const navigate = useNavigate()
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  console.log("Location State:", location.state);
 
   const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -30,10 +33,17 @@ const LoginPage = () => {
         const userDetails = response.data.user;
         setUser(userDetails);
 
-        navigate("/admin/dashboard");
+        const defaultPath = userDetails.roles.includes("ADMIN")
+          ? "/admin/dashboard"
+          : "/customer/dashboard";
+
+        const redirectPath = location.state?.from?.pathname || defaultPath;
+
+        toast.success("Welcome back to Tripvisito!");
+        setTimeout(() => {
+          navigate(redirectPath, { replace: true });
+        }, 100);
       }
-
-
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Login failed, please check your credentials");
@@ -41,7 +51,7 @@ const LoginPage = () => {
   };
 
   return (
-    <main className='w-full h-screen flex justify-center items-center min-h-screen  bg-[url("src/assets/images/auth-img.webp")] bg-cover bg-no-repeat'>
+    <main className='w-full h-screen flex justify-center items-center min-h-screen bg-[url("src/assets/images/auth-img.webp")] bg-cover bg-no-repeat'>
       <section className="size-full bg-[rgba(255,255,255,0.3)] glassmorphism flex justify-center items-center px-2 sm:px-4 overflow-y-auto">
         <div className="w-full max-w-6xl px-2 xs:px-4 sm:px-8 md:px-12 py-6 sm:py-8 md:py-12 bg-[rgba(255,255,255,0.4)] backdrop-blur-lg rounded-2xl sm:rounded-3xl my-4 sm:my-8 space-y-6 sm:space-y-8 md:space-y-0 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center">
           <header className="md:flex md:flex-col md:justify-center md:h-full space-y-6">
@@ -118,9 +128,10 @@ const LoginPage = () => {
                             id="email"
                             name="email"
                             type="text"
+                            value={email}
                             className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
                             placeholder="Email address"
-                            onChange={(e)=> setEmail(e.target.value)}
+                            onChange={(e) => setEmail(e.target.value)}
                           />
                         </div>
                         <div className="relative">
@@ -132,14 +143,19 @@ const LoginPage = () => {
                           </label>
                           <input
                             id="password"
+                            name="password"
                             type="password"
+                            value={password}
                             className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
                             placeholder="Password"
                             onChange={(e) => setPassword(e.target.value)}
                           />
                         </div>
                         <div className="relative pt-1 sm:pt-2">
-                          <button onClick={handleLogin} className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:bg-linear-to-r hover:from-sky-500 hover:to-cyan-400 transition-all hover:cursor-pointer">
+                          <button
+                            onClick={handleLogin}
+                            className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:bg-linear-to-r hover:from-sky-500 hover:to-cyan-400 transition-all hover:cursor-pointer"
+                          >
                             Login
                           </button>
                         </div>

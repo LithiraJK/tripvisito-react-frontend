@@ -52,7 +52,7 @@ const Index = () => {
               </p>
               <Link
                 to="/login"
-                className="inline-block bg-blue-600 hover:bg-blue-700 transition-colors px-8 py-3 text-white font-semibold rounded-lg shadow-lg"
+                className="inline-block bg-[rgba(0,0,0,0.1)] backdrop-blur-md hover:scale-105 transition-colors px-8 py-3 font-semibold rounded-lg shadow-lg border-2 border-black"
               >
                 Get Started
               </Link>
