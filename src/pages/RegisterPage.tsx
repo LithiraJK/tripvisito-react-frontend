@@ -1,15 +1,21 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
 import { register } from "../services/auth";
 import { toast } from "react-hot-toast";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+import api from "../services/api";
+import { useAuth } from "../contexts/authContext";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setUser } = useAuth();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleRegister = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -36,32 +42,80 @@ const RegisterPage = () => {
       return;
     }
 
-
     try {
       await register(name.trim(), email.trim(), password);
-      
+
       toast.success("Registration successful! Redirecting to login...");
-      
+
       setName("");
       setEmail("");
       setPassword("");
-      
+
       setTimeout(() => {
         navigate("/login");
       }, 1000);
-
     } catch (error: any) {
       console.error("Registration error:", error);
-      
+
       // Handle specific error messages from the API
-      const errorMessage = error?.response?.data?.message || 
-                          error?.response?.message || 
-                          error?.message ||
-                          "Registration failed. Please try again.";
-      
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.message ||
+        error?.message ||
+        "Registration failed. Please try again.";
+
       toast.error(errorMessage);
     }
   };
+
+  // --- 2. GOOGLE LOGIN LOGIC ---
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        // Google profile pic
+        const res = await axios.get(
+          "https://www.googleapis.com/oauth2/v3/userinfo",
+          {
+            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+          }
+        );
+
+        console.log("Actual Google User:", res.data);
+
+        const googleUser = res.data;
+
+        const response = await api.post("/auth/google-login", {
+          name: googleUser.name,
+          email: googleUser.email,
+          profileimg: googleUser.picture,
+        });
+
+        const backendData = response.data.data;
+        console.log("Backend Response:", backendData);
+
+        if (backendData.accessToken) {
+          localStorage.setItem("accessToken", backendData.accessToken);
+          localStorage.setItem("refreshToken", backendData.refreshToken);
+
+          const loggedInUser = backendData.user;
+          setUser(loggedInUser);
+
+          const defaultPath = loggedInUser.roles.includes("ADMIN")
+            ? "/admin/dashboard"
+            : "/customer/dashboard";
+
+          const redirectPath = location.state?.from?.pathname || defaultPath;
+
+          toast.success("Logged in with Google!");
+          navigate(redirectPath, { replace: true });
+        }
+      } catch (error) {
+        console.error("Google Login Error:", error);
+        toast.error("Google Login failed!");
+      }
+    },
+    onError: () => toast.error("Google Login Failed!"),
+  });
 
   return (
     <main className='w-full h-screen flex justify-center items-center min-h-screen  bg-[url("src/assets/images/auth-img.webp")] bg-cover bg-no-repeat'>
@@ -192,7 +246,10 @@ const RegisterPage = () => {
                           or{" "}
                         </p>
                         <div className="relative">
-                          <button className="w-full border border-gray-300 rounded-xl py-2 flex items-center justify-center hover:bg-gray-50 transition-all hover:cursor-pointer">
+                          <button
+                            className="w-full border border-gray-300 rounded-xl py-2 flex items-center justify-center hover:bg-gray-50 transition-all hover:cursor-pointer"
+                            onClick={() => googleLogin()}
+                          >
                             <FcGoogle className="mr-2 text-lg sm:text-xl" />
                             <span className="text-xs xs:text-sm sm:text-base">
                               Continue with Google
