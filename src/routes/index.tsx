@@ -11,6 +11,7 @@ import CreateUser from "../pages/admin/CreateUser";
 import UpdateTrip from "../pages/trip/UpdateTrip";
 import ThankyouMessage from "../components/ThankyouMessage";
 import UserDashboard from "../pages/user/UserDashboard";
+import ChatRoom from "../pages/admin/ChatRoom";
 
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
@@ -96,6 +97,7 @@ const Router = () => {
             <Route path="/admin/all-users" element={<AllUsers />} />
             <Route path="/admin/trips" element={<Trips />} />
             <Route path="/admin/user/create" element={<CreateUser />} />
+            <Route path="/admin/chats" element={<ChatRoom />} />
           </Route>
           <Route
             element={
