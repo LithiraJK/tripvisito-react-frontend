@@ -2,6 +2,8 @@ import { formatDate } from "../lib/utils";
 import { IoMdHome } from "react-icons/io";
 import { FaUsers } from "react-icons/fa";
 import { FaRegMap } from "react-icons/fa";
+import { IoChatbubbles } from "react-icons/io5";
+
 
 
 export const sidebarItems = [
@@ -22,6 +24,12 @@ export const sidebarItems = [
     icon: FaRegMap,
     label: "AI Trips",
     href: "admin/trips",
+  },
+  {
+    id: 3,
+    icon: IoChatbubbles,
+    label: "Messages",
+    href: "admin/chats",
   },
 ];
 
