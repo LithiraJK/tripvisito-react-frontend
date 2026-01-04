@@ -214,7 +214,7 @@ const CreateUser = () => {
               <button
                 type="button"
                 onClick={() => setSelectedRole('ADMIN')}
-                className={`px-8 py-2.5 rounded-lg text-sm font-semibold w-full pl-4 pr-10 py-3 border-2 rounded-lg duration-200 font-medium hover:border-blue-400 cursor-pointer border-gray-200 focus:outline-none ${
+                className={`px-8 py-2.5 rounded-lg text-sm font-semibold w-full pl-4 pr-10 border-2 duration-200 hover:border-blue-400 cursor-pointer border-gray-200 focus:outline-none ${
                   selectedRole === 'ADMIN' 
                     ? 'bg-blue-50 border-blue-500' 
                     : 'bg-white'

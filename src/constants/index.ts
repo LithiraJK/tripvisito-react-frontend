@@ -26,7 +26,7 @@ export const sidebarItems = [
     href: "admin/trips",
   },
   {
-    id: 3,
+    id: 4,
     icon: IoChatbubbles,
     label: "Messages",
     href: "admin/chats",

@@ -1,11 +1,10 @@
-import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const ThankyouMessage = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center relative overflow-hidden">
       {/* Decorative shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
@@ -26,7 +25,6 @@ const ThankyouMessage = () => {
 
       {/* Main content */}
       <div className="relative z-10 max-w-2xl mx-auto px-4 text-center">
-        {/* Success badge */}
         <div className="flex justify-center mb-8">
           <div className="relative">
             <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg animate-scale-in">

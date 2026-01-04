@@ -3,14 +3,12 @@ import Header from "../../components/Header";
 import TripCard from "../../components/TripCard";
 import { getMyDetails } from "../../services/auth";
 import { getAllTrips } from "../../services/trip";
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import ChatBox from "../../components/ChatBox"; 
-
-// --- REACT ICONS IMPORT ---
 import { IoChatbubblesSharp, IoClose } from "react-icons/io5"; 
 
 const UserDashboard = () => {
-  const { tripId } = useParams<{ tripId: string }>();
+  // const { tripId } = useParams<{ tripId: string }>();
   const [user, setUser] = useState<any>(null);
   const [allTrips, setAllTrips] = useState<any[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false); 
@@ -93,3 +91,7 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
+
+// get users booked trips and show in dashboard
+
+// show paid and pending trips separately 
