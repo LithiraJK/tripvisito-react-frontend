@@ -3,6 +3,7 @@ import { IoMdHome } from "react-icons/io";
 import { FaUsers } from "react-icons/fa";
 import { FaRegMap } from "react-icons/fa";
 import { IoChatbubbles } from "react-icons/io5";
+import { IoNotifications } from "react-icons/io5";
 
 
 
@@ -28,8 +29,14 @@ export const sidebarItems = [
   {
     id: 4,
     icon: IoChatbubbles,
-    label: "Messages",
+    label: "Chats",
     href: "admin/chats",
+  },
+  {
+    id: 5,
+    icon: IoNotifications,
+    label: "Notifications",
+    href: "admin/notifications",
   },
 ];
 

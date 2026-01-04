@@ -39,15 +39,15 @@ const Index = () => {
     <div className="absolute w-full top-0 left-0">
       {/* Hero Section */}
       <section className='w-full min-h-screen flex items-center bg-[url("src/assets/images/hero-img.png")] bg-cover bg-center bg-no-repeat'>
-        <div className="absolute h-screen inset-0 bg-linear-to-br from-[#c9efff] via-[#cff1ff3f] to-transparent"></div>
+        <div className="absolute h-screen inset-0 bg-linear-to-br from-[#dfffff] via-[#cff1ff3f] to-transparent"></div>
         
         <div className="relative w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="max-w-2xl">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-gray-800 mb-6 leading-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-800 mb-6 leading-tight">
                 Plan Your<br />Trip with Ease
               </h1>
-              <p className="text-base sm:text-lg text-gray-700 mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-800 mb-8 leading-relaxed">
                 Customize your travel itinerary in minutes—pick your destination, set your preferences, and explore with confidence.
               </p>
               <Link
@@ -308,10 +308,6 @@ const Index = () => {
         </button>
       </div>
       </section>
-
-     
-
-     
     <Footer />
     </div>
   );
