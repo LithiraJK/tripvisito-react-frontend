@@ -170,7 +170,6 @@ const UpdateTrip = () => {
 
   const handleItineraryChange = (
     dayIndex: number,
-    field: "location",
     value: string
   ) => {
     setItinerary((prev) => {
@@ -606,7 +605,6 @@ const UpdateTrip = () => {
                         onChange={(e) =>
                           handleItineraryChange(
                             dayIndex,
-                            "location",
                             e.target.value
                           )
                         }
