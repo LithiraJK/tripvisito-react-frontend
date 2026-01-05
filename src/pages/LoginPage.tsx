@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { login } from "../services/auth";
 import { useAuth } from "../contexts/authContext";
 import toast from "react-hot-toast";
-import { useGoogleLogin } from "@react-oauth/google"; // Google OAuth Hook
+import { useGoogleLogin } from "@react-oauth/google"; 
 import axios from "axios";
 import api from "../services/api";
 
@@ -15,9 +15,6 @@ const LoginPage = () => {
   const { setUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Redirect path
-  const from = location.state?.from?.pathname || "/admin/dashboard";
 
   // --- 1. MANUAL LOGIN LOGIC ---
   const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
@@ -38,7 +35,10 @@ const LoginPage = () => {
         const userDetails = response.data.user;
         setUser(userDetails);
 
-        const defaultPath = userDetails.roles.includes("ADMIN")
+        const loggedInUser = response.data.user;
+        setUser(loggedInUser);
+
+          const defaultPath = loggedInUser.roles.includes("ADMIN") || loggedInUser.roles.includes("SUPERADMIN")
           ? "/admin/dashboard"
           : "/customer/dashboard";
 
@@ -84,7 +84,7 @@ const LoginPage = () => {
           const loggedInUser = backendData.user;
           setUser(loggedInUser);
           
-          const defaultPath = loggedInUser.roles.includes("ADMIN")
+          const defaultPath = loggedInUser.roles.includes("ADMIN") || loggedInUser.roles.includes("SUPERADMIN")
             ? "/admin/dashboard"
             : "/customer/dashboard";
 

@@ -101,7 +101,7 @@ const UpdateTrip = () => {
 
         // Helper function to capitalize first letter of each word
         const capitalizeWords = (str: string) => {
-          if (!str) return "";
+          if (!str || typeof str !== "string") return "";
           return str
             .split("-")
             .map(
@@ -316,7 +316,7 @@ const UpdateTrip = () => {
       // Append trip details as JSON string
       formDataToSend.append("tripDetails", JSON.stringify(tripDetails));
 
-      imageFiles.forEach((file, index) => {
+      imageFiles.forEach((file) => {
         if (file) {
           formDataToSend.append("imageURLs", file);
         }
