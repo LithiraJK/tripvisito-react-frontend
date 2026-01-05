@@ -32,7 +32,7 @@ const TripCard = ({
   return (
     <Link
       to={tripLink}
-      className="shadow-md bg-white rounded-[16px] flex-col w-full relative shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out"
+      className="bg-white rounded-2xl flex-col w-full relative shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out"
     >
       <img
         src={imageUrl}
@@ -67,7 +67,7 @@ const TripCard = ({
           />
         ))}
       </div>
-      <article className="bg-white py-1 px-2.5 w-fit rounded-[20px] absolute top-2.5 right-4 text-dark-100 text-sm font-semibold">
+      <article className="bg-white py-1 px-2.5 w-fit rounded-2xl absolute top-2.5 right-4 text-dark-100 text-sm font-semibold">
         {price}
       </article>
     </Link>

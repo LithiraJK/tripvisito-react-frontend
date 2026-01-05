@@ -62,7 +62,16 @@ const Router = () => {
           </div>
         }
       >
-        <Toaster position="top-right" />
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#fff',
+              color: '#363636',
+            },
+          }}
+        />
         <Routes>
           {/* Landing Page with Layout */}
           <Route element={<LandingLayout />}>
