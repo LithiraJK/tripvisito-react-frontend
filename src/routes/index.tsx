@@ -1,24 +1,27 @@
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import AdminLayout from "../components/AdminLayout";
-import AllUsers from "../pages/admin/AllUsers";
 import { useAuth } from "../contexts/authContext";
 import { Toaster } from "react-hot-toast";
 import { CreateTrip } from "../pages/trip/CreateTrip";
-import TripDetails from "../pages/trip/TripDetails";
-import LandingLayout from "../components/LandingLayout";
-import CreateUser from "../pages/admin/CreateUser";
-import UpdateTrip from "../pages/trip/UpdateTrip";
-import ThankyouMessage from "../components/ThankyouMessage";
-import UserDashboard from "../pages/user/UserDashboard";
-import ChatRoom from "../pages/admin/ChatRoom";
-import Notifications from "../pages/Notifications";
 
+const TripDetails = lazy(() => import("../pages/trip/TripDetails"));
+const LandingLayout = lazy(() => import("../components/LandingLayout"));
+const CreateUser = lazy(() => import("../pages/admin/CreateUser"));
+const UpdateTrip = lazy(() => import("../pages/trip/UpdateTrip"));
+const ThankyouMessage = lazy(() => import("../components/ThankyouMessage"));
+const UserDashboard = lazy(() => import("../pages/user/UserDashboard"));
+const ChatRoom = lazy(() => import("../pages/admin/ChatRoom"));
+const Notifications = lazy(() => import("../pages/Notifications"));
+const AdminLayout = lazy(() => import("../components/AdminLayout"));
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
 const RegisterPage = lazy(() => import("../pages/RegisterPage"));
 const Dashboard = lazy(() => import("../pages/admin/Dashboard"));
 const Trips = lazy(() => import("../pages/admin/TripsPage"));
+const AllUsers = lazy(() => import("../pages/admin/AllUsers"));
+
+
+
 
 type RequiredAuthTypes = {
   children: React.ReactNode;
