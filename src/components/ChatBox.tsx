@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import api from "../services/api";
 import { useAuth } from "../contexts/authContext";
 import { IoSend } from "react-icons/io5";
 import logo from '../assets/icons/logo.svg'
 
-const socket = io("http://localhost:5000");
+const socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000");
 
 interface ChatBoxProps {
   roomId: string;

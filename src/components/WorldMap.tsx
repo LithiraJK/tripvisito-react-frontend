@@ -106,9 +106,7 @@ const WorldMap = ({ selectedCountry, onCountryClick, className = '' }: WorldMapP
         {geoData.features.map((feature, index) => {
           const isSelected = selectedCountry && 
             (feature.properties.admin.toLowerCase().includes(selectedCountry.toLowerCase()) ||
-             feature.properties.name.toLowerCase().includes(selectedCountry.toLowerCase()));
-          const isHovered = hoveredCountry === feature.properties.name;
-          
+             feature.properties.name.toLowerCase().includes(selectedCountry.toLowerCase()));          
           return (
             <path
               key={`${feature.properties.name}-${index}`}

@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getMyDetails } from "../services/auth";
-import { useLocation } from "react-router-dom";
 
 const AuthContext = createContext<any>(null);
 
