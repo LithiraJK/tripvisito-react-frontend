@@ -38,6 +38,9 @@ const TripDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+
   const path = useLocation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -56,7 +59,6 @@ const TripDetails = () => {
     groupType,
     bestTimeToVisit,
     weatherInfo,
-    location,
     itinerary,
   } = tripDetails || {};
 
@@ -65,6 +67,8 @@ const TripDetails = () => {
     { title: "Best Time to Visit : ", item: bestTimeToVisit },
     { title: "Weather : ", item: weatherInfo },
   ];
+
+
 
   // --- STRIPE REDIRECTION LOGIC ---
   const handlePayment = async () => {
@@ -132,9 +136,28 @@ const TripDetails = () => {
         console.error("Error loading popular trips:", error);
       }
     };
+    // Fetch Ratings Logic [cite: 2025-10-11]
+    const fetchTripReviews = async () => {
+      try {
+        const response = await api.get(`/reviews/trip/${tripId}`);
+        const reviews = response.data.data;
+        
+        if (reviews && reviews.length > 0) {
+          const total = reviews.reduce((acc: number, curr: any) => acc + curr.rating, 0);
+          setAverageRating(total / reviews.length);
+          setTotalReviews(reviews.length);
+        } else {
+          setAverageRating(0);
+          setTotalReviews(0);
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
 
     getTripData();
     fetchAllTrips();
+    fetchTripReviews();
   }, [tripId]);
 
   if (loading) {
@@ -238,18 +261,17 @@ const TripDetails = () => {
                 />
               ))}
             </div>
-            <div>
+             <div>
               <ul className="flex gap-1 justify-between items-center">
-                {Array(5)
-                  .fill(null)
-                  .map((_, index) => (
-                    <li key={index} className="text-yellow-400">
+                {/* Dynamic Stars [cite: 2025-10-11] */}
+                {Array(5).fill(null).map((_, index) => (
+                    <li key={index} className={index < Math.round(averageRating) ? "text-yellow-400" : "text-gray-300"}>
                       <FaStar />
                     </li>
                   ))}
-
                 <li className="ml-1">
-                  <Chip label="4.9/5" variant="warning" />
+                  {/* Dynamic Chip Label [cite: 2025-09-30] */}
+                  <Chip label={`${averageRating.toFixed(1)}/5 (${totalReviews})`} variant="warning" />
                 </li>
               </ul>
             </div>

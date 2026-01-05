@@ -1,4 +1,3 @@
-import { formatDate } from "../lib/utils";
 import { IoMdHome } from "react-icons/io";
 import { FaUsers } from "react-icons/fa";
 import { FaRegMap } from "react-icons/fa";

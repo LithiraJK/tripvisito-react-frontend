@@ -4,7 +4,7 @@ import Header from "../../components/Header";
 import ChatBox from "../../components/ChatBox";
 import { fetchChatUsers } from "../../services/chat";
 import io from "socket.io-client";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const socket = io(import.meta.env.VITE_API_SOCKET_URL);
 
@@ -51,7 +51,7 @@ const ChatRoom = () => {
 
   return (
     <main className="w-full min-h-screen flex flex-col gap-6 max-w-7xl mx-auto px-4 lg:px-8 pb-4">
-      <Toaster position="top-right" />
+
       <Header title="Message Center" description="Connect with your customers in real-time." />
 
       <section className="grid grid-cols-1 md:grid-cols-12 bg-white shadow-lg rounded-3xl overflow-hidden border border-gray-100 h-[75vh] md:h-[650px]">
