@@ -11,7 +11,7 @@ import {
 import Header from "../../components/Header";
 import TripCard from "../../components/TripCard";
 import ChatBox from "../../components/ChatBox";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { getMyDetails } from "../../services/auth";
 import {
   fetchNotifications,
@@ -110,7 +110,6 @@ const UserDashboard = () => {
 
   return (
     <main className="relative flex flex-col gap-8 w-full pb-20 max-w-7xl mx-auto px-4 lg:px-8">
-      <Toaster position="bottom-center" />
 
       {/* --- HEADER --- */}
       <div className="flex justify-between items-start">
@@ -203,8 +202,8 @@ const UserDashboard = () => {
 
       {/* --- REVIEW MODAL --- */}
       {showReviewModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl p-8 flex flex-col gap-6 animate-in zoom-in slide-in-from-bottom-5">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-md rounded-4xl shadow-2xl p-8 flex flex-col gap-6 animate-in zoom-in slide-in-from-bottom-5">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-black text-gray-900">Trip Review</h3>
               <button onClick={() => setShowReviewModal(false)} className="hover:bg-gray-100 p-2 rounded-full transition-colors">

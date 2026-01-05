@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 import {
   IoTrashOutline,
   IoCheckmarkDoneOutline,
-  IoEllipsisHorizontal,
 } from "react-icons/io5";
 import {
   fetchNotifications,
   markAsRead,
   deleteNotification,
 } from "../services/notification"; // Using your service [cite: 2025-10-11]
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import Header from "../components/Header";
 
 const NotificationPage = () => {
@@ -72,7 +71,7 @@ const NotificationPage = () => {
 
   return (
     <main className="w-full min-h-screen flex flex-col gap-6 max-w-7xl mx-auto px-4 lg:px-8 pb-4">
-      <Toaster position="top-right" />
+
       <Header
         title="Notification Center"
         description="Manage your notifications and stay updated."
