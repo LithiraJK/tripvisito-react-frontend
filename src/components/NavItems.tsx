@@ -3,7 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { sidebarItems } from "../constants/index.ts";
 import logo from "../assets/icons/logo.svg";
 import logoutIcon from "../assets/icons/logout.svg";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 // Icons
 import { 
@@ -84,7 +84,6 @@ const NavItems = () => {
 
   return (
     <section className="flex flex-col h-full relative">
-      <Toaster position="bottom-left" />
       
       {/* --- TOP SECTION: LOGO & NOTIFICATIONS --- */}
       <div className="flex items-center justify-between pr-4 relative">
@@ -107,7 +106,7 @@ const NavItems = () => {
           {unreadCount > 0 && (
             <span className="absolute top-2 right-2 flex h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative flex rounded-full h-4 w-4 bg-red-500 text-white text-[9px] flex items-center justify-center font-bold">
+              <span className="relative flex rounded-full h-4 w-4 bg-red-500 text-white text-[9px] items-center justify-center font-bold">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             </span>
@@ -116,7 +115,7 @@ const NavItems = () => {
 
         {/* --- MODERN FLOATING NOTIFICATION PANEL --- */}
         {isNotifOpen && (
-          <div className="absolute left-[260px] top-0 w-80 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-2xl z-[100] flex flex-col animate-in fade-in zoom-in duration-200 origin-top-left">
+          <div className="absolute left-[260px] top-0 w-80 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-2xl z-100 flex flex-col animate-in fade-in zoom-in duration-200 origin-top-left">
             <div className="p-4 border-b border-gray-50 flex justify-between items-center">
               <h2 className="text-sm font-bold text-gray-800">Notifications</h2>
               <button 

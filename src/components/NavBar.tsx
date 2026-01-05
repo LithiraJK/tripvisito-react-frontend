@@ -85,13 +85,13 @@ const NavBar = () => {
           <div className="hidden lg:flex items-center gap-3 z-50">
             <Link 
               to="/login" 
-              className="px-6 py-2 text-gray-700 font-medium hover:text-blue-600 transition-colors"
+              className="px-6 py-2 text-black font-medium hover:text-white transition-colors"
             >
               Sign In
             </Link>
             <Link 
               to="/register" 
-              className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-white/20 text-white font-medium rounded-lg hover:bg-blue-500 transition-colors"
             >
               Sign Up
             </Link>
