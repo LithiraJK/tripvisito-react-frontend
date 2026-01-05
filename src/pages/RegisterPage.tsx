@@ -118,7 +118,7 @@ const RegisterPage = () => {
   });
 
   return (
-    <main className='w-full h-screen flex justify-center items-center min-h-screen  bg-[url("src/assets/images/auth-img.webp")] bg-cover bg-no-repeat'>
+    <main className='w-full h-screen flex justify-center items-center min-h-screen  bg-[url("https://res.cloudinary.com/dxs4vmk1i/image/upload/v1767602259/auth-img_nyrdnw.webp")] bg-cover bg-no-repeat'>
       <section className="size-full bg-[rgba(255,255,255,0.3)] glassmorphism flex justify-center items-center px-2 sm:px-4 overflow-y-auto">
         <div className="w-full max-w-6xl px-2 xs:px-4 sm:px-8 md:px-12 py-6 sm:py-8 md:py-12 bg-[rgba(255,255,255,0.4)] backdrop-blur-lg rounded-2xl sm:rounded-3xl my-4 sm:my-8 space-y-6 sm:space-y-8 md:space-y-0 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center">
           <header className="md:flex md:flex-col md:justify-center md:h-full space-y-6">

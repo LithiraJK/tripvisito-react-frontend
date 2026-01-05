@@ -58,7 +58,7 @@ const prevReview = () => {
   return (
     <div className="absolute w-full top-0 left-0">
       {/* Hero Section */}
-      <section className='w-full min-h-screen flex items-center bg-[url("src/assets/images/hero-img.png")] bg-cover bg-center bg-no-repeat'>
+      <section className='w-full min-h-screen flex items-center bg-[url("https://res.cloudinary.com/dxs4vmk1i/image/upload/v1767602256/hero-img_yaygpb.png")] bg-cover bg-center bg-no-repeat'>
         <div className="absolute h-screen inset-0 bg-linear-to-br from-[#dfffff] via-[#cff1ff3f] to-transparent"></div>
 
         <div className="relative w-full">
