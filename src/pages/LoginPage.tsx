@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google"; 
 import axios from "axios";
 import api from "../services/api";
+import logo from "../assets/icons/logo.svg";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -107,7 +108,7 @@ const LoginPage = () => {
         <div className="w-full max-w-6xl px-2 xs:px-4 sm:px-8 md:px-12 py-6 sm:py-8 md:py-12 bg-[rgba(255,255,255,0.4)] backdrop-blur-lg rounded-2xl sm:rounded-3xl my-4 sm:my-8 space-y-6 sm:space-y-8 md:space-y-0 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center">
           <header className="md:flex md:flex-col md:justify-center md:h-full space-y-6">
             <Link to="/" className="nav-link flex flex-row items-center space-x-3 mb-4 group transition-all">
-              <img src="/src/assets/icons/logo.svg" alt="logo" className="md:size-10 transition-transform group-hover:scale-110" />
+              <img src={logo} alt="logo" className="md:size-10 transition-transform group-hover:scale-110" />
               <h1 className="sm:text-2xl font-bold bg-linear-to-r from-cyan-500 to-sky-600 bg-clip-text text-transparent">Tripvisito</h1>
             </Link>
             <article className="space-y-2 md:space-y-4">

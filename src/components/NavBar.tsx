@@ -67,11 +67,13 @@ const NavBar = () => {
 
         {user ? (
           <div className="hidden lg:flex items-center gap-4 z-50">
+            <Link to="/customer/dashboard">
             <img
               src={user?.profileimg}
               alt={user?.name || "User"}
               className="size-10 rounded-full shrink-0"
             />
+            </Link>
             <article className="flex-1 min-w-0">
               <h2 className="font-medium truncate">{user?.name || "Guest"}</h2>
               <p className="text-sm text-gray-600 truncate">{user?.email || "guest@example.com"}</p>

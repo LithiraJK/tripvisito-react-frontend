@@ -7,6 +7,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import api from "../services/api";
 import { useAuth } from "../contexts/authContext";
+import logo from "../assets/icons/logo.svg";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -127,7 +128,7 @@ const RegisterPage = () => {
               className="nav-link flex flex-row items-center space-x-3 mb-4 group transition-all"
             >
               <img
-                src="/src/assets/icons/logo.svg"
+                src={logo}
                 alt="logo"
                 className="md:size-10 transition-transform group-hover:scale-110"
               />
