@@ -6,7 +6,8 @@ import { IoSend } from "react-icons/io5";
 import logo from '../assets/icons/logo.svg'
 
 const socket = io(import.meta.env.VITE_API_SOCKET_URL, {
-  transports: ["polling"], 
+  transports: ["websocket"],
+  upgrade: false,
   withCredentials: true
 });
 
