@@ -6,7 +6,10 @@ import { fetchChatUsers } from "../../services/chat";
 import io from "socket.io-client";
 import toast from "react-hot-toast";
 
-const socket = io(import.meta.env.VITE_API_SOCKET_URL);
+const socket = io(import.meta.env.VITE_API_SOCKET_URL, {
+  transports: ["polling"],
+  withCredentials: true
+});
 
 const ChatRoom = () => {
   const [users, setUsers] = useState<any[]>([]);

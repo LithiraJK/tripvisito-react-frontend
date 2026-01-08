@@ -5,7 +5,10 @@ import { useAuth } from "../contexts/authContext";
 import { IoSend } from "react-icons/io5";
 import logo from '../assets/icons/logo.svg'
 
-const socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000");
+const socket = io(import.meta.env.VITE_API_SOCKET_URL, {
+  transports: ["polling"], 
+  withCredentials: true
+});
 
 interface ChatBoxProps {
   roomId: string;
