@@ -9,6 +9,7 @@ import Chip from "../../components/Chip";
 import { toast } from "react-hot-toast";
 import { generateTrip } from "../../services/trip";
 import { useNavigate } from "react-router-dom";
+import { budgetOptions, groupTypes, interests, travelStyles } from "../../constants";
 
 export interface Country {
   cca2: string;
@@ -207,12 +208,7 @@ export const CreateTrip = () => {
               Group Type
             </label>
             <ComboBox
-              options={[
-                { value: "family", label: "Family" },
-                { value: "friends", label: "Friends" },
-                { value: "solo", label: "Solo" },
-                { value: "couple", label: "Couple" },
-              ]}
+              options={groupTypes}
               value={formData.groupType}
               onChange={(value) => handleChange("groupType", value)}
               placeholder="Select group type..."
@@ -227,12 +223,7 @@ export const CreateTrip = () => {
               Travel Style
             </label>
             <ComboBox
-              options={[
-                { value: "adventure", label: "Adventure" },
-                { value: "relaxation", label: "Relaxation" },
-                { value: "cultural", label: "Cultural" },
-                { value: "romantic", label: "Romantic" },
-              ]}
+              options={travelStyles}
               value={formData.travelStyle}
               onChange={(value) => handleChange("travelStyle", value)}
               placeholder="Select a travel style..."
@@ -247,12 +238,7 @@ export const CreateTrip = () => {
               Interests
             </label>
             <ComboBox
-              options={[
-                { value: "nature", label: "Nature" },
-                { value: "history", label: "History" },
-                { value: "food", label: "Food" },
-                { value: "art", label: "Art" },
-              ]}
+              options={interests}
               value={formData.interests}
               onChange={(value) => handleChange("interests", value)}
               placeholder="Select your interests..."
@@ -267,11 +253,7 @@ export const CreateTrip = () => {
               Budget Estimate
             </label>
             <ComboBox
-              options={[
-                { value: "budget", label: "Budget" },
-                { value: "midrange", label: "Mid-range" },
-                { value: "luxury", label: "Luxury" },
-              ]}
+              options={budgetOptions}
               value={formData.budget}
               onChange={(value) => handleChange("budget", value)}
               placeholder="Select your budget preference"

@@ -4,8 +4,6 @@ import { FaRegMap } from "react-icons/fa";
 import { IoChatbubbles } from "react-icons/io5";
 import { IoNotifications } from "react-icons/io5";
 
-
-
 export const sidebarItems = [
   {
     id: 1,
@@ -79,29 +77,81 @@ export const chartOneData: object[] = [
 ];
 
 export const travelStyles = [
-  "Relaxed",
-  "Luxury",
-  "Adventure",
-  "Cultural",
-  "Nature & Outdoors",
-  "City Exploration",
+  {
+    value: "relaxed",
+    label: "Relaxed",
+  },
+  {
+    value: "luxury",
+    label: "Luxury",
+  },
+  {
+    value: "adventure",
+    label: "Adventure",
+  },
+
+  {
+    value: "cultural",
+    label: "Cultural",
+  },
+  {
+    value: "nature_outdoors",
+    label: "Nature & Outdoors",
+  },
+  {
+    value: "city_exploration",
+    label: "City Exploration",
+  },
 ];
 
 export const interests = [
-  "Food & Culinary",
-  "Historical Sites",
-  "Hiking & Nature Walks",
-  "Beaches & Water Activities",
-  "Museums & Art",
-  "Nightlife & Bars",
-  "Photography Spots",
-  "Shopping",
-  "Local Experiences",
+  {
+    value: "nature",
+    label: "Nature",
+  },
+  {
+    value: "history",
+    label: "History",
+  },
+  {
+    value: "food",
+    label: "Food",
+  },
+  {
+    value: "art",
+    label: "Art",
+  },
+  {
+    value: "wildlife",
+    label: "Wildlife",
+  },
+  {
+    value: "adventure_sports",
+    label: "Adventure Sports",
+  },
+  {
+    value: "beaches",
+    label: "Beaches",
+  },
+  {
+    value: "mountains",
+    label: "Mountains",
+  },
 ];
 
-export const budgetOptions = ["Budget", "Mid-range", "Luxury", "Premium"];
+export const budgetOptions = [
+                { value: "budget", label: "Budget" },
+                { value: "midrange", label: "Mid-range" },
+                { value: "luxury", label: "Luxury" },
+              ]
 
-export const groupTypes = ["Solo", "Couple", "Family", "Friends", "Business"];
+export const groupTypes = [
+                { value: "family", label: "Family" },
+                { value: "friends", label: "Friends" },
+                { value: "solo", label: "Solo" },
+                { value: "couple", label: "Couple" },
+                { value: "business", label: "Business" }
+              ];
 
 export const footers = ["Terms & Condition", "Privacy Policy"];
 
@@ -140,10 +190,9 @@ export const RIGHT_CONFETTI = {
 
 //////////////////////////////////////////////////////////////////////////////////
 export const dashboardStats = {
-    totalUsers: 1500,
-    totalTrips: 300,
-    usersJoined: { currentMonth: 218, lastMonth: 180 },
-    tripsCreated: { total: 62, currentMonth: 150, lastMonth: 210 },
-    userGrowth: { total: 60, currentMonth: 25, lastMonth: 20 },
-  };
-
+  totalUsers: 1500,
+  totalTrips: 300,
+  usersJoined: { currentMonth: 218, lastMonth: 180 },
+  tripsCreated: { total: 62, currentMonth: 150, lastMonth: 210 },
+  userGrowth: { total: 60, currentMonth: 25, lastMonth: 20 },
+};

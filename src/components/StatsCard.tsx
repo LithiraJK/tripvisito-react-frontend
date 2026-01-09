@@ -1,10 +1,12 @@
 import { calculateTrendPercentage, cn } from "../lib/utils";
+import TrendChart from "./TrendChart";
 
 export interface StatsCardProps {
   headerTitle: string;
   total: number;
   lastMonthCount: number;
   currentMonthCount: number;
+  chartData?: number[];
 }
 
 const StatsCard = ({
@@ -12,6 +14,7 @@ const StatsCard = ({
   total,
   lastMonthCount,
   currentMonthCount,
+  chartData,
 }: StatsCardProps) => {
   const { trend, percentage } = calculateTrendPercentage(
     currentMonthCount,
@@ -20,6 +23,7 @@ const StatsCard = ({
 
   const isDecrement = trend === "decrement";
   const isIncrement = trend === "increment";
+  const mappedTrend = trend === "no change" ? "neutral" : trend;
 
   return (
     <article className="p-6 flex flex-col gap-5 bg-white shadow-[400px] rounded-[20px] text-black">
@@ -59,17 +63,7 @@ const StatsCard = ({
             </p>
           </div>
         </div>
-        <img
-          src={`/src/assets/icons/${
-            isDecrement
-              ? "decrement.svg"
-              : isIncrement
-              ? "increment.svg"
-              : "neutral.svg"
-          }`}
-          alt="trend graph"
-          className="xl:w-32 w-full h-full md:h-32 xl:h-full"
-        />
+        <TrendChart trend={mappedTrend} data={chartData} />
       </div>
     </article>
   );
