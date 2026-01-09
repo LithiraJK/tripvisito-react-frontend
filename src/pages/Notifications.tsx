@@ -92,7 +92,7 @@ const NotificationPage = () => {
                 {tab}
                 {/* Animated Underline */}
                 {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full animate-in fade-in slide-in-from-bottom-1" />
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 rounded-full animate-in fade-in slide-in-from-bottom-1" />
                 )}
               </button>
             ))}
@@ -116,7 +116,7 @@ const NotificationPage = () => {
                   <div
                     className={`mt-2 size-2.5 rounded-full shrink-0 transition-all ${
                       !n.isRead
-                        ? "bg-blue-600 scale-100"
+                        ? "bg-blue-500 scale-100"
                         : "bg-transparent scale-0"
                     }`}
                   ></div>

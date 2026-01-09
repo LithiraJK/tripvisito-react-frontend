@@ -93,7 +93,7 @@ const TripsPage = () => {
             onClick={() => setPage(1)}
             className={`w-8 h-8 flex items-center justify-center text-sm rounded ${
               page === 1
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-500 text-white"
                 : "text-gray-600 hover:bg-gray-50"
             }`}
           >
@@ -112,7 +112,7 @@ const TripsPage = () => {
                 onClick={() => setPage(p)}
                 className={`w-8 h-8 flex items-center justify-center text-sm rounded ${
                   page === p
-                    ? "bg-blue-600 text-white"
+                    ? "bg-blue-500 text-white"
                     : "text-gray-600 hover:bg-gray-50"
                 }`}
               >
@@ -131,7 +131,7 @@ const TripsPage = () => {
               onClick={() => setPage(totalPages)}
               className={`w-8 h-8 flex items-center justify-center text-sm rounded ${
                 page === totalPages
-                  ? "bg-blue-600 text-white"
+                  ? "bg-blue-500 text-white"
                   : "text-gray-600 hover:bg-gray-50"
               }`}
             >

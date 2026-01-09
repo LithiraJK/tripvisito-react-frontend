@@ -351,7 +351,7 @@ const UpdateTrip = () => {
           description="Please wait while we fetch the trip information"
         />
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </div>
       </main>
     );
@@ -566,7 +566,7 @@ const UpdateTrip = () => {
                 <button
                   type="button"
                   onClick={addDay}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <MdAdd className="w-5 h-5" />
                   Add Day
@@ -651,7 +651,7 @@ const UpdateTrip = () => {
                 <button
                   type="button"
                   onClick={addBestTime}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   <MdAdd className="w-5 h-5" />
                   Add Item
@@ -693,7 +693,7 @@ const UpdateTrip = () => {
                 <button
                   type="button"
                   onClick={addWeather}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   <MdAdd className="w-5 h-5" />
                   Add Item
@@ -775,7 +775,7 @@ const UpdateTrip = () => {
                         Drop your image here
                       </p>
                       <p className="text-gray-400 text-sm mb-1">or</p>
-                      <span className="text-blue-600 font-medium hover:text-blue-700">
+                      <span className="text-blue-500 font-medium hover:text-blue-600">
                         Select Click to browse
                       </span>
                     </>
@@ -827,7 +827,7 @@ const UpdateTrip = () => {
                       ) : (
                         <>
                           <FiUpload className="w-8 h-8 text-gray-400 mb-2" />
-                          <span className="text-blue-600 text-sm font-medium hover:text-blue-700">
+                          <span className="text-blue-500 text-sm font-medium hover:text-blue-600">
                             Click to browse
                           </span>
                         </>

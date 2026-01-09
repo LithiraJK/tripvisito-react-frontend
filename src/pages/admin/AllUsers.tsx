@@ -71,7 +71,7 @@ const AllUsers = () => {
             onClick={() => handlePageClick(i)}
             className={`w-8 h-8 flex items-center justify-center text-sm rounded ${
               page === i
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-500 text-white"
                 : "text-gray-600 hover:bg-gray-50"
             }`}
           >
@@ -86,7 +86,7 @@ const AllUsers = () => {
           onClick={() => handlePageClick(1)}
           className={`w-8 h-8 flex items-center justify-center text-sm rounded ${
             page === 1
-              ? "bg-blue-600 text-white"
+              ? "bg-blue-500 text-white"
               : "text-gray-600 hover:bg-gray-50"
           }`}
         >
@@ -113,7 +113,7 @@ const AllUsers = () => {
             onClick={() => handlePageClick(i)}
             className={`w-8 h-8 flex items-center justify-center text-sm rounded ${
               page === i
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-500 text-white"
                 : "text-gray-600 hover:bg-gray-50"
             }`}
           >
@@ -136,7 +136,7 @@ const AllUsers = () => {
           onClick={() => handlePageClick(totalPages)}
           className={`w-8 h-8 flex items-center justify-center text-sm rounded ${
             page === totalPages
-              ? "bg-blue-600 text-white"
+              ? "bg-blue-500 text-white"
               : "text-gray-600 hover:bg-gray-50"
           }`}
         >
@@ -243,7 +243,7 @@ const AllUsers = () => {
       <section>
         {loading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           </div>
         ) : error ? (
           <div className="text-center py-12">

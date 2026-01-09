@@ -75,7 +75,7 @@ const ThankyouMessage = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-delay-2">
           <button
             onClick={() => navigate('/')}
-            className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            className="w-full sm:w-auto px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
           >
             View trip details
           </button>

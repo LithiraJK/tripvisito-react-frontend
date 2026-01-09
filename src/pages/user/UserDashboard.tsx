@@ -140,7 +140,7 @@ const UserDashboard = () => {
             onClick={() => setActiveTab("CONFIRMED")}
             className={`px-6 py-3 font-semibold text-sm transition-all ${
               activeTab === "CONFIRMED"
-                ? "border-b-2 border-blue-500 text-blue-600"
+                ? "border-b-2 border-blue-500 text-blue-500"
                 : "text-gray-400 hover:text-gray-600"
             }`}
           >
@@ -150,7 +150,7 @@ const UserDashboard = () => {
             onClick={() => setActiveTab("PENDING")}
             className={`px-6 py-3 font-semibold text-sm transition-all ${
               activeTab === "PENDING"
-                ? "border-b-2 border-blue-500 text-blue-600"
+                ? "border-b-2 border-blue-500 text-blue-500"
                 : "text-gray-400 hover:text-gray-600"
             }`}
           >
@@ -183,7 +183,7 @@ const UserDashboard = () => {
                   {activeTab === "CONFIRMED" && (
                     <button
                       onClick={() => { setSelectedBooking(book); setShowReviewModal(true); }}
-                      className="w-full py-3 bg-blue-50 text-blue-600 rounded-2xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                      className="w-full py-3 bg-blue-50 text-blue-500 rounded-2xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                     >
                       Rate this Trip
                     </button>
@@ -211,7 +211,7 @@ const UserDashboard = () => {
             </div>
             
             <div className="flex flex-col items-center gap-3">
-              <p className="text-xs font-bold text-blue-600 uppercase tracking-widest text-center">
+              <p className="text-xs font-bold text-blue-500 uppercase tracking-widest text-center">
                 How was your experience in {selectedBooking?.tripId?.tripDetails?.country}?
               </p>
               <div className="flex gap-2">
@@ -238,7 +238,7 @@ const UserDashboard = () => {
             <button 
               onClick={handleReviewSubmit}
               disabled={rating === 0}
-              className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 disabled:bg-gray-200 disabled:shadow-none transition-all active:scale-95"
+              className="w-full bg-blue-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 disabled:bg-gray-200 disabled:shadow-none transition-all active:scale-95"
             >
               Submit Review
             </button>

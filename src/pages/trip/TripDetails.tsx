@@ -136,7 +136,7 @@ const TripDetails = () => {
         console.error("Error loading popular trips:", error);
       }
     };
-    // Fetch Ratings Logic [cite: 2025-10-11]
+    // Fetch Ratings Logic 
     const fetchTripReviews = async () => {
       try {
         const response = await api.get(`/reviews/trip/${tripId}`);

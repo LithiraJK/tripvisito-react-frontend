@@ -181,7 +181,7 @@ const CreateUser = () => {
                   onClick={() => setSelectedRole('USER')}
                   className={`flex-1 p-4 rounded-xl border-2 transition-all text-left ${selectedRole === 'USER' ? 'border-blue-500 bg-blue-50' : 'border-gray-100'}`}
                 >
-                  <span className={`block font-bold ${selectedRole === 'USER' ? 'text-blue-600' : 'text-gray-700'}`}>User</span>
+                  <span className={`block font-bold ${selectedRole === 'USER' ? 'text-blue-500' : 'text-gray-700'}`}>User</span>
                   <span className="text-[10px] text-gray-400">Regular access for travelers</span>
                 </button>
                 <button
@@ -189,7 +189,7 @@ const CreateUser = () => {
                   onClick={() => setSelectedRole('ADMIN')}
                   className={`flex-1 p-4 rounded-xl border-2 transition-all text-left ${selectedRole === 'ADMIN' ? 'border-blue-500 bg-blue-50' : 'border-gray-100'}`}
                 >
-                  <span className={`block font-bold ${selectedRole === 'ADMIN' ? 'text-blue-600' : 'text-gray-700'}`}>Admin</span>
+                  <span className={`block font-bold ${selectedRole === 'ADMIN' ? 'text-blue-500' : 'text-gray-700'}`}>Admin</span>
                   <span className="text-[10px] text-gray-400">Full management control</span>
                 </button>
               </div>
