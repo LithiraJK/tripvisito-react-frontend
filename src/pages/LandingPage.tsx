@@ -6,6 +6,7 @@ import { getAllTrips } from "../services/trip";
 import TripCard from "../components/TripCard";
 import { FaStar, FaQuoteLeft } from "react-icons/fa";
 import { fetchAllReviews } from "../services/review";
+import Footer from "../components/Footer";
 
 const Index = () => {
   const [trips, setTrips] = useState<any[]>([]);
@@ -437,6 +438,8 @@ const prevReview = () => {
       </div>
     </div>
   </section>
+
+  <Footer />
 
     </div>
   );

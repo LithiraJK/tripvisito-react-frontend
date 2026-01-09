@@ -3,6 +3,8 @@ import logo from "../assets/icons/logo.svg";
 
 
 const Footer = () => {
+
+  
   return (
     <footer className="bg-linear-to-t from-blue-200 to-sky-50 text-[#112D4E] ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
