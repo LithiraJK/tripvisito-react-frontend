@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import NavItems from "./NavItems";
+import { IoCloseSharp } from "react-icons/io5";
+import { RxHamburgerMenu } from "react-icons/rx";
+import logo from "../assets/icons/logo.svg";
+
+
 
 const MobileSideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,7 +27,7 @@ const MobileSideBar = () => {
           className="flex flex-row items-center space-x-2"
           onClick={closeSidebar}
         >
-          <img src="/src/assets/icons/logo.svg" alt="logo" className="size-8" />
+          <img src={logo} alt="logo" className="size-8" />
           <h1 className="text-xl font-bold">Tripvisito</h1>
         </Link>
 
@@ -31,7 +36,7 @@ const MobileSideBar = () => {
           onClick={toggleSidebar}
           aria-label="Toggle menu"
         >
-          <img src="/src/assets/icons/menu.svg" alt="menu" className="size-7" />
+          <RxHamburgerMenu className="size-7" />
         </button>
       </header>
 
@@ -55,7 +60,7 @@ const MobileSideBar = () => {
             className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors z-10"
             aria-label="Close menu"
           >
-            <img src="/src/assets/icons/close.svg" alt="Close menu" className="w-6 h-6" />
+            <IoCloseSharp className="w-6 h-6" />
           </button>
 
           <div onClick={closeSidebar} className="flex-1 flex flex-col overflow-y-auto">
