@@ -27,7 +27,7 @@ const AllUsers = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await getAllUsers(page, 10);
+        const response = await getAllUsers(page, 6);
         const allUsers = response.data?.users || [];
         const filteredUsers = allUsers.filter((user: any) => !user.roles.includes("SUPERADMIN"));
         setUsers(filteredUsers);
