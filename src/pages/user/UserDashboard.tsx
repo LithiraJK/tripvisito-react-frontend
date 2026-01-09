@@ -29,7 +29,6 @@ const UserDashboard = () => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"CONFIRMED" | "PENDING">("CONFIRMED");
 
-  // Review System State [cite: 2025-09-30]
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [rating, setRating] = useState(0);
@@ -133,7 +132,7 @@ const UserDashboard = () => {
         </button>
       </div>
 
-      {/* --- BOOKING TABS --- [cite: 2025-10-11] */}
+      {/* --- BOOKING TABS --- */}
       <section className="flex flex-col gap-6">
         <h2 className="text-xl font-semibold text-gray-800">My Trip History</h2>
         <div className="flex border-b border-gray-200">
