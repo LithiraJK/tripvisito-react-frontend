@@ -1,9 +1,9 @@
 import { Outlet } from 'react-router-dom'
-import NavItems from './NavItems'
-import Sidebar from './Sidebar'
-import MobileSideBar from './MobileSideBar'
+import NavItems from '../components/NavItems'
+import Sidebar from '../components/Sidebar'
+import MobileSideBar from '../components/MobileSideBar'
 
-const UserLayout = () => {
+const AdminLayout = () => {
   return (
     <div className='min-h-screen min-w-[375px] flex bg-gray-50'>
       {/* Mobile Sidebar */}
@@ -24,4 +24,4 @@ const UserLayout = () => {
   )
 }
 
-export default UserLayout
+export default AdminLayout

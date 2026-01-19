@@ -11,3 +11,18 @@ body {
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
+
+@keyframes dot-pulse {
+  0%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-dot-pulse {
+  animation: dot-pulse 1s ease-in-out infinite;
+}

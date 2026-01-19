@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import logo from "../assets/icons/logo.svg";
 import logoutIcon from "../assets/icons/logout.svg";
@@ -9,6 +9,7 @@ const NavBar = () => {
 
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate()
+  const location = useLocation();
 
 
    useEffect(() => {
@@ -60,9 +61,17 @@ const NavBar = () => {
       <nav className="w-full flex justify-between items-center py-4 bg-transparent">
         <Link to="/" className="flex flex-row items-center gap-2 z-50">
           <img src={logo} alt="logo" className="size-8 sm:size-9" />
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-            Tripvisito
-          </h1>
+          {
+            location.pathname === '/' ? (
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-100">
+                Tripvisito
+              </h1>
+            ) : (
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                Tripvisito
+              </h1>
+            )
+          }
         </Link>
 
         {user ? (
@@ -85,15 +94,16 @@ const NavBar = () => {
           </div>
         ) : (
           <div className="hidden lg:flex items-center gap-3 z-50">
+            
             <Link 
               to="/login" 
-              className="px-6 py-2 text-black font-medium hover:text-white transition-colors"
+              className="px-6 py-2 text-white font-medium hover:text-white transition-colors"
             >
               Sign In
             </Link>
             <Link 
               to="/register" 
-              className="px-6 py-2 bg-white/20 text-white font-medium rounded-lg hover:bg-blue-500 transition-colors"
+              className="px-6 py-2 bg-white/20 text-white font-medium rounded-lg hover:bg-white/30 transition-colors"
             >
               Sign Up
             </Link>

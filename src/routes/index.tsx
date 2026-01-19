@@ -3,16 +3,17 @@ import { lazy, Suspense } from "react";
 import { useAuth } from "../contexts/authContext";
 import { Toaster } from "react-hot-toast";
 import { CreateTrip } from "../pages/trip/CreateTrip";
+import TravelLoader from "../components/TravelLoader";
 
 const TripDetails = lazy(() => import("../pages/trip/TripDetails"));
-const LandingLayout = lazy(() => import("../components/LandingLayout"));
+const LandingLayout = lazy(() => import("../pages/LandingLayout"));
 const CreateUser = lazy(() => import("../pages/admin/CreateUser"));
 const UpdateTrip = lazy(() => import("../pages/trip/UpdateTrip"));
 const ThankyouMessage = lazy(() => import("../components/ThankyouMessage"));
 const UserDashboard = lazy(() => import("../pages/user/UserDashboard"));
 const ChatRoom = lazy(() => import("../pages/admin/ChatRoom"));
 const Notifications = lazy(() => import("../pages/Notifications"));
-const AdminLayout = lazy(() => import("../components/AdminLayout"));
+const AdminLayout = lazy(() => import("../pages/AdminLayout"));
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
 const RegisterPage = lazy(() => import("../pages/RegisterPage"));
@@ -61,7 +62,7 @@ const Router = () => {
       <Suspense
         fallback={
           <div className="flex items-center justify-center h-screen bg-gray-100">
-            <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+            <TravelLoader />
           </div>
         }
       >
