@@ -45,3 +45,8 @@ export const deleteUser = async (userId: string) => {
   const res = await api.delete(`/auth/delete/${userId}`);
   return res.data;
 }
+
+export const fetchLatestUsers = async () => {
+  const res = await api.get("/auth/latest-users");
+  return res.data;
+}

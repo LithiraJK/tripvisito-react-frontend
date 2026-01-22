@@ -4,3 +4,8 @@ export const getMyBookedTrips = async () => {
   const res = await api.get("/payment/my-bookings");
   return res.data;
 };
+
+export const fetchLatestPayments = async () => {
+  const res = await api.get("/payment/latest");
+  return res.data;
+}

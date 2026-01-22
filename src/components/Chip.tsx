@@ -23,7 +23,7 @@ const Chip = ({ label, variant = "default", className }: ChipProps) => {
   return (
     <span 
       className={cn(
-        "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border",
+        "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border",
         variants[variant],
         className
       )}
