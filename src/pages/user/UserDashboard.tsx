@@ -20,6 +20,16 @@ import {
 } from "../../services/notification";
 import { getMyBookedTrips } from "../../services/payment";
 import { submitTripReview } from "../../services/review";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  pageVariants,
+  modalVariants,
+  slideInRightVariants,
+  staggerContainerVariants,
+  staggerItemVariants,
+  scrollRevealViewport,
+  buttonHoverVariants
+} from "../../lib/animations";
 
 const UserDashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -108,7 +118,12 @@ const UserDashboard = () => {
   const filteredTrips = bookings.filter((b) => b.status === activeTab);
 
   return (
-    <main className="relative flex flex-col gap-8 w-full pb-20 max-w-7xl mx-auto px-4 lg:px-8">
+    <motion.main 
+      className="relative flex flex-col gap-8 w-full pb-20 max-w-7xl mx-auto px-4 lg:px-8"
+      initial="initial"
+      animate="animate"
+      variants={pageVariants}
+    >
 
       {/* --- HEADER --- */}
       <div className="flex justify-between items-start">
@@ -158,14 +173,24 @@ const UserDashboard = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7"
+          key={activeTab}
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainerVariants}
+        >
           {filteredTrips.length > 0 ? (
             filteredTrips.map((book) => {
               const trip = book.tripId;
               const details = trip?.tripDetails;
 
               return (
-                <div key={book._id} className="flex flex-col gap-3 group">
+                <motion.div 
+                  key={book._id} 
+                  className="flex flex-col gap-3 group"
+                  variants={staggerItemVariants}
+                >
                   <TripCard
                     id={trip?._id || trip?.id}
                     name={details?.name || "Booking Information"}
@@ -181,14 +206,16 @@ const UserDashboard = () => {
                   
                   {/* Review Button only for Confirmed Trips */}
                   {activeTab === "CONFIRMED" && (
-                    <button
+                    <motion.button
                       onClick={() => { setSelectedBooking(book); setShowReviewModal(true); }}
                       className="w-full py-3 bg-blue-50 text-blue-500 rounded-2xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       Rate this Trip
-                    </button>
+                    </motion.button>
                   )}
-                </div>
+                </motion.div>
               );
             })
           ) : (
@@ -196,13 +223,27 @@ const UserDashboard = () => {
               No {activeTab.toLowerCase()} trips found.
             </div>
           )}
-        </div>
+        </motion.div>
       </section>
 
       {/* --- REVIEW MODAL --- */}
-      {showReviewModal && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-md rounded-4xl shadow-2xl p-8 flex flex-col gap-6 animate-in zoom-in slide-in-from-bottom-5">
+      <AnimatePresence>
+        {showReviewModal && (
+          <motion.div 
+            className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowReviewModal(false)}
+          >
+            <motion.div 
+              className="bg-white w-full max-w-md rounded-4xl shadow-2xl p-8 flex flex-col gap-6"
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={(e) => e.stopPropagation()}
+            >
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-black text-gray-900">Trip Review</h3>
               <button onClick={() => setShowReviewModal(false)} className="hover:bg-gray-100 p-2 rounded-full transition-colors">
@@ -242,15 +283,29 @@ const UserDashboard = () => {
             >
               Submit Review
             </button>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* --- NOTIFICATION DRAWER --- */}
-      {isNotifOpen && (
-        <>
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-55" onClick={() => setIsNotifOpen(false)} />
-          <div className="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl z-60 border-l border-gray-100 flex flex-col animate-in slide-in-from-right duration-300 rounded-bl-3xl rounded-tl-3xl">
+      <AnimatePresence>
+        {isNotifOpen && (
+          <>
+            <motion.div 
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-55" 
+              onClick={() => setIsNotifOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+            <motion.div 
+              className="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-2xl z-60 border-l border-gray-100 flex flex-col rounded-bl-3xl rounded-tl-3xl"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            >
             <div className="p-6 border-b rounded-tl-3xl flex justify-between items-center bg-gray-50/50">
               <h2 className="font-bold text-gray-800">Your Activity</h2>
               <button onClick={() => setIsNotifOpen(false)} className="hover:bg-gray-200 p-1 rounded-full">
@@ -286,25 +341,36 @@ const UserDashboard = () => {
                 <div className="p-10 text-center text-gray-400">No notifications yet.</div>
               )}
             </div>
-          </div>
-        </>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* --- CHAT WIDGET --- */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-        {isChatOpen && user && (
-          <div className="mb-4 transition-all animate-in fade-in zoom-in slide-in-from-bottom-10 duration-300 origin-bottom-right">
-            <ChatBox roomId={user.id || user._id} isAdminView={false} />
-          </div>
-        )}
-        <button
+        <AnimatePresence>
+          {isChatOpen && user && (
+            <motion.div 
+              className="mb-4"
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChatBox roomId={user.id || user._id} isAdminView={false} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <motion.button
           onClick={() => setIsChatOpen(!isChatOpen)}
           className="bg-blue-500 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
         >
           {isChatOpen ? <IoClose size={28} /> : <IoChatbubblesSharp size={28} />}
-        </button>
+        </motion.button>
       </div>
-    </main>
+    </motion.main>
   );
 };
 

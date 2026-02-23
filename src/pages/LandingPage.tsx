@@ -7,6 +7,12 @@ import TripCard from "../components/TripCard";
 import { FaStar, FaQuoteLeft } from "react-icons/fa";
 import { fetchAllReviews } from "../services/review";
 import Footer from "../components/Footer";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  staggerContainerVariants, 
+  staggerItemVariants,
+  scrollRevealViewport
+} from "../lib/animations";
 
 const Index = () => {
   const [trips, setTrips] = useState<any[]>([]);
@@ -63,23 +69,41 @@ const prevReview = () => {
 
         <div className="relative w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-            <div className="max-w-2xl">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-100 mb-6 leading-tight">
+            <motion.div 
+              className="max-w-2xl"
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainerVariants}
+            >
+              <motion.h1 
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-100 mb-6 leading-tight"
+                variants={staggerItemVariants}
+              >
                 Plan Your
                 <br />
                 Trip with Ease
-              </h1>
-              <p className="text-base sm:text-lg text-gray-100 mb-8 leading-relaxed">
+              </motion.h1>
+              <motion.p 
+                className="text-base sm:text-lg text-gray-100 mb-8 leading-relaxed"
+                variants={staggerItemVariants}
+              >
                 Customize your travel itinerary in minutes—pick your
                 destination, set your preferences, and explore with confidence.
-              </p>
-              <Link
-                to="/login"
-                className="inline-block bg-white/20 hover:scale-105 transition-colors px-8 py-3 font-semibold rounded-lg shadow-lg border-2  text-white"
-              >
-                Get Started
-              </Link>
-            </div>
+              </motion.p>
+              <motion.div variants={staggerItemVariants}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link
+                    to="/login"
+                    className="inline-block bg-white/20 transition-colors px-8 py-3 font-semibold rounded-lg shadow-lg border-2  text-white"
+                  >
+                    Get Started
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -92,9 +116,18 @@ const prevReview = () => {
             description="Check out some of the best places you can visit around the world."
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-[200px] sm:auto-rows-[220px] lg:auto-rows-[240px]">
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-[200px] sm:auto-rows-[220px] lg:auto-rows-[240px]"
+            initial="hidden"
+            whileInView="visible"
+            viewport={scrollRevealViewport}
+            variants={staggerContainerVariants}
+          >
             {/* Australia Tour - Medium card */}
-            <div className="relative sm:col-span-2 rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+            <motion.div 
+              className="relative sm:col-span-2 rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+              variants={staggerItemVariants}
+            >
               <img
                 src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?"
                 alt="Australia Tour"
@@ -115,10 +148,13 @@ const prevReview = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Australia Tour - Small card */}
-            <div className="relative rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+            <motion.div 
+              className="relative rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+              variants={staggerItemVariants}
+            >
               <img
                 src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?"
                 alt="Australia Tour"
@@ -139,10 +175,13 @@ const prevReview = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Japan Tour - Small card */}
-            <div className="relative sm:row-span-2 rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+            <motion.div 
+              className="relative sm:row-span-2 rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+              variants={staggerItemVariants}
+            >
               <img
                 src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?"
                 alt="Japan Tour"
@@ -163,10 +202,13 @@ const prevReview = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* London, United State - Medium card */}
-            <div className="relative sm:row-span-2 rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+            <motion.div 
+              className="relative sm:row-span-2 rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+              variants={staggerItemVariants}
+            >
               <img
                 src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?"
                 alt="London, United State"
@@ -187,10 +229,13 @@ const prevReview = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Japan Tour - Small card */}
-            <div className="relative rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+            <motion.div 
+              className="relative rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+              variants={staggerItemVariants}
+            >
               <img
                 src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?"
                 alt="Japan Tour"
@@ -211,10 +256,13 @@ const prevReview = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Japan Tour - Small card */}
-            <div className="relative rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+            <motion.div 
+              className="relative rounded-xl sm:rounded-2xl overflow-hidden group cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+              variants={staggerItemVariants}
+            >
               <img
                 src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?"
                 alt="Japan Tour"
@@ -235,8 +283,8 @@ const prevReview = () => {
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -259,7 +307,13 @@ const prevReview = () => {
             <p className="text-gray-500">No trips found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7"
+            initial="hidden"
+            whileInView="visible"
+            viewport={scrollRevealViewport}
+            variants={staggerContainerVariants}
+          >
             {trips.map((trip) => (
               <TripCard
                 key={trip.id}
@@ -275,7 +329,7 @@ const prevReview = () => {
                 price={trip.tripDetails?.estimatedPrice || ""}
               />
             ))}
-          </div>
+          </motion.div>
         )}
 
         <div className="flex justify-between items-center border-t border-gray-100 my-5 py-5">
@@ -380,8 +434,16 @@ const prevReview = () => {
             <FiChevronLeft size={60} />
           </button>
 
-          {reviews.length > 0 && (
-            <div className="w-150 h-100 bg-white/10 backdrop-blur-xl p-10 md:p-16 rounded-[40px] shadow-2xl animate-in fade-in zoom-in duration-500">
+          <AnimatePresence mode="wait">
+            {reviews.length > 0 && (
+              <motion.div 
+                key={currentReviewIndex}
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="w-150 h-100 bg-white/10 backdrop-blur-xl p-10 md:p-16 rounded-[40px] shadow-2xl"
+              >
               <div className="flex flex-col items-center text-center gap-8">
                 
                 <FaQuoteLeft className="text-white/20 size-16 absolute top-10 left-10" />
@@ -414,8 +476,9 @@ const prevReview = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Right Arrow */}
           <button 

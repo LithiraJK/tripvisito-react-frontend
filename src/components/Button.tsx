@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { buttonHoverVariants } from '../lib/animations';
 
 interface ButtonProps {
     ctaText?: string;
@@ -39,16 +41,20 @@ const Button = ({
     const buttonClasses = `${baseStyles} ${widthStyles} ${variantStyles[variant]} ${className}`;
 
     const buttonContent = (
-        <button 
+        <motion.button 
             className={buttonClasses}
             onClick={onClick}
             disabled={disabled}
             type={type}
+            variants={buttonHoverVariants}
+            initial="rest"
+            whileHover={!disabled ? "hover" : "rest"}
+            whileTap={!disabled ? "tap" : "rest"}
         >
             {icon && iconPosition === 'left' && icon}
             {ctaText}
             {icon && iconPosition === 'right' && icon}
-        </button>
+        </motion.button>
     );
 
     if (ctaURL) {

@@ -14,6 +14,14 @@
   import Chip from "../../components/Chip";
   import { fetchLatestPayments } from "../../services/payment";
   import { cn } from "../../lib/utils";
+  import { motion } from "framer-motion";
+  import {
+    pageVariants,
+    staggerContainerVariants,
+    staggerItemVariants,
+    fadeInUpVariants,
+    scrollRevealViewport
+  } from "../../lib/animations";
 
   const Dashboard = () => {
     const [user, setUser] = useState<any>(null);
@@ -111,7 +119,12 @@
     }, []);
 
     return (
-      <main className="flex flex-col gap-10 w-full pb-20 max-w-7xl mx-auto px-4 lg:px-8">
+      <motion.main 
+        className="flex flex-col gap-10 w-full pb-20 max-w-7xl mx-auto px-4 lg:px-8"
+        initial="initial"
+        animate="animate"
+        variants={pageVariants}
+      >
         <Header
           title={`Welcome, ${user?.name ?? "Guest"} 👋`}
           description="Track activity, trends and popular destinations"
@@ -121,7 +134,13 @@
         />
 
         <section className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            initial="hidden"
+            whileInView="visible"
+            viewport={scrollRevealViewport}
+            variants={staggerContainerVariants}
+          >
             {/* Total Users Card */}
             <StatsCard
               headerTitle="Total Users"
@@ -148,13 +167,27 @@
               lastMonthCount={stats?.active?.lastMonth || 0}
               chartData={stats?.active?.trend || []}
             />
-          </div>
+          </motion.div>
         </section>
 
         <section className="flex flex-col gap-6">
           <div className="flex flex-col gap-9 mt-2.5">
-            <h1 className="text-xl font-semibold text-black">Trips</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7">
+            <motion.h1 
+              className="text-xl font-semibold text-black"
+              initial="hidden"
+              whileInView="visible"
+              viewport={scrollRevealViewport}
+              variants={fadeInUpVariants}
+            >
+              Trips
+            </motion.h1>
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7"
+              initial="hidden"
+              whileInView="visible"
+              viewport={scrollRevealViewport}
+              variants={staggerContainerVariants}
+            >
               {allTrips.map((trip) => (
                 <TripCard
                   key={trip.id}
@@ -170,12 +203,21 @@
                   price={trip.tripDetails?.estimatedPrice || ""}
                 />
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <motion.section 
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={scrollRevealViewport}
+          variants={staggerContainerVariants}
+        >
           {/* User Growth Card */}
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm h-[350px]">
+          <motion.div 
+            className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm h-[350px]"
+            variants={staggerItemVariants}
+          >
             <h3 className="text-lg font-bold mb-4">User Growth</h3>
             <div className="h-[250px]">
               <UserGrowthChart
@@ -183,19 +225,31 @@
                 values={growthData.values}
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Trip Trends Card */}
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm h-[350px]">
+          <motion.div 
+            className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm h-[350px]"
+            variants={staggerItemVariants}
+          >
             <h3 className="text-lg font-bold mb-4">Trip Trends</h3>
             <div className="h-[250px]">
               <TripTrendsChart />
             </div>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+        <motion.section 
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10"
+          initial="hidden"
+          whileInView="visible"
+          viewport={scrollRevealViewport}
+          variants={staggerContainerVariants}
+        >
+          <motion.div 
+            className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm"
+            variants={staggerItemVariants}
+          >
             <h3 className="text-lg font-bold mb-6">Latest user signups</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -237,9 +291,12 @@
                 </tbody>
               </table>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+          <motion.div 
+            className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
+            variants={staggerItemVariants}
+          >
     <h3 className="text-lg font-bold mb-6">Latest trip bookings</h3>
     <div className="overflow-x-auto">
       <table className="w-full text-left">
@@ -302,9 +359,9 @@
   </tbody>
       </table>
     </div>
-  </div>
-        </section>
-      </main>
+  </motion.div>
+        </motion.section>
+      </motion.main>
     );
   };
 

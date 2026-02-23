@@ -1,6 +1,8 @@
 import { FaArrowUp, FaArrowDown, FaArrowRightLong } from "react-icons/fa6";
 import { calculateTrendPercentage, cn } from "../lib/utils";
 import TrendChart from "./TrendChart";
+import { motion } from "framer-motion";
+import { fadeInUpVariants, scrollRevealViewport } from "../lib/animations";
 
 export interface StatsCardProps {
   headerTitle: string;
@@ -27,7 +29,13 @@ const StatsCard = ({
   const mappedTrend = trend === "no change" ? "neutral" : trend;
 
   return (
-    <article className="p-6 flex flex-col gap-5 bg-white shadow-sm border border-gray-100 rounded-[20px] text-black">
+    <motion.article 
+      className="p-6 flex flex-col gap-5 bg-white shadow-sm border border-gray-100 rounded-[20px] text-black"
+      initial="hidden"
+      whileInView="visible"
+      viewport={scrollRevealViewport}
+      variants={fadeInUpVariants}
+    >
       <h3 className="text-base font-medium text-gray-600">{headerTitle}</h3>
 
       <div className="flex flex-row md:flex-col-reverse xl:flex-row xl:items-center gap-3 justify-between">
@@ -60,7 +68,7 @@ const StatsCard = ({
         </div>
         <TrendChart trend={mappedTrend} data={chartData} />
       </div>
-    </article>
+    </motion.article>
   );
 };
 
