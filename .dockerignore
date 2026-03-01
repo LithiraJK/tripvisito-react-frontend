@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+npm-debug.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist
+build
+.vite
+*.local
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+*.md
+.editorconfig
+.prettierrc
+.eslintrc*
+eslint.config.js
+README.md
+LICENSE
+
+# Docker files
+dockerfile
+.dockerignore
+docker-compose*.yml
