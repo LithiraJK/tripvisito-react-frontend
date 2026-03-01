@@ -24,11 +24,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   pageVariants,
   modalVariants,
-  slideInRightVariants,
   staggerContainerVariants,
   staggerItemVariants,
-  scrollRevealViewport,
-  buttonHoverVariants
 } from "../../lib/animations";
 
 const UserDashboard = () => {
