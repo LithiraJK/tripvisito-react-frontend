@@ -60,7 +60,6 @@
         try {
           const response = await fetchDashboardStats();
           setStats(response.data);
-          console.log("Dashboard Stats:", response);
         } catch (error) {
           console.error("Error fetching dashboard stats:", error);
         }

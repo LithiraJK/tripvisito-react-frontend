@@ -66,7 +66,9 @@ const StatsCard = ({
             </p>
           </div>
         </div>
-        <TrendChart trend={mappedTrend} data={chartData} />
+        <div className="flex-shrink-0">
+          <TrendChart trend={mappedTrend} data={chartData} />
+        </div>
       </div>
     </motion.article>
   );

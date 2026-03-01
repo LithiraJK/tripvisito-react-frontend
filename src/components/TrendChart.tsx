@@ -25,8 +25,18 @@ interface TrendChartProps {
 }
 
 const TrendChart = ({ trend, data }: TrendChartProps) => {
-  // Generate smooth curve data if not provided
-  const defaultData = data || [30, 25, 35, 28, 40, 35, 45];
+  // Generate smooth curve data based on trend if not provided
+  const getDefaultData = () => {
+    if (trend === "increment") {
+      return [20, 25, 22, 30, 28, 35, 40]; // Upward trend
+    } else if (trend === "decrement") {
+      return [40, 38, 35, 32, 30, 28, 25]; // Downward trend
+    } else {
+      return [30, 28, 30, 29, 30, 31, 30]; // Neutral/flat trend
+    }
+  };
+
+  const defaultData = data && data.length > 0 ? data : getDefaultData();
 
   // Color schemes based on trend
   const colors = {
@@ -87,7 +97,7 @@ const TrendChart = ({ trend, data }: TrendChartProps) => {
   };
 
   return (
-    <div className="xl:w-32 w-full h-24 md:h-32 xl:h-full">
+    <div className="w-full h-20 md:h-24 md:w-40 xl:w-32 xl:h-20" style={{ minHeight: '80px', minWidth: '100px' }}>
       <Line data={chartData} options={options} />
     </div>
   );
