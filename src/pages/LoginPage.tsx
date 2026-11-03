@@ -9,50 +9,60 @@ import axios from "axios";
 import api from "../services/api";
 import logo from "../assets/icons/logo.svg";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const { setUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   // --- 1. MANUAL LOGIN LOGIC ---
-  const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLButtonElement | HTMLFormElement>) => {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
-      toast.error("Please Enter both email and password!");
+      toast.error("Please enter both email and password!");
+      return;
+    }
+
+    if (!EMAIL_REGEX.test(email.trim())) {
+      toast.error("Please enter a valid email address!");
       return;
     }
 
     try {
-      const response: any = await login(email, password);
+      setIsLoading(true);
+      const response: any = await login(email.trim(), password);
 
       if (response?.data?.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
         localStorage.setItem("refreshToken", response.data.refreshToken);
 
-        const userDetails = response.data.user;
-        setUser(userDetails);
-
         const loggedInUser = response.data.user;
         setUser(loggedInUser);
 
-          const defaultPath = loggedInUser.roles.includes("ADMIN") || loggedInUser.roles.includes("SUPERADMIN")
-          ? "/admin/dashboard"
-          : "/customer/dashboard";
+        const defaultPath =
+          loggedInUser.roles.includes("ADMIN") ||
+          loggedInUser.roles.includes("SUPERADMIN")
+            ? "/admin/dashboard"
+            : "/customer/dashboard";
 
         const redirectPath = location.state?.from?.pathname || defaultPath;
 
         toast.success("Welcome back to Tripvisito!");
-        setTimeout(() => {
-          navigate(redirectPath, { replace: true });
-        }, 100);
+        navigate(redirectPath, { replace: true });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      toast.error("Login failed, please check your credentials");
+      const errMsg = error?.response?.data?.message || "Login failed, please check your credentials";
+      toast.error(errMsg);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,12 +70,10 @@ const LoginPage = () => {
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        // Google profile pic
+        setIsGoogleLoading(true);
         const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
-
-        console.log("Actual Google User:", res.data);
 
         const googleUser = res.data;
 
@@ -76,7 +84,6 @@ const LoginPage = () => {
         });
 
         const backendData = response.data.data;
-        console.log("Backend Response:", backendData)
 
         if (backendData.accessToken) {
           localStorage.setItem("accessToken", backendData.accessToken);
@@ -94,9 +101,12 @@ const LoginPage = () => {
           toast.success("Logged in with Google!");
           navigate(redirectPath, { replace: true });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Google Login Error:", error);
-        toast.error("Google Login failed!");
+        const errMsg = error?.response?.data?.message || "Google Login failed!";
+        toast.error(errMsg);
+      } finally {
+        setIsGoogleLoading(false);
       }
     },
     onError: () => toast.error("Google Login Failed!"),
@@ -128,17 +138,37 @@ const LoginPage = () => {
                       <p className="text-lg sm:text-base text-gray-500">Welcome back!</p>
                     </div>
                     
-                    <div className="space-y-3 sm:space-y-4">
+                    <form onSubmit={handleLogin} className="space-y-3 sm:space-y-4">
                       <div className="relative">
                         <label className="text-sm font-medium text-gray-700 block mb-1">Email Address</label>
-                        <input type="text" value={email} className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Email address" onChange={(e) => setEmail(e.target.value)} />
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                          placeholder="Email address"
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
                       </div>
                       <div className="relative">
                         <label className="text-sm font-medium text-gray-700 block mb-1">Password</label>
-                        <input type="password" value={password} className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+                        <input
+                          type="password"
+                          required
+                          value={password}
+                          className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                          placeholder="Password"
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
                       </div>
                       <div className="relative pt-1 sm:pt-2">
-                        <button onClick={handleLogin} className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:opacity-90 transition-all cursor-pointer">Login</button>
+                        <button
+                          type="submit"
+                          disabled={isLoading || isGoogleLoading}
+                          className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          {isLoading ? "Signing in..." : "Login"}
+                        </button>
                       </div>
                       
                       <p className="text-center text-xs sm:text-sm text-gray-500 py-1 sm:py-2">or</p>
@@ -146,14 +176,18 @@ const LoginPage = () => {
                       {/* --- GOOGLE LOGIN BUTTON --- */}
                       <div className="relative">
                         <button 
+                          type="button"
+                          disabled={isLoading || isGoogleLoading}
                           onClick={() => googleLogin()}
-                          className="w-full border border-gray-300 rounded-xl py-2 flex items-center justify-center hover:bg-gray-50 transition-all cursor-pointer"
+                          className="w-full border border-gray-300 rounded-xl py-2 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 transition-all cursor-pointer"
                         >
                           <FcGoogle className="mr-2 text-lg sm:text-xl" />
-                          <span className="text-xs xs:text-sm sm:text-base">Continue with Google</span>
+                          <span className="text-xs xs:text-sm sm:text-base">
+                            {isGoogleLoading ? "Connecting to Google..." : "Continue with Google"}
+                          </span>
                         </button>
                       </div>
-                    </div>
+                    </form>
                   </div>
 
                   <div className="w-full flex justify-center mt-4 sm:mt-6">

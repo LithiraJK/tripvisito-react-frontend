@@ -68,9 +68,7 @@ const TripDetails = () => {
     { title: "Weather : ", item: weatherInfo },
   ];
 
-
-
-  // --- STRIPE REDIRECTION LOGIC ---
+  // --- STRIPE REDIRECTION LOGIC (LOG-03) ---
   const handlePayment = async () => {
     if (!user) {
       toast.error("Please login to continue payment");
@@ -80,25 +78,30 @@ const TripDetails = () => {
 
     if (!tripDetails) return;
 
+    const numericAmount = Number(String(estimatedPrice || "0").replace(/[^0-9.]/g, ""));
+    if (!numericAmount || numericAmount <= 0) {
+      toast.error("Valid trip price not found. Cannot proceed to payment.");
+      return;
+    }
+
     try {
       setIsProcessing(true);
 
       const response = await api.post("/payment/checkout", {
         tripId: tripId,
-        tripName: name,
-        tripImage: imageUrls[0],
-        tripDescription: description,
-
-        amount: Number(estimatedPrice.replace(/[^0-9.]/g, "")),
+        tripName: name || "Trip Booking",
+        tripImage: imageUrls[0] || "",
+        tripDescription: description || "",
+        amount: numericAmount,
       });
 
       if (response.data.url) {
         window.location.href = response.data.url;
       }
-    } catch (error: any) {
-      console.error("Checkout Error:", error);
+    } catch (checkoutError: any) {
+      console.error("Checkout Error:", checkoutError);
       toast.error(
-        error.response?.data?.message || "Cannot initiate payment process."
+        checkoutError.response?.data?.message || "Cannot initiate payment process."
       );
     } finally {
       setIsProcessing(false);
@@ -116,11 +119,10 @@ const TripDetails = () => {
       try {
         setLoading(true);
         const response = await getTripDetails(tripId);
-        console.log("Trip Data:", response);
         setTripDetails(response.data.trip.tripDetails);
         setImageUrls(response.data.trip.imageUrls || []);
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
         setError("Failed to load trip Data");
       } finally {
         setLoading(false);
@@ -130,12 +132,12 @@ const TripDetails = () => {
     const fetchAllTrips = async () => {
       try {
         const response = await getAllTrips(1, 4);
-        console.log("All Trips Data:", response);
         setPopularTrips(response.data.trips || []);
-      } catch (error) {
-        console.error("Error loading popular trips:", error);
+      } catch (err) {
+        console.error("Error loading popular trips:", err);
       }
     };
+
     // Fetch Ratings Logic 
     const fetchTripReviews = async () => {
       try {
@@ -150,8 +152,8 @@ const TripDetails = () => {
           setAverageRating(0);
           setTotalReviews(0);
         }
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
       }
     };
 
@@ -166,9 +168,11 @@ const TripDetails = () => {
         <Header
           title="Trip Details"
           description="View and edit AI-generated travel plans"
-          ctaText="Edit Trip Data"
-          ctaURL={`/admin/trip/edit/${tripId}`}
-          icon={<AiFillEdit />}
+          {...(isAdmin && {
+            ctaText: "Edit Trip Data",
+            ctaURL: `/admin/trip/edit/${tripId}`,
+            icon: <AiFillEdit />,
+          })}
         />
         <div className="flex items-center justify-center py-20">
           <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
@@ -263,14 +267,12 @@ const TripDetails = () => {
             </div>
              <div>
               <ul className="flex gap-1 justify-between items-center">
-                {/* Dynamic Stars [cite: 2025-10-11] */}
                 {Array(5).fill(null).map((_, index) => (
                     <li key={index} className={index < Math.round(averageRating) ? "text-yellow-400" : "text-gray-300"}>
                       <FaStar />
                     </li>
                   ))}
                 <li className="ml-1">
-                  {/* Dynamic Chip Label [cite: 2025-09-30] */}
                   <Chip label={`${averageRating.toFixed(1)}/5 (${totalReviews})`} variant="warning" />
                 </li>
               </ul>

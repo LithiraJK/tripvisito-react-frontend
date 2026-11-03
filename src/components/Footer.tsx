@@ -1,23 +1,17 @@
 import { Link } from "react-router-dom";
 import logo from "../assets/icons/logo.svg";
 
-
 const Footer = () => {
-
-  
   return (
-    <footer className="bg-white text-[#112D4E] ">
-      
+    <footer className="bg-white text-[#112D4E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
             <Link to="/" className="flex flex-row items-center gap-2 z-50">
-          <img src={logo} alt="logo" className="size-8 sm:size-9" />
-          <h1 className="text-xl sm:text-2xl font-bold">
-            Tripvisito
-          </h1>
-        </Link>
+              <img src={logo} alt="logo" className="size-8 sm:size-9" />
+              <h1 className="text-xl sm:text-2xl font-bold">Tripvisito</h1>
+            </Link>
             <p className="text-sm text-[#112D4E]">
               Discover the world's most amazing destinations and create unforgettable memories with our curated travel experiences.
             </p>
@@ -50,29 +44,24 @@ const Footer = () => {
             <h3 className="text-[#112D4E] font-semibold text-lg mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
-                  About Us
-                </a>
+                <Link to="/" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
+                  Home
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
+                <Link to="/#destinations" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
                   Destinations
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
+                <Link to="/#popular-trips" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
                   Tours & Packages
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
-                  Travel Guides
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
-                  Blog
-                </a>
+                <Link to="/customer/dashboard" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
+                  My Bookings
+                </Link>
               </li>
             </ul>
           </div>
@@ -82,29 +71,24 @@ const Footer = () => {
             <h3 className="text-[#112D4E] font-semibold text-lg mb-4">Support</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
+                <span className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors cursor-pointer">
                   Help Center
-                </a>
+                </span>
               </li>
               <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
+                <span className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors cursor-pointer">
                   Contact Us
-                </a>
+                </span>
               </li>
               <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
-                  FAQs
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
+                <span className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors cursor-pointer">
                   Terms & Conditions
-                </a>
+                </span>
               </li>
               <li>
-                <a href="#" className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors">
+                <span className="text-sm text-[#112D4E] hover:text-blue-500 transition-colors cursor-pointer">
                   Privacy Policy
-                </a>
+                </span>
               </li>
             </ul>
           </div>
@@ -118,13 +102,13 @@ const Footer = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>Galle, Baddegama, Sri Lanaka</span>
+                <span>Galle, Baddegama, Sri Lanka</span>
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <span>info@tourvisto.lk</span>
+                <span>info@tripvisito.lk</span>
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +124,7 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-[#1a3f6b]">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-[#112D4E]">
-              © {new Date().getFullYear()} Tourvisto. All rights reserved.
+              &copy; {new Date().getFullYear()} Tripvisito. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-[#112D4E]">
               <span>Crafted with ❤️ for travelers</span>

@@ -1,15 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 import api from "../services/api";
 import { useAuth } from "../contexts/authContext";
 import { IoSend } from "react-icons/io5";
-import logo from '../assets/icons/logo.svg'
-
-const socket = io(import.meta.env.VITE_API_SOCKET_URL, {
-  transports: ["websocket"],
-  upgrade: false,
-  withCredentials: true
-});
+import logo from '../assets/icons/logo.svg';
 
 interface ChatBoxProps {
   roomId: string;
@@ -21,25 +15,41 @@ const ChatBox = ({ roomId, isAdminView = false }: ChatBoxProps) => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
         const res = await api.get(`/chat/history/${roomId}`);
-        setMessages(res.data.data);
+        setMessages(res.data.data || []);
       } catch (err) {
         console.error("Error fetching history:", err);
       }
     };
-    fetchHistory();
+    if (roomId) {
+      fetchHistory();
+    }
   }, [roomId]);
 
   useEffect(() => {
+    if (!roomId) return;
+
+    const socket = io(import.meta.env.VITE_API_SOCKET_URL, {
+      transports: ["websocket"],
+      upgrade: false,
+      withCredentials: true,
+    });
+    socketRef.current = socket;
+
     socket.emit("join_chat", roomId);
     socket.on("receive_message", (newMessage) => {
       setMessages((prev) => [...prev, newMessage]);
     });
-    return () => { socket.off("receive_message"); };
+
+    return () => {
+      socket.off("receive_message");
+      socket.disconnect();
+    };
   }, [roomId]);
 
   useEffect(() => {
@@ -47,14 +57,14 @@ const ChatBox = ({ roomId, isAdminView = false }: ChatBoxProps) => {
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (message.trim()) {
+    if (message.trim() && socketRef.current) {
       const messageData = {
         room: roomId,
         senderId: user?.id || user?._id,
-        message: message,
-        sender: { name: user?.name, profileimg: user?.profileimg }
+        message: message.trim(),
+        sender: { name: user?.name, profileimg: user?.profileimg },
       };
-      socket.emit("send_message", messageData);
+      socketRef.current.emit("send_message", messageData);
       setMessage("");
     }
   };
@@ -69,7 +79,7 @@ const ChatBox = ({ roomId, isAdminView = false }: ChatBoxProps) => {
       {!isAdminView && (
         <div className="shrink-0 bg-linear-to-r from-blue-600 to-sky-500 p-4 text-white flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="logo"  className=""/>
+            <img src={logo} alt="logo" className="size-6" />
             <span className="font-bold text-sm">Tripvisito Support</span>
             <div className="size-2 bg-green-400 rounded-full animate-pulse"></div>
           </div>
@@ -104,7 +114,11 @@ const ChatBox = ({ roomId, isAdminView = false }: ChatBoxProps) => {
           placeholder="Message us..."
           className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-sky-400"
         />
-        <button onClick={handleSendMessage} className="bg-blue-500 text-white p-2 rounded-lg hover:bg-sky-600 active:scale-95 transition-all">
+        <button 
+          onClick={handleSendMessage} 
+          aria-label="Send message"
+          className="bg-blue-500 text-white p-2 rounded-lg hover:bg-sky-600 active:scale-95 transition-all cursor-pointer"
+        >
           <IoSend size={14} />
         </button>
       </div>

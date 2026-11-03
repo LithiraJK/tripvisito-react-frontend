@@ -6,16 +6,16 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register", "/trip"];
+const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register", "/auth/google-login", "/trip"];
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
-    // Check if the URL exactly matches or starts with public endpoints (but not sub-paths)
+    // Check if the URL exactly matches or starts with public endpoints
     const isPublic = PUBLIC_ENDPOINTS.some((url) => {
       const requestUrl = config.url || '';
-      return requestUrl === url || requestUrl === url.slice(1); // Remove leading slash
+      return requestUrl === url || requestUrl === url.slice(1);
     });
 
     if (!isPublic && token) {
@@ -33,8 +33,8 @@ api.interceptors.response.use(
     const originalRequest: any = error.config;
 
     const isProtected = !PUBLIC_ENDPOINTS.some((url) => {
-      const requestUrl = originalRequest.url || '';
-      return requestUrl === url || requestUrl === url.slice(1) || requestUrl.startsWith(url);
+      const requestUrl = originalRequest?.url || '';
+      return requestUrl === url || requestUrl === url.slice(1);
     });
 
     if (
@@ -57,10 +57,14 @@ api.interceptors.response.use(
         }
 
         const data = await refreshTokens(refreshToken);
-        console.log(data);
+        const newAccessToken = data?.data?.accessToken || data?.accessToken;
 
-        localStorage.setItem("accessToken", data.data.accessToken);
-        if (data.data.refreshToken) {
+        if (!newAccessToken) {
+          throw new Error("Failed to retrieve new access token");
+        }
+
+        localStorage.setItem("accessToken", newAccessToken);
+        if (data?.data?.refreshToken) {
           localStorage.setItem("refreshToken", data.data.refreshToken);
         }
 
@@ -68,11 +72,11 @@ api.interceptors.response.use(
         console.log("✅ Token refresh successful");
 
         // Retry original request with new access token
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         console.log("🔄 Retrying original request...");
         return api(originalRequest);
       } catch (refreshErr) {
-        toast.dismiss(toastId); // dismiss toast if refresh fails
+        toast.dismiss(toastId);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         window.location.href = "/login";

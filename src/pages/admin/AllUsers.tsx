@@ -14,7 +14,6 @@ import withReactContent from "sweetalert2-react-content";
 
 const MySwal = withReactContent(Swal);
 
-
 const AllUsers = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [page, setPage] = useState(1);
@@ -32,9 +31,9 @@ const AllUsers = () => {
         const filteredUsers = allUsers.filter((user: any) => !user.roles.includes("SUPERADMIN"));
         setUsers(filteredUsers);
         setTotalPages(response.data?.totalPages || 1);
-      } catch (error) {
+      } catch (err) {
         setError("Failed to fetch users");
-        console.error(error);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -63,7 +62,6 @@ const AllUsers = () => {
     const maxVisiblePages = 5;
     
     if (totalPages <= maxVisiblePages) {
-      // Show all pages if total is less than max
       for (let i = 1; i <= totalPages; i++) {
         buttons.push(
           <button
@@ -102,7 +100,6 @@ const AllUsers = () => {
         );
       }
 
-      // Show pages around current page
       const start = Math.max(2, page - 1);
       const end = Math.min(totalPages - 1, page + 1);
       
@@ -148,7 +145,6 @@ const AllUsers = () => {
     return buttons;
   };
 
-
   const getRoleLabel = (roles: string[]) => {
     if (roles.includes("ADMIN")) return "Admin";
     return "User";
@@ -188,8 +184,8 @@ const AllUsers = () => {
           confirmButtonColor: '#3b82f6',
           timer: 2000
         });
-      } catch (error: any) {
-        const errorMessage = error?.response?.data?.message || error?.message || 'Failed to update user status. Please try again.';
+      } catch (err: any) {
+        const errorMessage = err?.response?.data?.message || err?.message || 'Failed to update user status. Please try again.';
         MySwal.fire({
           title: 'Error!',
           text: errorMessage,
@@ -224,9 +220,9 @@ const AllUsers = () => {
           confirmButtonColor: '#3b82f6',
           timer: 2000
         });
-      } catch (error: any) {
-        console.error("Failed to delete user", error);
-        const errorMessage = error?.response?.data?.message || error?.message;
+      } catch (err: any) {
+        console.error("Failed to delete user", err);
+        const errorMessage = err?.response?.data?.message || err?.message;
         MySwal.fire({
           title: 'Error!',
           text: errorMessage || 'Failed to delete user. Please try again.',
@@ -271,8 +267,12 @@ const AllUsers = () => {
                     <th className="py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                       Roles
                     </th>
-                    <th className="py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">Is Block</th>
-                    <th className="py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right"></th>
+                    <th className="py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">
+                      Account Status
+                    </th>
+                    <th className="py-4 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -283,7 +283,7 @@ const AllUsers = () => {
                     >
                       <td className="py-4 px-4 flex items-center gap-3">
                         <img
-                          src={user.profileimg || "/assets/images/default-avatar.png"}
+                          src={user.profileimg || "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-profile-picture-business-profile-woman-suitable-social-media-profiles-icons-screensavers-as-templatex9_719432-1339.jpg?semt=ais_hybrid&w=740&q=80"}
                           alt={user.name}
                           className="w-8 h-8 rounded-full object-cover"
                         />
@@ -306,23 +306,27 @@ const AllUsers = () => {
                       </td>
                       <td className="py-4 px-4 text-right">
                         <button 
-                          onClick={() => {
-                          handleUserStatusToggle(user._id, user.isBlock);
-                          console.log('Toggle user:', user._id);
-                          }}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                          user.isBlock ? 'bg-gray-600' : 'bg-gray-300'
+                          onClick={() => handleUserStatusToggle(user._id, user.isBlock)}
+                          aria-label={user.isBlock ? "Unblock user" : "Block user"}
+                          title={user.isBlock ? "Blocked - Click to Unblock" : "Active - Click to Block"}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                            user.isBlock ? 'bg-red-500' : 'bg-emerald-500'
                           }`}
                         >
                           <span
-                          className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                            user.isBlock ? 'translate-x-5' : 'translate-x-1'
-                          }`}
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              user.isBlock ? 'translate-x-6' : 'translate-x-1'
+                            }`}
                           />
                         </button>
                       </td>
                       <td className="py-4 px-4 text-right">
-                        <button className="text-gray-400 hover:text-red-500 transition-colors" onClick={() => {handleUserDelete(user._id)}}>
+                        <button
+                          className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-red-50 cursor-pointer"
+                          aria-label="Delete user"
+                          title="Delete user"
+                          onClick={() => {handleUserDelete(user._id)}}
+                        >
                           <FiTrash2 size={18} />
                         </button>
                       </td>
@@ -340,7 +344,7 @@ const AllUsers = () => {
                 className={`flex items-center gap-1 text-sm px-4 py-2 rounded-lg bg-white border-0 drop-shadow-xl ${
                   page === 1
                     ? "text-gray-300 cursor-not-allowed"
-                    : "text-gray-500 hover:text-gray-700 hover:scale-105"
+                    : "text-gray-500 hover:text-gray-700 hover:scale-105 cursor-pointer"
                 }`}
               >
                 <FiChevronLeft size={16} />
@@ -357,7 +361,7 @@ const AllUsers = () => {
                 className={`flex items-center gap-1 text-sm px-4 py-2 rounded-lg bg-white border-0 drop-shadow-xl ${
                   page === totalPages
                     ? "text-gray-300 cursor-not-allowed"
-                    : "text-gray-500 hover:text-gray-700 hover:scale-105"
+                    : "text-gray-500 hover:text-gray-700 hover:scale-105 cursor-pointer"
                 }`}
               >
                 Next

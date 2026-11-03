@@ -86,31 +86,36 @@ const UserDashboard = () => {
 
   const handleReviewSubmit = async () => {
     try {
-        const tripId = selectedBooking?.tripId?._id || selectedBooking?.tripId?.id;
+      const tripId = selectedBooking?.tripId?._id || selectedBooking?.tripId?.id;
 
-        if (!tripId || rating === 0) {
-            toast.error("Please provide a rating before submitting.");
-            return;
-        }
+      if (!tripId || rating === 0) {
+        toast.error("Please select a star rating before submitting.");
+        return;
+      }
 
-        await submitTripReview({
-            tripId,
-            rating,
-            comment: reviewText
-        });
+      if (!reviewText.trim()) {
+        toast.error("Please provide a comment for your review.");
+        return;
+      }
 
-        toast.success(`Thank you! Your review for ${selectedBooking?.tripId?.tripDetails?.name} is live.`);
-        
-        setShowReviewModal(false);
-        setRating(0);
-        setReviewText("");
+      await submitTripReview({
+        tripId,
+        rating,
+        comment: reviewText.trim(),
+      });
+
+      toast.success(`Thank you! Your review for ${selectedBooking?.tripId?.tripDetails?.name} is live.`);
+      
+      setShowReviewModal(false);
+      setRating(0);
+      setReviewText("");
         
     } catch (err: any) {
-        const errorMessage = err.response?.data?.message || "Failed to submit review";
-        toast.error(errorMessage);
-        console.error("Review Error:", err);
+      const errorMessage = err.response?.data?.message || "Failed to submit review";
+      toast.error(errorMessage);
+      console.error("Review Error:", err);
     }
-};
+  };
 
   const filteredTrips = bookings.filter((b) => b.status === activeTab);
 
@@ -130,6 +135,7 @@ const UserDashboard = () => {
         />
         <button
           onClick={() => setIsNotifOpen(!isNotifOpen)}
+          aria-label="Toggle Notifications"
           className="relative p-3 mt-4 bg-white shadow-md rounded-xl hover:bg-gray-50 transition-all border border-gray-100"
         >
           <IoNotificationsOutline size={24} className="text-gray-700" />
@@ -181,6 +187,10 @@ const UserDashboard = () => {
             filteredTrips.map((book) => {
               const trip = book.tripId;
               const details = trip?.tripDetails;
+              const displayPrice =
+                typeof book.amount === "number"
+                  ? `$${book.amount.toFixed(2)}`
+                  : `$${book.amount || "0"}`;
 
               return (
                 <motion.div 
@@ -198,7 +208,7 @@ const UserDashboard = () => {
                       details?.travelStyle,
                       details?.interests,
                     ].filter(Boolean)}
-                    price={book.amount}
+                    price={displayPrice}
                   />
                   
                   {/* Review Button only for Confirmed Trips */}
@@ -243,7 +253,7 @@ const UserDashboard = () => {
             >
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-black text-gray-900">Trip Review</h3>
-              <button onClick={() => setShowReviewModal(false)} className="hover:bg-gray-100 p-2 rounded-full transition-colors">
+              <button onClick={() => setShowReviewModal(false)} aria-label="Close" className="hover:bg-gray-100 p-2 rounded-full transition-colors">
                 <IoClose size={24} />
               </button>
             </div>
@@ -254,7 +264,7 @@ const UserDashboard = () => {
               </p>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <button key={star} onClick={() => setRating(star)} className="hover:scale-110 transition-transform">
+                  <button key={star} onClick={() => setRating(star)} aria-label={`${star} star`} className="hover:scale-110 transition-transform">
                     {star <= rating ? (
                       <IoStar size={36} className="text-amber-400" />
                     ) : (
@@ -275,7 +285,7 @@ const UserDashboard = () => {
 
             <button 
               onClick={handleReviewSubmit}
-              disabled={rating === 0}
+              disabled={rating === 0 || !reviewText.trim()}
               className="w-full bg-blue-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 disabled:bg-gray-200 disabled:shadow-none transition-all active:scale-95"
             >
               Submit Review
@@ -305,7 +315,7 @@ const UserDashboard = () => {
             >
             <div className="p-6 border-b rounded-tl-3xl flex justify-between items-center bg-gray-50/50">
               <h2 className="font-bold text-gray-800">Your Activity</h2>
-              <button onClick={() => setIsNotifOpen(false)} className="hover:bg-gray-200 p-1 rounded-full">
+              <button onClick={() => setIsNotifOpen(false)} aria-label="Close" className="hover:bg-gray-200 p-1 rounded-full">
                 <IoClose size={24} />
               </button>
             </div>
@@ -324,11 +334,11 @@ const UserDashboard = () => {
                     </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {!n.isRead && (
-                        <button onClick={() => handleMarkAsRead(n._id)} className="p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg">
+                        <button onClick={() => handleMarkAsRead(n._id)} aria-label="Mark as read" className="p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg">
                           <IoCheckmarkDoneOutline size={18} />
                         </button>
                       )}
-                      <button onClick={() => handleDeleteNotif(n._id)} className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg">
+                      <button onClick={() => handleDeleteNotif(n._id)} aria-label="Delete notification" className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg">
                         <IoTrashOutline size={18} />
                       </button>
                     </div>
@@ -360,6 +370,7 @@ const UserDashboard = () => {
         </AnimatePresence>
         <motion.button
           onClick={() => setIsChatOpen(!isChatOpen)}
+          aria-label="Toggle chat"
           className="bg-blue-500 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
