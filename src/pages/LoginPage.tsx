@@ -60,7 +60,7 @@ const LoginPage = () => {
     } catch (error: any) {
       console.error("Login error:", error);
       const errMsg = error?.response?.data?.message || "Login failed, please check your credentials";
-      toast.error(errMsg);
+      toast.error(errMsg, { duration: 4500 });
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +104,7 @@ const LoginPage = () => {
       } catch (error: any) {
         console.error("Google Login Error:", error);
         const errMsg = error?.response?.data?.message || "Google Login failed!";
-        toast.error(errMsg);
+        toast.error(errMsg, { duration: 4500 });
       } finally {
         setIsGoogleLoading(false);
       }
