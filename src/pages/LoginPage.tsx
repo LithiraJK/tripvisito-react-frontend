@@ -12,8 +12,9 @@ import logo from "../assets/icons/logo.svg";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => localStorage.getItem("rememberedEmail") || "");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("rememberMeChecked") === "true");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
@@ -37,11 +38,26 @@ const LoginPage = () => {
 
     try {
       setIsLoading(true);
-      const response: any = await login(email.trim(), password);
+      const response: any = await login(email.trim(), password, rememberMe);
 
       if (response?.data?.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
         localStorage.setItem("refreshToken", response.data.refreshToken);
+
+        // Store 7-day expiration if rememberMe, otherwise 24 hours
+        const expiresInMs = rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+        const expTime = response.data?.expiresAt
+          ? new Date(response.data.expiresAt).getTime()
+          : Date.now() + expiresInMs;
+        localStorage.setItem("authExpiresAt", String(expTime));
+
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail", email.trim());
+          localStorage.setItem("rememberMeChecked", "true");
+        } else {
+          localStorage.removeItem("rememberedEmail");
+          localStorage.removeItem("rememberMeChecked");
+        }
 
         const loggedInUser = response.data.user;
         setUser(loggedInUser);
@@ -54,7 +70,11 @@ const LoginPage = () => {
 
         const redirectPath = location.state?.from?.pathname || defaultPath;
 
-        toast.success("Welcome back to Tripvisito!");
+        toast.success(
+          rememberMe 
+            ? "Welcome back! Session remembered for 7 days." 
+            : "Welcome back to Tripvisito!"
+        );
         navigate(redirectPath, { replace: true });
       }
     } catch (error: any) {
@@ -89,6 +109,11 @@ const LoginPage = () => {
           localStorage.setItem("accessToken", backendData.accessToken);
           localStorage.setItem("refreshToken", backendData.refreshToken);
 
+          const expMs = backendData.expiresAt 
+            ? new Date(backendData.expiresAt).getTime() 
+            : Date.now() + 7 * 24 * 60 * 60 * 1000;
+          localStorage.setItem("authExpiresAt", String(expMs));
+
           const loggedInUser = backendData.user;
           setUser(loggedInUser);
           
@@ -98,7 +123,7 @@ const LoginPage = () => {
 
           const redirectPath = location.state?.from?.pathname || defaultPath;
 
-          toast.success("Logged in with Google!");
+          toast.success("Logged in with Google! Session remembered for 7 days.");
           navigate(redirectPath, { replace: true });
         }
       } catch (error: any) {
@@ -161,7 +186,24 @@ const LoginPage = () => {
                           onChange={(e) => setPassword(e.target.value)}
                         />
                       </div>
-                      <div className="relative pt-1 sm:pt-2">
+
+                      {/* --- REMEMBER ME & FORGOT PASSWORD --- */}
+                      <div className="flex items-center justify-between text-xs py-0.5">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                            className="size-4 text-cyan-500 rounded border-gray-300 focus:ring-cyan-400 cursor-pointer accent-cyan-500"
+                          />
+                          <span className="text-gray-600 font-medium">Remember me (7 days)</span>
+                        </label>
+                        <a href="#" className="text-cyan-600 hover:underline">
+                          Forgot Password?
+                        </a>
+                      </div>
+
+                      <div className="relative pt-1">
                         <button
                           type="submit"
                           disabled={isLoading || isGoogleLoading}

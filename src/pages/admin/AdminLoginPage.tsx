@@ -18,8 +18,9 @@ import logo from "../../assets/icons/logo.svg";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AdminLoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => localStorage.getItem("rememberedAdminEmail") || "");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("rememberAdminChecked") === "true");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,11 +43,25 @@ const AdminLoginPage = () => {
 
     try {
       setIsLoading(true);
-      const res: any = await adminLoginService(email.trim(), password);
+      const res: any = await adminLoginService(email.trim(), password, rememberMe);
 
       if (res?.data?.accessToken) {
         localStorage.setItem("accessToken", res.data.accessToken);
         localStorage.setItem("refreshToken", res.data.refreshToken);
+
+        const expiresInMs = rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+        const expTime = res.data?.expiresAt
+          ? new Date(res.data.expiresAt).getTime()
+          : Date.now() + expiresInMs;
+        localStorage.setItem("authExpiresAt", String(expTime));
+
+        if (rememberMe) {
+          localStorage.setItem("rememberedAdminEmail", email.trim());
+          localStorage.setItem("rememberAdminChecked", "true");
+        } else {
+          localStorage.removeItem("rememberedAdminEmail");
+          localStorage.removeItem("rememberAdminChecked");
+        }
 
         const loggedInUser = res.data.user;
         setUser(loggedInUser);
@@ -54,7 +69,11 @@ const AdminLoginPage = () => {
         const redirectPath =
           location.state?.from?.pathname || "/admin/dashboard";
 
-        toast.success(`Welcome to Command Center, ${loggedInUser.name}! 🛡️`);
+        toast.success(
+          rememberMe 
+            ? `Welcome, ${loggedInUser.name}! Staff session active for 7 days. 🛡️` 
+            : `Welcome to Command Center, ${loggedInUser.name}! 🛡️`
+        );
         navigate(redirectPath, { replace: true });
       }
     } catch (err: any) {
@@ -158,6 +177,19 @@ const AdminLoginPage = () => {
                 {showPassword ? <IoEyeOffOutline size={18} /> : <IoEyeOutline size={18} />}
               </button>
             </div>
+          </div>
+
+          {/* Remember Me Checkbox */}
+          <div className="flex items-center justify-between text-xs pt-1">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="size-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500 cursor-pointer accent-sky-600"
+              />
+              <span className="text-slate-600 font-semibold">Remember staff session (7 days)</span>
+            </label>
           </div>
 
           {/* Submit Button */}

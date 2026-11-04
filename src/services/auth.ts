@@ -1,12 +1,12 @@
 import api from "./api"
 
-export const login = async (email: string, password: string) => {
-  const res = await api.post("/auth/login", { email, password })
+export const login = async (email: string, password: string, rememberMe: boolean = false) => {
+  const res = await api.post("/auth/login", { email, password, rememberMe })
   return res.data
 }
 
-export const adminLoginService = async (email: string, password: string) => {
-  const res = await api.post("/auth/admin-login", { email, password })
+export const adminLoginService = async (email: string, password: string, rememberMe: boolean = false) => {
+  const res = await api.post("/auth/admin-login", { email, password, rememberMe })
   return res.data
 }
 

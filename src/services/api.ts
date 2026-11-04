@@ -6,11 +6,21 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register", "/auth/google-login", "/trip"];
+const PUBLIC_ENDPOINTS = ["/auth/login", "/auth/register", "/auth/google-login", "/auth/admin-login", "/trip"];
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
+    // Check if 7-day session has expired
+    const expiresAt = localStorage.getItem("authExpiresAt");
+    if (expiresAt && Date.now() > parseInt(expiresAt, 10)) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("authExpiresAt");
+      window.location.href = "/login";
+      return Promise.reject(new Error("Session expired after 7 days"));
+    }
+
     const token = localStorage.getItem("accessToken");
     // Check if the URL exactly matches or starts with public endpoints
     const isPublic = PUBLIC_ENDPOINTS.some((url) => {
@@ -36,6 +46,16 @@ api.interceptors.response.use(
       const requestUrl = originalRequest?.url || '';
       return requestUrl === url || requestUrl === url.slice(1);
     });
+
+    // Check if 7-day session has expired before trying refresh
+    const expiresAt = localStorage.getItem("authExpiresAt");
+    if (expiresAt && Date.now() > parseInt(expiresAt, 10)) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("authExpiresAt");
+      window.location.href = "/login";
+      return Promise.reject(new Error("Session expired after 7 days"));
+    }
 
     if (
       error.response?.status === 401 &&
@@ -67,6 +87,12 @@ api.interceptors.response.use(
         if (data?.data?.refreshToken) {
           localStorage.setItem("refreshToken", data.data.refreshToken);
         }
+        if (data?.data?.expiresAt) {
+          const expMs = new Date(data.data.expiresAt).getTime();
+          if (!isNaN(expMs)) {
+            localStorage.setItem("authExpiresAt", String(expMs));
+          }
+        }
 
         toast.dismiss(toastId);
         console.log("✅ Token refresh successful");
@@ -79,6 +105,7 @@ api.interceptors.response.use(
         toast.dismiss(toastId);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        localStorage.removeItem("authExpiresAt");
         window.location.href = "/login";
         return Promise.reject(refreshErr);
       }
