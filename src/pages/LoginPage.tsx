@@ -71,15 +71,11 @@ const LoginPage = () => {
     onSuccess: async (tokenResponse) => {
       try {
         setIsGoogleLoading(true);
+        const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
 
-        const userInfo = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-          }
-        );
-
-        const googleUser = userInfo.data;
+        const googleUser = res.data;
 
         const response = await api.post("/auth/google-login", {
           name: googleUser.name,
@@ -122,77 +118,54 @@ const LoginPage = () => {
         <div className="w-full max-w-6xl px-2 xs:px-4 sm:px-8 md:px-12 py-6 sm:py-8 md:py-12 bg-[rgba(255,255,255,0.4)] backdrop-blur-lg rounded-2xl sm:rounded-3xl my-4 sm:my-8 space-y-6 sm:space-y-8 md:space-y-0 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center">
           <header className="md:flex md:flex-col md:justify-center md:h-full space-y-6">
             <Link to="/" className="nav-link flex flex-row items-center space-x-3 mb-4 group transition-all">
-              <figure className="flex items-center">
-                <img src={logo} alt="logo" className="h-6 w-auto sm:h-8" />
-              </figure>
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-cyan-500 to-sky-600 bg-clip-text text-transparent">
-                Tripvisito
-              </h1>
+              <img src={logo} alt="logo" className="md:size-10 transition-transform group-hover:scale-110" />
+              <h1 className="sm:text-2xl font-bold bg-linear-to-r from-cyan-500 to-sky-600 bg-clip-text text-transparent">Tripvisito</h1>
             </Link>
-            <div className="space-y-2">
-              <h2 className="text-2xl xs:text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight">
-                Sign In to Explore <br className="hidden sm:inline" />
-                <span className="text-blue-500 font-medium">Your Travel World</span>
-              </h2>
-              <p className="text-xs xs:text-sm sm:text-base text-gray-600">
-                Unlock personalized trips, AI travel planning, and exclusive destinations.
-              </p>
-            </div>
+            <article className="space-y-2 md:space-y-4">
+              <h2 className="sm:text-xl text-2xl md:text-4xl font-bold text-gray-800 leading-tight">Start Your Travel Journey</h2>
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-md">Log in to manage your trips, discover new destinations, and create unforgettable travel experiences.</p>
+            </article>
           </header>
-
-          <div className="w-full flex justify-center items-center">
-            <div className="w-full max-w-md bg-white rounded-xl sm:rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-              <div className="p-4 xs:p-6 sm:p-8">
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="space-y-2 text-center">
-                    <h3 className="text-xl sm:text-2xl font-bold text-gray-800">Welcome Back</h3>
-                    <p className="text-xs sm:text-sm text-gray-500">
-                      Sign in with your email or Google account
-                    </p>
-                  </div>
-
-                  <div className="space-y-3 sm:space-y-4">
-                    {/* --- MANUAL LOGIN FORM --- */}
+          
+          <div className="w-full">
+            <div className="py-4 sm:py-6 flex flex-col justify-center">
+              <div className="relative py-2 sm:py-3 w-full max-w-xl mx-auto drop-shadow-xl">
+                <div className="absolute inset-0 bg-linear-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 rounded-2xl sm:rounded-3xl"></div>
+                <div className="relative px-4 py-6 xs:px-6 xs:py-8 sm:p-10 bg-white shadow-lg rounded-2xl sm:rounded-3xl">
+                  <div className="w-full mx-auto">
+                    <div className="flex flex-col justify-center items-center mb-4 sm:mb-6">
+                      <h1 className="sm:text-xl text-2xl md:text-4xl font-bold text-gray-800 mb-2">Login</h1>
+                      <p className="text-lg sm:text-base text-gray-500">Welcome back!</p>
+                    </div>
+                    
                     <form onSubmit={handleLogin} className="space-y-3 sm:space-y-4">
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                          Email Address
-                        </label>
+                      <div className="relative">
+                        <label className="text-sm font-medium text-gray-700 block mb-1">Email Address</label>
                         <input
                           type="email"
                           required
                           value={email}
+                          className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                          placeholder="Email address"
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="your.email@example.com"
-                          className="w-full border border-gray-300 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                         />
                       </div>
-
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                          Password
-                        </label>
+                      <div className="relative">
+                        <label className="text-sm font-medium text-gray-700 block mb-1">Password</label>
                         <input
                           type="password"
                           required
                           value={password}
+                          className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                          placeholder="Password"
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full border border-gray-300 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                         />
                       </div>
-
-                      <div className="flex justify-end">
-                        <a href="#" className="text-xs text-blue-500 hover:underline">
-                          Forgot Password?
-                        </a>
-                      </div>
-
-                      <div>
-                        <button 
+                      <div className="relative pt-1 sm:pt-2">
+                        <button
                           type="submit"
                           disabled={isLoading || isGoogleLoading}
-                          className="w-full bg-blue-500 text-white rounded-xl py-2.5 sm:py-3 text-xs sm:text-sm font-semibold hover:bg-blue-600 disabled:bg-blue-300 transition-all cursor-pointer shadow-md shadow-blue-500/20"
+                          className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer flex items-center justify-center gap-2"
                         >
                           {isLoading ? "Signing in..." : "Login"}
                         </button>
@@ -217,9 +190,14 @@ const LoginPage = () => {
                     </form>
                   </div>
 
-                  <div className="w-full flex flex-col items-center gap-1 mt-4 sm:mt-6">
-                    <p className="text-xs sm:text-sm text-center">Don't have an account? <Link to="/register" className="text-blue-500 hover:underline font-medium">Sign Up</Link></p>
-                    <Link to="/admin/login" className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors mt-2 flex items-center gap-1">
+                  <div className="w-full flex flex-col items-center justify-center mt-4 sm:mt-6 gap-2">
+                    <p className="text-lg xs:text-sm text-center">
+                      Don't have an account? <Link to="/register" className="text-blue-500 hover:underline font-medium">Sign Up</Link>
+                    </p>
+                    <Link
+                      to="/admin/login"
+                      className="text-xs text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-1 font-medium"
+                    >
                       Staff & Admin Portal 🛡️
                     </Link>
                   </div>
