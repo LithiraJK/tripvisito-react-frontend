@@ -16,6 +16,7 @@ const Notifications = lazy(() => import("../pages/Notifications"));
 const AdminLayout = lazy(() => import("../pages/AdminLayout"));
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
+const AdminLoginPage = lazy(() => import("../pages/admin/AdminLoginPage"));
 const RegisterPage = lazy(() => import("../pages/RegisterPage"));
 const Dashboard = lazy(() => import("../pages/admin/Dashboard"));
 const Trips = lazy(() => import("../pages/admin/TripsPage"));
@@ -39,16 +40,17 @@ const RequireAuth = ({ children, roles }: RequiredAuthTypes) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    const isTryingAdmin = roles && roles.some((r) => r === "ADMIN" || r === "SUPERADMIN");
+    return <Navigate to={isTryingAdmin ? "/admin/login" : "/login"} state={{ from: location }} replace />;
   }
 
   if (roles && !roles.some((role) => user.roles?.includes(role))) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
         <h2 className="text-2xl font-bold mb-2 text-red-600">Access Denied</h2>
-        <p className="text-gray-600 mb-4">You do not have permission to view this page.</p>
-        <a href="/" className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-          Return Home
+        <p className="text-gray-600 mb-4">You do not have administrative clearance to access this area.</p>
+        <a href="/admin/login" className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
+          Switch to Staff Login
         </a>
       </div>
     );
@@ -99,6 +101,7 @@ const Router = () => {
           {/* Auth Pages - Full Page (No Layout) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
 
           {/* Protected Admin Routes (LOG-10: guarded with ADMIN and SUPERADMIN) */}
           <Route
@@ -119,7 +122,7 @@ const Router = () => {
             <Route path="/admin/trip/edit/:tripId" element={<UpdateTrip />} />
           </Route>
 
-          {/* 404 Wildcard Route (ENH-14) */}
+          {/* 404 Wildcard Route */}
           <Route
             path="*"
             element={
