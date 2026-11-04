@@ -10,6 +10,7 @@ import { toast } from "react-hot-toast";
 import { generateTrip } from "../../services/trip";
 import { useNavigate } from "react-router-dom";
 import { budgetOptions, groupTypes, interests, travelStyles } from "../../constants";
+import AIGenerationLoader from "../../components/AIGenerationLoader";
 
 export interface Country {
   cca2: string;
@@ -305,6 +306,15 @@ export const CreateTrip = () => {
           </footer>
         </form>
       </section>
+
+      {/* Progressive AI Generation Loader */}
+      {loading && (
+        <AIGenerationLoader
+          country={formData.country}
+          duration={formData.duration}
+          travelStyle={formData.travelStyle}
+        />
+      )}
     </main>
   );
 };

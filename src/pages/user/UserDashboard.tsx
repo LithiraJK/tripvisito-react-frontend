@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   IoChatbubblesSharp,
   IoClose,
@@ -7,9 +8,13 @@ import {
   IoCheckmarkDoneOutline,
   IoStar,
   IoStarOutline,
+  IoHeart,
+  IoTicketOutline,
+  IoTimeOutline,
 } from "react-icons/io5";
 import Header from "../../components/Header";
 import TripCard from "../../components/TripCard";
+import BoardingPassCard from "../../components/BoardingPassCard";
 import ChatBox from "../../components/ChatBox";
 import toast from "react-hot-toast";
 import { getMyDetails } from "../../services/auth";
@@ -20,6 +25,7 @@ import {
 } from "../../services/notification";
 import { getMyBookedTrips } from "../../services/payment";
 import { submitTripReview } from "../../services/review";
+import { useWishlist } from "../../contexts/wishlistContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   pageVariants,
@@ -29,17 +35,29 @@ import {
 } from "../../lib/animations";
 
 const UserDashboard = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [user, setUser] = useState<any>(null);
   const [bookings, setBookings] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"CONFIRMED" | "PENDING">("CONFIRMED");
+
+  const initialTab = searchParams.get("tab")?.toUpperCase() === "SAVED" ? "SAVED" : "CONFIRMED";
+  const [activeTab, setActiveTab] = useState<"CONFIRMED" | "PENDING" | "SAVED">(initialTab as any);
+
+  const { wishlist } = useWishlist();
 
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab")?.toUpperCase();
+    if (tabParam === "SAVED") {
+      setActiveTab("SAVED");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,11 +135,12 @@ const UserDashboard = () => {
     }
   };
 
-  const filteredTrips = bookings.filter((b) => b.status === activeTab);
+  const confirmedTrips = bookings.filter((b) => b.status === "CONFIRMED");
+  const pendingTrips = bookings.filter((b) => b.status === "PENDING");
 
   return (
     <motion.main 
-      className="relative flex flex-col gap-8 w-full pb-20 max-w-7xl mx-auto px-4 lg:px-8"
+      className="relative flex flex-col gap-8 w-full pb-24 max-w-7xl mx-auto px-4 lg:px-8"
       initial="initial"
       animate="animate"
       variants={pageVariants}
@@ -130,13 +149,13 @@ const UserDashboard = () => {
       {/* --- HEADER --- */}
       <div className="flex justify-between items-start">
         <Header
-          title={`Welcome, ${user?.name ?? "Guest"} 👋`}
-          description="Manage your bookings and stay updated."
+          title={`Welcome back, ${user?.name ?? "Explorer"} 👋`}
+          description="Manage your boarding passes, pending trips, and saved bucket list."
         />
         <button
           onClick={() => setIsNotifOpen(!isNotifOpen)}
           aria-label="Toggle Notifications"
-          className="relative p-3 mt-4 bg-white shadow-md rounded-xl hover:bg-gray-50 transition-all border border-gray-100"
+          className="relative p-3 mt-4 bg-white shadow-md rounded-2xl hover:bg-gray-50 transition-all border border-gray-100 cursor-pointer"
         >
           <IoNotificationsOutline size={24} className="text-gray-700" />
           {unreadCount > 0 && (
@@ -152,85 +171,158 @@ const UserDashboard = () => {
 
       {/* --- BOOKING TABS --- */}
       <section className="flex flex-col gap-6">
-        <h2 className="text-xl font-semibold text-gray-800">My Trip History</h2>
-        <div className="flex border-b border-gray-200">
+        <div className="flex flex-wrap items-center gap-2 border-b border-gray-200">
           <button
-            onClick={() => setActiveTab("CONFIRMED")}
-            className={`px-6 py-3 font-semibold text-sm transition-all ${
+            onClick={() => { setActiveTab("CONFIRMED"); setSearchParams({}); }}
+            className={`flex items-center gap-2 px-5 py-3 font-bold text-sm transition-all border-b-2 cursor-pointer ${
               activeTab === "CONFIRMED"
-                ? "border-b-2 border-blue-500 text-blue-500"
-                : "text-gray-400 hover:text-gray-600"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-400 hover:text-gray-700"
             }`}
           >
-            Confirmed Trips ({bookings.filter((b) => b.status === "CONFIRMED").length})
+            <IoTicketOutline size={18} />
+            Boarding Passes ({confirmedTrips.length})
           </button>
+
           <button
-            onClick={() => setActiveTab("PENDING")}
-            className={`px-6 py-3 font-semibold text-sm transition-all ${
+            onClick={() => { setActiveTab("PENDING"); setSearchParams({}); }}
+            className={`flex items-center gap-2 px-5 py-3 font-bold text-sm transition-all border-b-2 cursor-pointer ${
               activeTab === "PENDING"
-                ? "border-b-2 border-blue-500 text-blue-500"
-                : "text-gray-400 hover:text-gray-600"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-400 hover:text-gray-700"
             }`}
           >
-            Pending Payments ({bookings.filter((b) => b.status === "PENDING").length})
+            <IoTimeOutline size={18} />
+            Pending Payments ({pendingTrips.length})
+          </button>
+
+          <button
+            onClick={() => { setActiveTab("SAVED"); setSearchParams({ tab: "saved" }); }}
+            className={`flex items-center gap-2 px-5 py-3 font-bold text-sm transition-all border-b-2 cursor-pointer ${
+              activeTab === "SAVED"
+                ? "border-rose-500 text-rose-500"
+                : "border-transparent text-gray-400 hover:text-gray-700"
+            }`}
+          >
+            <IoHeart size={18} className={activeTab === "SAVED" ? "text-rose-500" : "text-gray-400"} />
+            Saved Bucket List ({wishlist.length})
           </button>
         </div>
 
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7"
-          key={activeTab}
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainerVariants}
-        >
-          {filteredTrips.length > 0 ? (
-            filteredTrips.map((book) => {
-              const trip = book.tripId;
-              const details = trip?.tripDetails;
-              const displayPrice =
-                typeof book.amount === "number"
-                  ? `$${book.amount.toFixed(2)}`
-                  : `$${book.amount || "0"}`;
-
-              return (
-                <motion.div 
-                  key={book._id} 
-                  className="flex flex-col gap-3 group"
-                  variants={staggerItemVariants}
-                >
-                  <TripCard
-                    id={trip?._id || trip?.id}
-                    name={details?.name || "Booking Information"}
-                    location={details?.country || "Location not set"}
-                    imageUrl={trip?.imageUrls?.[0] || ""}
-                    tags={[
-                      details?.budget,
-                      details?.travelStyle,
-                      details?.interests,
-                    ].filter(Boolean)}
-                    price={displayPrice}
+        {/* --- TAB CONTENT: CONFIRMED BOARDING PASSES --- */}
+        {activeTab === "CONFIRMED" && (
+          <motion.div 
+            className="grid grid-cols-1 lg:grid-cols-2 gap-7"
+            key="confirmed"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainerVariants}
+          >
+            {confirmedTrips.length > 0 ? (
+              confirmedTrips.map((book) => (
+                <motion.div key={book._id} variants={staggerItemVariants}>
+                  <BoardingPassCard
+                    booking={book}
+                    passengerName={user?.name || "Explorer"}
+                    onRateClick={() => {
+                      setSelectedBooking(book);
+                      setShowReviewModal(true);
+                    }}
                   />
-                  
-                  {/* Review Button only for Confirmed Trips */}
-                  {activeTab === "CONFIRMED" && (
-                    <motion.button
-                      onClick={() => { setSelectedBooking(book); setShowReviewModal(true); }}
-                      className="w-full py-3 bg-blue-50 text-blue-500 rounded-2xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Rate this Trip
-                    </motion.button>
-                  )}
                 </motion.div>
-              );
-            })
-          ) : (
-            <div className="col-span-full py-16 text-center text-gray-400 italic bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200">
-              No {activeTab.toLowerCase()} trips found.
-            </div>
-          )}
-        </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full py-20 text-center bg-gray-50/70 rounded-3xl border-2 border-dashed border-gray-200">
+                <IoTicketOutline size={48} className="mx-auto text-gray-300 mb-3" />
+                <h4 className="text-base font-bold text-gray-700">No confirmed bookings yet</h4>
+                <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+                  Ready for your next journey? Explore our AI-curated trips and book to receive your digital boarding pass!
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* --- TAB CONTENT: PENDING PAYMENTS --- */}
+        {activeTab === "PENDING" && (
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7"
+            key="pending"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainerVariants}
+          >
+            {pendingTrips.length > 0 ? (
+              pendingTrips.map((book) => {
+                const trip = book.tripId;
+                const details = trip?.tripDetails;
+                const displayPrice =
+                  typeof book.amount === "number"
+                    ? `$${book.amount.toFixed(2)}`
+                    : `$${book.amount || "0"}`;
+
+                return (
+                  <motion.div 
+                    key={book._id} 
+                    className="flex flex-col gap-3 group"
+                    variants={staggerItemVariants}
+                  >
+                    <TripCard
+                      id={trip?._id || trip?.id}
+                      name={details?.name || "Booking Information"}
+                      location={details?.country || "Location not set"}
+                      imageUrl={trip?.imageUrls?.[0] || ""}
+                      tags={[
+                        details?.budget,
+                        details?.travelStyle,
+                        details?.interests,
+                      ].filter(Boolean)}
+                      price={displayPrice}
+                    />
+                  </motion.div>
+                );
+              })
+            ) : (
+              <div className="col-span-full py-20 text-center bg-gray-50/70 rounded-3xl border-2 border-dashed border-gray-200">
+                <p className="text-gray-400 italic">No pending payments found.</p>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* --- TAB CONTENT: SAVED BUCKET LIST --- */}
+        {activeTab === "SAVED" && (
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-7"
+            key="saved"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainerVariants}
+          >
+            {wishlist.length > 0 ? (
+              wishlist.map((item) => (
+                <motion.div key={item.id} variants={staggerItemVariants}>
+                  <TripCard
+                    id={item.id}
+                    name={item.name}
+                    location={item.location}
+                    imageUrl={item.imageUrl}
+                    tags={item.tags || []}
+                    price={item.price}
+                  />
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full py-20 text-center bg-gray-50/70 rounded-3xl border-2 border-dashed border-gray-200">
+                <IoHeart size={44} className="mx-auto text-rose-300 mb-3" />
+                <h4 className="text-base font-bold text-gray-700">Your Bucket List is empty</h4>
+                <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+                  Click the ❤️ heart icon on any trip card across the app to bookmark it here for later.
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
       </section>
 
       {/* --- REVIEW MODAL --- */}
@@ -253,7 +345,7 @@ const UserDashboard = () => {
             >
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-black text-gray-900">Trip Review</h3>
-              <button onClick={() => setShowReviewModal(false)} aria-label="Close" className="hover:bg-gray-100 p-2 rounded-full transition-colors">
+              <button onClick={() => setShowReviewModal(false)} aria-label="Close" className="hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer">
                 <IoClose size={24} />
               </button>
             </div>
@@ -264,7 +356,7 @@ const UserDashboard = () => {
               </p>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <button key={star} onClick={() => setRating(star)} aria-label={`${star} star`} className="hover:scale-110 transition-transform">
+                  <button key={star} onClick={() => setRating(star)} aria-label={`${star} star`} className="hover:scale-110 transition-transform cursor-pointer">
                     {star <= rating ? (
                       <IoStar size={36} className="text-amber-400" />
                     ) : (
@@ -286,7 +378,7 @@ const UserDashboard = () => {
             <button 
               onClick={handleReviewSubmit}
               disabled={rating === 0 || !reviewText.trim()}
-              className="w-full bg-blue-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 disabled:bg-gray-200 disabled:shadow-none transition-all active:scale-95"
+              className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 disabled:bg-gray-200 disabled:shadow-none transition-all active:scale-95 cursor-pointer"
             >
               Submit Review
             </button>
@@ -315,7 +407,7 @@ const UserDashboard = () => {
             >
             <div className="p-6 border-b rounded-tl-3xl flex justify-between items-center bg-gray-50/50">
               <h2 className="font-bold text-gray-800">Your Activity</h2>
-              <button onClick={() => setIsNotifOpen(false)} aria-label="Close" className="hover:bg-gray-200 p-1 rounded-full">
+              <button onClick={() => setIsNotifOpen(false)} aria-label="Close" className="hover:bg-gray-200 p-1 rounded-full cursor-pointer">
                 <IoClose size={24} />
               </button>
             </div>
@@ -334,11 +426,11 @@ const UserDashboard = () => {
                     </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {!n.isRead && (
-                        <button onClick={() => handleMarkAsRead(n._id)} aria-label="Mark as read" className="p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg">
+                        <button onClick={() => handleMarkAsRead(n._id)} aria-label="Mark as read" className="p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg cursor-pointer">
                           <IoCheckmarkDoneOutline size={18} />
                         </button>
                       )}
-                      <button onClick={() => handleDeleteNotif(n._id)} aria-label="Delete notification" className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg">
+                      <button onClick={() => handleDeleteNotif(n._id)} aria-label="Delete notification" className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg cursor-pointer">
                         <IoTrashOutline size={18} />
                       </button>
                     </div>
@@ -371,7 +463,7 @@ const UserDashboard = () => {
         <motion.button
           onClick={() => setIsChatOpen(!isChatOpen)}
           aria-label="Toggle chat"
-          className="bg-blue-500 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300"
+          className="bg-blue-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
