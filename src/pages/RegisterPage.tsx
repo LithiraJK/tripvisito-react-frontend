@@ -13,12 +13,14 @@ const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { setUser } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleRegister = async (e: React.FormEvent<HTMLButtonElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLButtonElement | HTMLFormElement>) => {
     e.preventDefault();
 
     if (!name.trim()) {
@@ -33,17 +35,18 @@ const RegisterPage = () => {
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(email.trim())) {
       toast.error("Please enter a valid email address");
       return;
     }
 
-    if (!password.trim()) {
-      toast.error("Please enter a password");
+    if (!password.trim() || password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
       return;
     }
 
     try {
+      setIsLoading(true);
       await register(name.trim(), email.trim(), password);
 
       toast.success("Registration successful! Redirecting to login...");
@@ -58,7 +61,6 @@ const RegisterPage = () => {
     } catch (error: any) {
       console.error("Registration error:", error);
 
-      // Handle specific error messages from the API
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.message ||
@@ -66,6 +68,8 @@ const RegisterPage = () => {
         "Registration failed. Please try again.";
 
       toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,15 +77,13 @@ const RegisterPage = () => {
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        // Google profile pic
+        setIsGoogleLoading(true);
         const res = await axios.get(
           "https://www.googleapis.com/oauth2/v3/userinfo",
           {
             headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
           }
         );
-
-        console.log("Actual Google User:", res.data);
 
         const googleUser = res.data;
 
@@ -92,7 +94,6 @@ const RegisterPage = () => {
         });
 
         const backendData = response.data.data;
-        console.log("Backend Response:", backendData);
 
         if (backendData.accessToken) {
           localStorage.setItem("accessToken", backendData.accessToken);
@@ -101,7 +102,7 @@ const RegisterPage = () => {
           const loggedInUser = backendData.user;
           setUser(loggedInUser);
 
-          const defaultPath = loggedInUser.roles.includes("ADMIN")
+          const defaultPath = loggedInUser.roles.includes("ADMIN") || loggedInUser.roles.includes("SUPERADMIN")
             ? "/admin/dashboard"
             : "/customer/dashboard";
 
@@ -110,9 +111,12 @@ const RegisterPage = () => {
           toast.success("Logged in with Google!");
           navigate(redirectPath, { replace: true });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Google Login Error:", error);
-        toast.error("Google Login failed!");
+        const errMsg = error?.response?.data?.message || "Google Login failed!";
+        toast.error(errMsg);
+      } finally {
+        setIsGoogleLoading(false);
       }
     },
     onError: () => toast.error("Google Login Failed!"),
@@ -185,7 +189,7 @@ const RegisterPage = () => {
                         Create your account to start your travel journey!
                       </p>
                     </div>
-                    <div>
+                    <form onSubmit={handleRegister}>
                       <div className="space-y-3 sm:space-y-4">
                         <div className="relative">
                           <label
@@ -198,6 +202,8 @@ const RegisterPage = () => {
                             id="name"
                             name="name"
                             type="text"
+                            required
+                            value={name}
                             className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
                             placeholder="Name"
                             onChange={(e) => setName(e.target.value)}
@@ -213,7 +219,9 @@ const RegisterPage = () => {
                           <input
                             id="email"
                             name="email"
-                            type="text"
+                            type="email"
+                            required
+                            value={email}
                             className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
                             placeholder="Email address"
                             onChange={(e) => setEmail(e.target.value)}
@@ -224,11 +232,14 @@ const RegisterPage = () => {
                             htmlFor="password"
                             className="text-sm font-medium text-gray-700 block mb-1"
                           >
-                            Password
+                            Password (min 6 characters)
                           </label>
                           <input
                             id="password"
                             type="password"
+                            required
+                            minLength={6}
+                            value={password}
                             className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
                             placeholder="Password"
                             onChange={(e) => setPassword(e.target.value)}
@@ -236,29 +247,31 @@ const RegisterPage = () => {
                         </div>
                         <div className="relative pt-1 sm:pt-2">
                           <button
-                            onClick={handleRegister}
-                            className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:bg-linear-to-r hover:from-sky-500 hover:to-cyan-400 transition-all hover:cursor-pointer"
+                            type="submit"
+                            disabled={isLoading || isGoogleLoading}
+                            className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:bg-linear-to-r hover:from-sky-500 hover:to-cyan-400 disabled:opacity-50 transition-all hover:cursor-pointer flex items-center justify-center gap-2"
                           >
-                            Create An Account
+                            {isLoading ? "Creating Account..." : "Create An Account"}
                           </button>
                         </div>
                         <p className="text-center text-xs sm:text-sm text-gray-500 py-1 sm:py-2">
-                          {" "}
-                          or{" "}
+                          or
                         </p>
                         <div className="relative">
                           <button
-                            className="w-full border border-gray-300 rounded-xl py-2 flex items-center justify-center hover:bg-gray-50 transition-all hover:cursor-pointer"
+                            type="button"
+                            disabled={isLoading || isGoogleLoading}
+                            className="w-full border border-gray-300 rounded-xl py-2 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 transition-all hover:cursor-pointer"
                             onClick={() => googleLogin()}
                           >
                             <FcGoogle className="mr-2 text-lg sm:text-xl" />
                             <span className="text-xs xs:text-sm sm:text-base">
-                              Continue with Google
+                              {isGoogleLoading ? "Connecting to Google..." : "Continue with Google"}
                             </span>
                           </button>
                         </div>
                       </div>
-                    </div>
+                    </form>
                   </div>
 
                   <div className="w-full flex justify-center mt-4 sm:mt-6">

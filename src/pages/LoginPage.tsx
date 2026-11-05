@@ -9,50 +9,80 @@ import axios from "axios";
 import api from "../services/api";
 import logo from "../assets/icons/logo.svg";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => localStorage.getItem("rememberedEmail") || "");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(() => localStorage.getItem("rememberMeChecked") === "true");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const { setUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   // --- 1. MANUAL LOGIN LOGIC ---
-  const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLButtonElement | HTMLFormElement>) => {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
-      toast.error("Please Enter both email and password!");
+      toast.error("Please enter both email and password!");
+      return;
+    }
+
+    if (!EMAIL_REGEX.test(email.trim())) {
+      toast.error("Please enter a valid email address!");
       return;
     }
 
     try {
-      const response: any = await login(email, password);
+      setIsLoading(true);
+      const response: any = await login(email.trim(), password, rememberMe);
 
       if (response?.data?.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
         localStorage.setItem("refreshToken", response.data.refreshToken);
 
-        const userDetails = response.data.user;
-        setUser(userDetails);
+        // Store 7-day expiration if rememberMe, otherwise 24 hours
+        const expiresInMs = rememberMe ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+        const expTime = response.data?.expiresAt
+          ? new Date(response.data.expiresAt).getTime()
+          : Date.now() + expiresInMs;
+        localStorage.setItem("authExpiresAt", String(expTime));
+
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail", email.trim());
+          localStorage.setItem("rememberMeChecked", "true");
+        } else {
+          localStorage.removeItem("rememberedEmail");
+          localStorage.removeItem("rememberMeChecked");
+        }
 
         const loggedInUser = response.data.user;
         setUser(loggedInUser);
 
-          const defaultPath = loggedInUser.roles.includes("ADMIN") || loggedInUser.roles.includes("SUPERADMIN")
-          ? "/admin/dashboard"
-          : "/customer/dashboard";
+        const defaultPath =
+          loggedInUser.roles.includes("ADMIN") ||
+          loggedInUser.roles.includes("SUPERADMIN")
+            ? "/admin/dashboard"
+            : "/customer/dashboard";
 
         const redirectPath = location.state?.from?.pathname || defaultPath;
 
-        toast.success("Welcome back to Tripvisito!");
-        setTimeout(() => {
-          navigate(redirectPath, { replace: true });
-        }, 100);
+        toast.success(
+          rememberMe 
+            ? "Welcome back! Session remembered for 7 days." 
+            : "Welcome back to Tripvisito!"
+        );
+        navigate(redirectPath, { replace: true });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      toast.error("Login failed, please check your credentials");
+      const errMsg = error?.response?.data?.message || "Login failed, please check your credentials";
+      toast.error(errMsg, { duration: 4500 });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,12 +90,10 @@ const LoginPage = () => {
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        // Google profile pic
+        setIsGoogleLoading(true);
         const res = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
-
-        console.log("Actual Google User:", res.data);
 
         const googleUser = res.data;
 
@@ -76,11 +104,15 @@ const LoginPage = () => {
         });
 
         const backendData = response.data.data;
-        console.log("Backend Response:", backendData)
 
         if (backendData.accessToken) {
           localStorage.setItem("accessToken", backendData.accessToken);
           localStorage.setItem("refreshToken", backendData.refreshToken);
+
+          const expMs = backendData.expiresAt 
+            ? new Date(backendData.expiresAt).getTime() 
+            : Date.now() + 7 * 24 * 60 * 60 * 1000;
+          localStorage.setItem("authExpiresAt", String(expMs));
 
           const loggedInUser = backendData.user;
           setUser(loggedInUser);
@@ -91,12 +123,15 @@ const LoginPage = () => {
 
           const redirectPath = location.state?.from?.pathname || defaultPath;
 
-          toast.success("Logged in with Google!");
+          toast.success("Logged in with Google! Session remembered for 7 days.");
           navigate(redirectPath, { replace: true });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Google Login Error:", error);
-        toast.error("Google Login failed!");
+        const errMsg = error?.response?.data?.message || "Google Login failed!";
+        toast.error(errMsg, { duration: 4500 });
+      } finally {
+        setIsGoogleLoading(false);
       }
     },
     onError: () => toast.error("Google Login Failed!"),
@@ -128,17 +163,54 @@ const LoginPage = () => {
                       <p className="text-lg sm:text-base text-gray-500">Welcome back!</p>
                     </div>
                     
-                    <div className="space-y-3 sm:space-y-4">
+                    <form onSubmit={handleLogin} className="space-y-3 sm:space-y-4">
                       <div className="relative">
                         <label className="text-sm font-medium text-gray-700 block mb-1">Email Address</label>
-                        <input type="text" value={email} className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Email address" onChange={(e) => setEmail(e.target.value)} />
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                          placeholder="Email address"
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
                       </div>
                       <div className="relative">
                         <label className="text-sm font-medium text-gray-700 block mb-1">Password</label>
-                        <input type="password" value={password} className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+                        <input
+                          type="password"
+                          required
+                          value={password}
+                          className="text-xs xs:text-sm py-2 px-3 xs:px-4 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                          placeholder="Password"
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
                       </div>
-                      <div className="relative pt-1 sm:pt-2">
-                        <button onClick={handleLogin} className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:opacity-90 transition-all cursor-pointer">Login</button>
+
+                      {/* --- REMEMBER ME & FORGOT PASSWORD --- */}
+                      <div className="flex items-center justify-between text-xs py-0.5">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                            className="size-4 text-cyan-500 rounded border-gray-300 focus:ring-cyan-400 cursor-pointer accent-cyan-500"
+                          />
+                          <span className="text-gray-600 font-medium">Remember me (7 days)</span>
+                        </label>
+                        <a href="#" className="text-cyan-600 hover:underline">
+                          Forgot Password?
+                        </a>
+                      </div>
+
+                      <div className="relative pt-1">
+                        <button
+                          type="submit"
+                          disabled={isLoading || isGoogleLoading}
+                          className="w-full bg-linear-to-r from-cyan-400 to-sky-500 text-white text-sm sm:text-base font-semibold rounded-lg px-4 py-2 hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          {isLoading ? "Signing in..." : "Login"}
+                        </button>
                       </div>
                       
                       <p className="text-center text-xs sm:text-sm text-gray-500 py-1 sm:py-2">or</p>
@@ -146,18 +218,30 @@ const LoginPage = () => {
                       {/* --- GOOGLE LOGIN BUTTON --- */}
                       <div className="relative">
                         <button 
+                          type="button"
+                          disabled={isLoading || isGoogleLoading}
                           onClick={() => googleLogin()}
-                          className="w-full border border-gray-300 rounded-xl py-2 flex items-center justify-center hover:bg-gray-50 transition-all cursor-pointer"
+                          className="w-full border border-gray-300 rounded-xl py-2 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 transition-all cursor-pointer"
                         >
                           <FcGoogle className="mr-2 text-lg sm:text-xl" />
-                          <span className="text-xs xs:text-sm sm:text-base">Continue with Google</span>
+                          <span className="text-xs xs:text-sm sm:text-base">
+                            {isGoogleLoading ? "Connecting to Google..." : "Continue with Google"}
+                          </span>
                         </button>
                       </div>
-                    </div>
+                    </form>
                   </div>
 
-                  <div className="w-full flex justify-center mt-4 sm:mt-6">
-                    <p className="text-lg xs:text-sm text-center">Don't have an account? <Link to="/register" className="text-blue-500 hover:underline font-medium">Sign Up</Link></p>
+                  <div className="w-full flex flex-col items-center justify-center mt-4 sm:mt-6 gap-2">
+                    <p className="text-lg xs:text-sm text-center">
+                      Don't have an account? <Link to="/register" className="text-blue-500 hover:underline font-medium">Sign Up</Link>
+                    </p>
+                    <Link
+                      to="/admin/login"
+                      className="text-xs text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-1 font-medium"
+                    >
+                      Staff & Admin Portal 🛡️
+                    </Link>
                   </div>
                 </div>
               </div>

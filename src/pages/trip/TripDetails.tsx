@@ -4,7 +4,7 @@ import Header from "../../components/Header";
 import { getTripDetails, getAllTrips } from "../../services/trip";
 import InfoPill from "../../components/InfoPill";
 import { MdOutlineDateRange } from "react-icons/md";
-import { IoLocationOutline } from "react-icons/io5";
+import { IoLocationOutline, IoShareSocialOutline, IoDownloadOutline } from "react-icons/io5";
 import { cn } from "../../lib/utils";
 import Chip from "../../components/Chip";
 import { FaStar } from "react-icons/fa";
@@ -15,28 +15,21 @@ import { AiFillEdit } from "react-icons/ai";
 import api from "../../services/api";
 import toast from "react-hot-toast";
 import { useAuth } from "../../contexts/authContext";
-
-export interface DayPlan {
-  day: number;
-  location: string;
-  activities: Activity[];
-}
-
-export interface Activity {
-  time: string;
-  description: string;
-}
+import CostBreakdown from "../../components/CostBreakdown";
+import ItineraryTimeline from "../../components/ItineraryTimeline";
+import ShareModal from "../../components/ShareModal";
+import { exportTripToPDF } from "../../lib/pdfExport";
 
 const TripDetails = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const [tripDetails, setTripDetails] = useState<any>(null);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-
   const [popularTrips, setPopularTrips] = useState<any[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
@@ -68,9 +61,7 @@ const TripDetails = () => {
     { title: "Weather : ", item: weatherInfo },
   ];
 
-
-
-  // --- STRIPE REDIRECTION LOGIC ---
+  // --- STRIPE REDIRECTION LOGIC (LOG-03) ---
   const handlePayment = async () => {
     if (!user) {
       toast.error("Please login to continue payment");
@@ -80,28 +71,57 @@ const TripDetails = () => {
 
     if (!tripDetails) return;
 
+    const numericAmount = Number(String(estimatedPrice || "0").replace(/[^0-9.]/g, ""));
+    if (!numericAmount || numericAmount <= 0) {
+      toast.error("Valid trip price not found. Cannot proceed to payment.");
+      return;
+    }
+
     try {
       setIsProcessing(true);
 
       const response = await api.post("/payment/checkout", {
         tripId: tripId,
-        tripName: name,
-        tripImage: imageUrls[0],
-        tripDescription: description,
-
-        amount: Number(estimatedPrice.replace(/[^0-9.]/g, "")),
+        tripName: name || "Trip Booking",
+        tripImage: imageUrls[0] || "",
+        tripDescription: description || "",
+        amount: numericAmount,
       });
 
       if (response.data.url) {
         window.location.href = response.data.url;
       }
-    } catch (error: any) {
-      console.error("Checkout Error:", error);
+    } catch (checkoutError: any) {
+      console.error("Checkout Error:", checkoutError);
       toast.error(
-        error.response?.data?.message || "Cannot initiate payment process."
+        checkoutError.response?.data?.message || "Cannot initiate payment process."
       );
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    try {
+      setIsDownloadingPDF(true);
+      exportTripToPDF({
+        title: name || "Trip Itinerary",
+        country: country || "",
+        duration: duration || 0,
+        budget: budget || "",
+        travelStyle: travelStyle || "",
+        estimatedPrice: estimatedPrice || "",
+        description: description || "",
+        itinerary: itinerary || [],
+        bestTimeToVisit: bestTimeToVisit || [],
+        weatherInfo: weatherInfo || [],
+      });
+      toast.success("PDF travel guide generated successfully!");
+    } catch (pdfErr) {
+      console.error("PDF export error:", pdfErr);
+      toast.error("Failed to generate PDF guide");
+    } finally {
+      setIsDownloadingPDF(false);
     }
   };
 
@@ -116,11 +136,10 @@ const TripDetails = () => {
       try {
         setLoading(true);
         const response = await getTripDetails(tripId);
-        console.log("Trip Data:", response);
         setTripDetails(response.data.trip.tripDetails);
         setImageUrls(response.data.trip.imageUrls || []);
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
         setError("Failed to load trip Data");
       } finally {
         setLoading(false);
@@ -130,12 +149,12 @@ const TripDetails = () => {
     const fetchAllTrips = async () => {
       try {
         const response = await getAllTrips(1, 4);
-        console.log("All Trips Data:", response);
         setPopularTrips(response.data.trips || []);
-      } catch (error) {
-        console.error("Error loading popular trips:", error);
+      } catch (err) {
+        console.error("Error loading popular trips:", err);
       }
     };
+
     // Fetch Ratings Logic 
     const fetchTripReviews = async () => {
       try {
@@ -150,8 +169,8 @@ const TripDetails = () => {
           setAverageRating(0);
           setTotalReviews(0);
         }
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
       }
     };
 
@@ -166,9 +185,11 @@ const TripDetails = () => {
         <Header
           title="Trip Details"
           description="View and edit AI-generated travel plans"
-          ctaText="Edit Trip Data"
-          ctaURL={`/admin/trip/edit/${tripId}`}
-          icon={<AiFillEdit />}
+          {...(isAdmin && {
+            ctaText: "Edit Trip Data",
+            ctaURL: `/admin/trip/edit/${tripId}`,
+            icon: <AiFillEdit />,
+          })}
         />
         <div className="flex items-center justify-center py-20">
           <div className="w-16 h-16 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
@@ -207,22 +228,53 @@ const TripDetails = () => {
           icon: <AiFillEdit />,
         })}
       />
-      <section className="flex flex-col gap-9 mt-2.5  w-full max-w-3xl px-4 lg:px-8 mx-auto">
-        <header>
-          <h1 className="text-3xl font-semibold mb-3 text-black md:text-4xl">
-            {name || "Loading..."}
-          </h1>
-          <InfoPill text={`${duration} days`} icon={<MdOutlineDateRange />} />
-          <InfoPill
-            text={
-              itinerary
-                ?.slice(0, 2)
-                .map((item: any) => item.location)
-                .join(", ") || ""
-            }
-            icon={<IoLocationOutline />}
-          />
+      <section className="flex flex-col gap-9 mt-2.5 w-full max-w-3xl px-4 lg:px-8 mx-auto">
+        <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold mb-3 text-black md:text-4xl">
+              {name || "Loading..."}
+            </h1>
+            <div className="flex items-center gap-4 flex-wrap">
+              <InfoPill text={`${duration} days`} icon={<MdOutlineDateRange />} />
+              <InfoPill
+                text={
+                  itinerary
+                    ?.slice(0, 2)
+                    .map((item: any) => item.location)
+                    .join(", ") || ""
+                }
+                icon={<IoLocationOutline />}
+              />
+            </div>
+          </div>
+
+          {/* Quick Action Buttons (Share & Download PDF) */}
+          <div className="flex items-center gap-2 self-start shrink-0">
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              aria-label="Share Trip"
+              title="Share Trip"
+              className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+            >
+              <IoShareSocialOutline size={18} />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+
+            <button
+              onClick={handleDownloadPDF}
+              disabled={isDownloadingPDF}
+              aria-label="Download PDF"
+              title="Download PDF"
+              className="p-2.5 rounded-xl border border-blue-200 bg-blue-50/70 text-blue-600 hover:bg-blue-100 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+            >
+              <IoDownloadOutline size={18} />
+              <span className="hidden sm:inline">
+                {isDownloadingPDF ? "Exporting..." : "PDF Guide"}
+              </span>
+            </button>
+          </div>
         </header>
+
         <section className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-7 mt-1">
           {imageUrls.map((url: string, index: number) => (
             <img
@@ -263,14 +315,12 @@ const TripDetails = () => {
             </div>
              <div>
               <ul className="flex gap-1 justify-between items-center">
-                {/* Dynamic Stars [cite: 2025-10-11] */}
                 {Array(5).fill(null).map((_, index) => (
                     <li key={index} className={index < Math.round(averageRating) ? "text-yellow-400" : "text-gray-300"}>
                       <FaStar />
                     </li>
                   ))}
                 <li className="ml-1">
-                  {/* Dynamic Chip Label [cite: 2025-09-30] */}
                   <Chip label={`${averageRating.toFixed(1)}/5 (${totalReviews})`} variant="warning" />
                 </li>
               </ul>
@@ -278,67 +328,50 @@ const TripDetails = () => {
           </section>
 
           <section className="flex justify-between gap-5 w-full">
-            <article className="flex flex-col gap-4">
-              <h3 className=" text-xl md:text-3xl text-dark-100 font-semibold">
+            <article className="flex flex-col gap-2">
+              <h3 className="text-xl md:text-3xl text-dark-100 font-semibold">
                 {duration}-Day {country} {travelStyle}
               </h3>
-              <p className="text-base md:text-xl text-gray-400 font-normal">
-                {budget}, {groupType} and {interests}{" "}
+              <p className="text-base text-gray-500 font-normal">
+                {budget}, {groupType} and {interests}
               </p>
             </article>
 
-            <h2 className=" text-lg md:text-2xl text-dark-100 font-semibold">
+            <h2 className="text-xl md:text-3xl text-blue-600 font-bold whitespace-nowrap">
               {estimatedPrice}
             </h2>
           </section>
         </section>
-        <p className="text-sm md:text-lg font-normal first-letter:text-3xl first-letter:font-semibold">
+
+        <p className="text-sm md:text-base text-gray-700 leading-relaxed font-normal">
           {description}
         </p>
 
-        <ul className="flex flex-col gap-9">
-          {itinerary?.map((dayPlan: DayPlan, index: number) => (
-            <li
-              key={index}
-              className="flex flex-col max-sm:flex-col  justify-between sm:gap-7 gap-3 text-sm md:text-lg font-normal text-dark-400 list-disc!"
-            >
-              <h3 className="text-base md:text-xl font-semibold text-black">
-                Day {dayPlan.day}: {dayPlan.location}
-              </h3>
-              <ul className="flex flex-col sm:gap-3 gap-7">
-                {dayPlan.activities.map((activity, number) => (
-                  <li
-                    key={number}
-                    className="flex flex-col max-sm:flex-col justify-between sm:gap-7 gap-3 text-sm md:text-lg font-normal text-dark-400 list-disc!"
-                  >
-                    <span className="w-[90px] font-medium">
-                      {activity.time}
-                    </span>
-                    <p>{activity.description}</p>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
+        {/* Cost Breakdown Widget */}
+        <CostBreakdown estimatedPrice={estimatedPrice} />
+
+        {/* Interactive Day-by-Day Timeline */}
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Detailed Daily Plan</h2>
+          <ItineraryTimeline itinerary={itinerary} />
+        </div>
 
         {visitTimeAndWeather.map((section) => (
-          <section key={section.title} className="flex flex-col gap-5">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-base md:text-xl text-dark-400 font-semibold">
-                {section.title}
-              </h3>
-              <ul className="flex flex-col gap-3">
-                {section.item?.map((item: any) => (
-                  <li
-                    key={item}
-                    className="flex justify-between gap-7 text-sm md:text-lg font-normal text-dark-400 list-disc"
-                  >
-                    <p className="grow">{item}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <section key={section.title} className="flex flex-col gap-4 bg-slate-50/70 p-5 rounded-2xl border border-slate-100">
+            <h3 className="text-base md:text-lg text-gray-900 font-semibold">
+              {section.title}
+            </h3>
+            <ul className="flex flex-col gap-2">
+              {section.item?.map((item: any) => (
+                <li
+                  key={item}
+                  className="flex gap-2 text-sm text-gray-600"
+                >
+                  <span className="text-blue-500">•</span>
+                  <p>{item}</p>
+                </li>
+              ))}
+            </ul>
           </section>
         ))}
 
@@ -358,11 +391,11 @@ const TripDetails = () => {
             onClick={handlePayment}
             disabled={isProcessing || isAdmin}
             variant="primary"
-            className="md:w-full cursor-pointer"
+            className="md:w-full cursor-pointer py-3.5"
           />
-          <p className="text-xs text-gray-400 mt-6 leading-relaxed">
+          <p className="text-xs text-gray-400 mt-4 leading-relaxed text-center">
             By clicking "Proceed to Pay", you agree to our terms and conditions.
-            Your card information is never stored on our servers.
+            Your card information is securely processed through Stripe.
           </p>
         </div>
       </section>
@@ -388,6 +421,14 @@ const TripDetails = () => {
           ))}
         </div>
       </section>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        tripTitle={name || "Tripvisito Trip"}
+        tripUrl={window.location.href}
+      />
     </main>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import ComboBox from "../../components/ComboBox";
 import Header from "../../components/Header";
 import WorldMap from "../../components/WorldMap";
@@ -10,6 +10,7 @@ import { toast } from "react-hot-toast";
 import { generateTrip } from "../../services/trip";
 import { useNavigate } from "react-router-dom";
 import { budgetOptions, groupTypes, interests, travelStyles } from "../../constants";
+import AIGenerationLoader from "../../components/AIGenerationLoader";
 
 export interface Country {
   cca2: string;
@@ -43,7 +44,6 @@ export const getCountries = async (): Promise<Country[]> => {
 
     const data = await response.json();
 
-    // Check if data is an array
     if (!Array.isArray(data)) {
       console.error("Invalid data format received:", data);
       return [];
@@ -74,7 +74,7 @@ export const CreateTrip = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -87,7 +87,6 @@ export const CreateTrip = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
     if (
@@ -99,21 +98,19 @@ export const CreateTrip = () => {
       !formData.budget
     ) {
       setError("Please fill all required fields.");
-      setLoading(false);
       toast.error("Please fill all required fields.");
       return;
     }
 
     if (formData.duration < 1 || formData.duration > 10) {
       setError("Duration must be between 1 and 10 days");
-      setLoading(false);
       toast.error("Duration must be between 1 and 10 days");
       return;
     }
 
     try {
-      console.log("Form submitted:", formData);
       setLoading(true);
+      console.log("Form submitted:", formData);
       const tripData = await generateTrip(
         formData.country,
         formData.travelStyle,
@@ -123,22 +120,28 @@ export const CreateTrip = () => {
         formData.groupType
       );
 
-      if(!tripData){
+      if (!tripData) {
         setError("No trip data received from server");
+        toast.error("No trip data received from server");
+        return;
       }
 
       console.log("Generated Trip Data:", tripData);
-      setLoading(false);
 
-      //navigate to edit page with tripData
-      if(tripData.data && tripData.data.tripId){
+      // navigate to edit page with tripData
+      if (tripData.data && tripData.data.tripId) {
+        toast.success("Trip generated successfully!");
         navigate(`/admin/trip/${tripData.data.tripId}`);
-      }else{
+      } else {
         setError("Invalid trip data received from server");
+        toast.error("Invalid trip data received from server");
       }
-
-    } catch (error) {
-      console.error("Error generating trip:", error);
+    } catch (err: any) {
+      console.error("Error generating trip:", err);
+      const errMsg = err?.response?.data?.message || "Failed to generate trip. Please try again.";
+      setError(errMsg);
+      toast.error(errMsg);
+    } finally {
       setLoading(false);
     }
   };
@@ -303,6 +306,15 @@ export const CreateTrip = () => {
           </footer>
         </form>
       </section>
+
+      {/* Progressive AI Generation Loader */}
+      {loading && (
+        <AIGenerationLoader
+          country={formData.country}
+          duration={formData.duration}
+          travelStyle={formData.travelStyle}
+        />
+      )}
     </main>
   );
 };

@@ -16,13 +16,11 @@ const Notifications = lazy(() => import("../pages/Notifications"));
 const AdminLayout = lazy(() => import("../pages/AdminLayout"));
 const Index = lazy(() => import("../pages/LandingPage"));
 const LoginPage = lazy(() => import("../pages/LoginPage"));
+const AdminLoginPage = lazy(() => import("../pages/admin/AdminLoginPage"));
 const RegisterPage = lazy(() => import("../pages/RegisterPage"));
 const Dashboard = lazy(() => import("../pages/admin/Dashboard"));
 const Trips = lazy(() => import("../pages/admin/TripsPage"));
 const AllUsers = lazy(() => import("../pages/admin/AllUsers"));
-
-
-
 
 type RequiredAuthTypes = {
   children: React.ReactNode;
@@ -42,20 +40,25 @@ const RequireAuth = ({ children, roles }: RequiredAuthTypes) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    const isTryingAdmin = roles && roles.some((r) => r === "ADMIN" || r === "SUPERADMIN");
+    return <Navigate to={isTryingAdmin ? "/admin/login" : "/login"} state={{ from: location }} replace />;
   }
 
   if (roles && !roles.some((role) => user.roles?.includes(role))) {
     return (
-      <div className="text-center py-20">
-        <h2 className="text-xl font-bold mb-2">Access Denied</h2>
-        <p>You do not have permission to view this page.</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <h2 className="text-2xl font-bold mb-2 text-red-600">Access Denied</h2>
+        <p className="text-gray-600 mb-4">You do not have administrative clearance to access this area.</p>
+        <a href="/admin/login" className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
+          Switch to Staff Login
+        </a>
       </div>
     );
   }
 
   return <>{children}</>;
 };
+
 const Router = () => {
   return (
     <BrowserRouter>
@@ -98,11 +101,12 @@ const Router = () => {
           {/* Auth Pages - Full Page (No Layout) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
 
-          {/* Protected Routes */}
+          {/* Protected Admin Routes (LOG-10: guarded with ADMIN and SUPERADMIN) */}
           <Route
             element={
-              <RequireAuth>
+              <RequireAuth roles={["ADMIN", "SUPERADMIN"]}>
                 <AdminLayout />
               </RequireAuth>
             }
@@ -113,19 +117,28 @@ const Router = () => {
             <Route path="/admin/user/create" element={<CreateUser />} />
             <Route path="/admin/chats" element={<ChatRoom />} />
             <Route path="/admin/notifications" element={<Notifications />} />
-          </Route>
-          <Route
-            element={
-              <RequireAuth roles={["ADMIN"]}>
-                <AdminLayout />
-              </RequireAuth>
-            }
-          >
             <Route path="/admin/trip/create" element={<CreateTrip />} />
-            {/* Dynamic Routes */}
             <Route path="/admin/trip/:tripId" element={<TripDetails />} />
             <Route path="/admin/trip/edit/:tripId" element={<UpdateTrip />} />
           </Route>
+
+          {/* 404 Wildcard Route */}
+          <Route
+            path="*"
+            element={
+              <div className="flex flex-col items-center justify-center min-h-screen text-center px-4 bg-gray-50">
+                <h1 className="text-6xl font-bold text-blue-500 mb-4">404</h1>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">Page Not Found</h2>
+                <p className="text-gray-600 mb-6 max-w-md">The page you are looking for does not exist or may have been moved.</p>
+                <a
+                  href="/"
+                  className="px-6 py-2.5 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors shadow-md"
+                >
+                  Return to Home
+                </a>
+              </div>
+            }
+          />
         </Routes>
       </Suspense>
     </BrowserRouter>
