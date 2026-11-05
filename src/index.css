@@ -1,2 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-poppins: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+html,
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9fbfc;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure all text elements, headings, inputs, and buttons globally use Poppins */
+*,
+*::before,
+*::after,
+input,
+button,
+select,
+textarea,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+a,
+label,
+figcaption,
+article {
+  font-family: 'Poppins', sans-serif;
+}
+
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-dot-pulse {
+  animation: dot-pulse 1s ease-in-out infinite;
+}

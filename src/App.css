@@ -1,9 +1,18 @@
-
 html,
 body {
-  font-family: "Figtree", sans-serif;
+  font-family: 'Poppins', sans-serif;
   background-color: #f9fbfc;
   scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after,
+input,
+button,
+select,
+textarea {
+  font-family: 'Poppins', sans-serif;
 }
 
 .glassmorphism {
