@@ -27,12 +27,20 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   useEffect(() => {
-    // Check if 7-day or 1-day session has already expired
+    const hasToken =
+      Boolean(localStorage.getItem("accessToken")) ||
+      Boolean(localStorage.getItem("refreshToken"));
+
+    // Check if 7-day or 1-day session has expired
     if (isSessionExpired()) {
-      console.warn("Session expired after 7 days - automatically logging out.");
       logout();
       setLoading(false);
-      toast.error("Your session has expired. Please log in again.", { id: "session-expired-init" });
+      // Only show toast if the user was actually logged in previously
+      if (hasToken) {
+        toast.error("Your session has expired. Please log in again.", {
+          id: "session-expired-init",
+        });
+      }
       return;
     }
 
@@ -55,12 +63,16 @@ export const AuthProvider = ({ children }: any) => {
       setLoading(false);
     }
 
-    // Periodic check every 60 seconds to automatically logout when 7 days expire in background
+    // Periodic check every 60 seconds to automatically logout if 7 days expire while tab is open
     const interval = setInterval(() => {
-      if (isSessionExpired()) {
+      const activeToken =
+        Boolean(localStorage.getItem("accessToken")) ||
+        Boolean(localStorage.getItem("refreshToken"));
+
+      if (activeToken && isSessionExpired()) {
         console.warn("Session expired after 7 days during active session.");
         logout();
-        toast.error("Your session has expired after 7 days. Please sign in again.", {
+        toast.error("Your session has expired. Please sign in again.", {
           id: "session-expired-interval",
         });
       }
